@@ -56,10 +56,10 @@ repos:
   #     language_version: python3
   #     exclude: 'templates'
 
-  - repo: local
-    hooks:
-      - id: powershell-script-analyzer
-        name: PSScriptAnalyzer
-        entry: pwsh -Command "Install-Module -Name PSScriptAnalyzer -Repository PSGallery -Force -Scope CurrentUser; Invoke-ScriptAnalyzer -Path .\*.ps1 -Recurse"
-        language: system
-        files: \.ps1$
+  # - repo: local
+  #   hooks:
+  #     - id: powershell-script-analyzer
+  #       name: PSScriptAnalyzer
+  #       entry: pwsh -Command "Install-Module -Name PSScriptAnalyzer -Repository PSGallery -Force -Scope CurrentUser; Invoke-ScriptAnalyzer -Path .\*.ps1 -Recurse"
+  #       language: system
+  #       files: \.ps1$

@@ -1,24 +1,24 @@
 function DisplayEnvironmentVariables {
-    Write-Host ""
-    Write-Host "System Environment Variables"  -ForegroundColor Green
-    Write-Host "RTE_ENVIRONMENT:       $env:RTE_ENVIRONMENT"
-    Write-Host "PROJECTS_BASE_DIR:     $env:PROJECTS_BASE_DIR"
-    Write-Host "PROJECT_DIR:           $env:PROJECT_DIR"
-    Write-Host "SCRIPTS_DIR:           $env:SCRIPTS_DIR"
-    Write-Host "SECRETS_DIR:           $env:SECRETS_DIR"
-    Write-Host "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
-    Write-Host "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
-    Write-Host ""
-    Write-Host "Project Environment Variables"  -ForegroundColor Green
-    Write-Host "INSTALLER_PWD:        $env:INSTALLER_PWD"
-    Write-Host "INSTALLER_USERID:     $env:INSTALLER_USERID"
-    Write-Host "MYSQL_DATABASE:       $env:MYSQL_DATABASE"
-    Write-Host "MYSQL_HOST:           $env:MYSQL_HOST"
-    Write-Host "MYSQL_ROOT_PASSWORD:  $env:MYSQL_ROOT_PASSWORD"
-    Write-Host "MYSQL_TCP_PORT:       $env:MYSQL_TCP_PORT"
-    Write-Host "PROJECT_NAME:         $env:PROJECT_NAME"
-    Write-Host ""
-    Write-Host "Git Information"  -ForegroundColor Green
+    Write-Information ""
+    Write-Information "System Environment Variables"  -ForegroundColor Green
+    Write-Information "RTE_ENVIRONMENT:       $env:RTE_ENVIRONMENT"
+    Write-Information "PROJECTS_BASE_DIR:     $env:PROJECTS_BASE_DIR"
+    Write-Information "PROJECT_DIR:           $env:PROJECT_DIR"
+    Write-Information "SCRIPTS_DIR:           $env:SCRIPTS_DIR"
+    Write-Information "SECRETS_DIR:           $env:SECRETS_DIR"
+    Write-Information "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
+    Write-Information "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
+    Write-Information ""
+    Write-Information "Project Environment Variables"  -ForegroundColor Green
+    Write-Information "INSTALLER_PWD:        $env:INSTALLER_PWD"
+    Write-Information "INSTALLER_USERID:     $env:INSTALLER_USERID"
+    Write-Information "MYSQL_DATABASE:       $env:MYSQL_DATABASE"
+    Write-Information "MYSQL_HOST:           $env:MYSQL_HOST"
+    Write-Information "MYSQL_ROOT_PASSWORD:  $env:MYSQL_ROOT_PASSWORD"
+    Write-Information "MYSQL_TCP_PORT:       $env:MYSQL_TCP_PORT"
+    Write-Information "PROJECT_NAME:         $env:PROJECT_NAME"
+    Write-Information ""
+    Write-Information "Git Information"  -ForegroundColor Green
     git branch --all
 }
 function InitVirtualEnvironment {
@@ -31,7 +31,7 @@ function InitVirtualEnvironment {
         return
     }
 
-    Write-Host "Initialize the  $_project_name virtual environment"
+    Write-Information "Initialize the  $_project_name virtual environment"
 
     # Check for required environment variables and display help if they're missing
     if (-not $env:RTE_ENVIRONMENT -or -not $env:SCRIPTS_DIR -or -not $env:SECRETS_DIR -or -not $env:PROJECTS_BASE_DIR -or -not $env:VENV_BASE_DIR) {
@@ -75,7 +75,7 @@ function InitVirtualEnvironment {
 }
 
 function ShowEnvVarHelp {
-    Write-Host "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
+    Write-Information "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
 
     $_env_vars = @(
         @("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT),
@@ -87,27 +87,27 @@ function ShowEnvVarHelp {
 
     foreach ($var in $_env_vars) {
         if ([string]::IsNullOrEmpty($var[1])) {
-            Write-Host $var[0] -ForegroundColor Red -NoNewline
-            Write-Host " - Not Set"
+            Write-Information $var[0] -ForegroundColor Red -NoNewline
+            Write-Information " - Not Set"
         } else {
-            Write-Host $var[0] -ForegroundColor Green -NoNewline
+            Write-Information $var[0] -ForegroundColor Green -NoNewline
             $s = " - Set to: " +  $var[1]
-            Write-Host $s
+            Write-Information $s
         }
     }
 }
 
 function ShowHelp {
     $separator = "-" * 80
-    Write-Host $separator -ForegroundColor Cyan
+    Write-Information $separator -ForegroundColor Cyan
 
     # Introduction
 @"
 This script, 'vi.ps1', initializes a Python virtual environment. This include running the
 venv_${_project_name}_setup_custom .ps1 and venv_${_project_name}_setup_mandatory.ps1 scripts.
-"@ | Write-Host
+"@ | Write-Information
 
-    Write-Host $separator -ForegroundColor Cyan
+    Write-Information $separator -ForegroundColor Cyan
 
     # Environment Variables
 @"
@@ -120,8 +120,8 @@ venv_${_project_name}_setup_custom .ps1 and venv_${_project_name}_setup_mandator
     3. SECRETS_DIR:       Directory for storing secrets (e.g., g:\Google Drive\Secrets).
     4. SCRIPTS_DIR:       Directory where this script resides.
     5. VENV_BASE_DIR:     Directory for virtual environments (e.g., c:\venv).
-"@ | Write-Host
-Write-Host $separator -ForegroundColor Cyan
+"@ | Write-Information
+Write-Information $separator -ForegroundColor Cyan
 @"
     Usage:
     ------
@@ -130,12 +130,12 @@ Write-Host $separator -ForegroundColor Cyan
 
     Parameters:
     1. ProjectName:  The name of the project.
-"@ | Write-Host
+"@ | Write-Information
 
 }
 
 function ShowEnvVarHelp {
-    Write-Host "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
+    Write-Information "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
 
     $_env_vars = @(
         @("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT),
@@ -147,23 +147,23 @@ function ShowEnvVarHelp {
 
     foreach ($var in $_env_vars) {
         if ([string]::IsNullOrEmpty($var[1])) {
-            Write-Host $var[0] -ForegroundColor Red -NoNewline
-            Write-Host " - Not Set"
+            Write-Information $var[0] -ForegroundColor Red -NoNewline
+            Write-Information " - Not Set"
         } else {
-            Write-Host $var[0] -ForegroundColor Green -NoNewline
+            Write-Information $var[0] -ForegroundColor Green -NoNewline
             $s = " - Set to: " +  $var[1]
-            Write-Host $s
+            Write-Information $s
         }
     }
 }
 
 # Script execution starts here
-Write-Host ''
-Write-Host ''
+Write-Information ''
+Write-Information ''
 $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-Write-Host "=[ START $dateTime ]==================================================" -ForegroundColor Blue
+Write-Information "=[ START $dateTime ]==================================================" -ForegroundColor Blue
 InitVirtualEnvironment -_project_name $args[0]
 DisplayEnvironmentVariables
-Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
-Write-Host ''
-Write-Host ''
+Write-Information '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
+Write-Information ''
+Write-Information ''
