@@ -5,19 +5,19 @@ on:
   push:
 
 jobs:
-  #  Pre-Commit:
-  #    uses: ./.github/workflows/01-pre-commit.yml
-  #
-  #  Check-Documentation:
-  #    needs: Pre-Commit
-  #    uses: ./.github/workflows/02-check-documentation.yml
-  #
-  #  CI:
-  #    needs: Check-Documentation
-  #    uses: ./.github/workflows/03-ci.yml
-  #    secrets: inherit
+  Pre-Commit-and-Document-Check:
+    uses: ./.github/workflows/01-pre-commit-and-document-check.yml
+
+  # Pre-Commit-and-Document-Check:
+  #   needs: Pre-Commit
+  #   uses: ./.github/workflows/02-check-documentation.yml
+
+  # CI:
+  #   needs: Check-Documentation
+  #   uses: ./.github/workflows/03-ci.yml
+  #   secrets: inherit
 
   Build-and-Deploy-to-Production:
-    #    needs: CI
+    needs: Pre-Commit-and-Document-Check
     if: startsWith(github.ref, 'refs/tags/')
     uses: ./.github/workflows/04-build-and-deploy-to-production.yml

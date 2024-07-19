@@ -4,56 +4,44 @@ requires = [
     "pytest-runner",
     "setuptools >= 68",
     "toml",
-    #    "wheel",
     "setuptools-git >= 1.1",
-    #    "reahl-component-metadata>=7.0,<7.1",
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = 'rtecommon'
-version = '0.1.28'
+name = 'venvit'
+version = '5.3.1'
 authors = [
     { name = 'Hendrik du Toit', email = 'hendrik@brightedge.co.za' },
     { name = 'Henru du Toit', email = 'henru@brightedge.co.za' },
     { name = 'Dirk du Toit', email = 'dirk@brightedge.co.za' },
 ]
-description = 'Common tools/utilities/configurations used in the RealTime Events echo system.'
+description = 'Tools for creating Python virtual environments.'
 license = { file = 'LICENSE' }
 classifiers = [
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 4 - Beta',
     'Intended Audience :: Developers',
-    'Intended Audience :: System Administrators',
-    'Topic :: Internet :: WWW/HTTP',
-    'Topic :: Office/Business',
-    'Programming Language :: Python :: 3.12'
+    'Topic :: Software Development',
+    'Topic :: Software Development :: Version Control',
+    'Topic :: Software Development :: Version Control :: Git',
+    'Topic :: Utilities',
+    'Programming Language :: Python :: 3.12',
+    'License :: OSI Approved :: MIT License',
 ]
 readme = { file = 'README.md', content-type = 'text/md' }
 requires-python = '<3.13'
-dependencies = [
-    'mysql-connector-python',
-    'pydantic',
-    'pydantic_settings',
-    'sqlalchemy < 2.0.0',
-]
+dependencies = ['pre-commit', 'mdformat', 'rstcheck']
 
 [project.optional-dependencies]
-dev = [
-    'build',
-    'isort',
-    'mdformat',
-    'Pygments',
-    'pytest',
-    'pytest-cov',
-]
+dev = []
 
 [project.urls]
-Changelog = 'https://github.com/RealTimeEvents/rtecommon/blob/enhancement/master/ReleaseNotes.md'
-Homepage = 'https://github.com/RealTimeEvents/rtecommon'
+Changelog = 'https://github.com/BrightEdgeeServices/venvit/blob/enhancement/master/ReleaseNotes.md'
+Homepage = 'https://github.com/BrightEdgeeServices/venvit'
 
-[tool.black]
-line-length = 120
-target-version = ["py312"]
+# [tool.black]
+# line-length = 120
+# target-version = ["py312"]
 
 [tool.codespell]
 count = ''
@@ -61,32 +49,32 @@ quiet-level = 2
 skip = 'documentation/Archive/*'
 ignore-words-list = 'space-holder'
 
-[tool.coverage.run]
-source = ['src', 'tests']
+# [tool.coverage.run]
+# source = ['src', 'tests']
 
-[tool.isort]
-profile = "black"
+# [tool.isort]
+# profile = "black"
 
-[tool.pytest.ini_options]
-addopts = ['-vv', '--ignore-glob=*\\Archive']
-#addopts = ['--import-mode=importlib', "-v", "--cov=./", "--ignore-glob=*\\Archive", "--cov-report=html"]
-markers = [
-    "config: Run config tests",
-    "dbdef: Run dbdef tests ",
-    "select: Run a selection of tests",
-]
-filterwarnings = [
-    "ignore::DeprecationWarning",
-]
-#python_functions = 'demo_setup'
-testpaths = 'tests'
+# [tool.pytest.ini_options]
+# addopts = ['-vv', '--ignore-glob=*\\Archive']
+# #addopts = ['--import-mode=importlib', "-v", "--cov=./", "--ignore-glob=*\\Archive", "--cov-report=html"]
+# markers = [
+#     "config: Run config tests",
+#     "dbdef: Run dbdef tests ",
+#     "select: Run a selection of tests",
+# ]
+# filterwarnings = [
+#     "ignore::DeprecationWarning",
+# ]
+# #python_functions = 'demo_setup'
+# testpaths = 'tests'
 
 
-[tool.setuptools.packages.find]
-where = ["src"]
+# [tool.setuptools.packages.find]
+# where = ["src"]
 #include = ["rtecommon"]
 #exclude = ["additional*"]
-namespaces = false
+# namespaces = false
 
 [tool.setuptools.dynamic]
 readme = { file = ["README.md", "UPGRADE.md"] }

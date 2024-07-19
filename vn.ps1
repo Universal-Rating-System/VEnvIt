@@ -38,7 +38,7 @@ function CreateVirtualEnvironment {
         return
     }
 
-    Write-Host "Create new $_project_name virtual environment"
+    Write-Information "Create new $_project_name virtual environment"
 
     # Check for required environment variables and display help if they're missing
     if (-not $env:RTE_ENVIRONMENT -or -not $env:SCRIPTS_DIR -or -not $env:SECRETS_DIR -or -not $env:PROJECTS_BASE_DIR -or -not $env:VENV_BASE_DIR -or -not $env:VENV_PYTHON_BASE_DIR) {
@@ -81,23 +81,23 @@ function CreateVirtualEnvironment {
     $_project_dir = Join-Path $_institution_dir $_project_name
 
     # Output configuration details
-    Write-Host "Project name:      $_project_name"
-    Write-Host "Python version:    $_python_version"
-    Write-Host "Institution Accr:  $_institution"
-    Write-Host "Dev Mode:          $_dev_mode"
-    Write-Host "Reset project:     $_reset"
-    Write-Host "SCRIPTS_DIR:       $_scripts_dir"
-    Write-Host "PROJECTS_BASE_DIR: $_project_base_dir"
-    Write-Host "INSTITUTION_DIR:   $_institution_dir"
-    Write-Host "PROJECT_DIR:       $_project_dir"
-    Write-Host "VENV_BASE_DIR:     $_venv_base_dir"
-    Write-Host "VENV_PYTHON_BASE:  $_python_base_dir"
+    Write-Information "Project name:      $_project_name"
+    Write-Information "Python version:    $_python_version"
+    Write-Information "Institution Accr:  $_institution"
+    Write-Information "Dev Mode:          $_dev_mode"
+    Write-Information "Reset project:     $_reset"
+    Write-Information "SCRIPTS_DIR:       $_scripts_dir"
+    Write-Information "PROJECTS_BASE_DIR: $_project_base_dir"
+    Write-Information "INSTITUTION_DIR:   $_institution_dir"
+    Write-Information "PROJECT_DIR:       $_project_dir"
+    Write-Information "VENV_BASE_DIR:     $_venv_base_dir"
+    Write-Information "VENV_PYTHON_BASE:  $_python_base_dir"
 
     $_continue = ReadYesOrNo -_prompt_text "Continue"
 
     if ($_continue -eq "Y") {
         Set-Location -Path $_institution_dir.Substring(0,2)
-        Write-Host $_python_base_dir\Python$_python_version\python -m venv --clear $_venv_base_dir\$_project_name"_env"
+        Write-Information "$_python_base_dir\Python$_python_version\python -m venv --clear $_venv_base_dir\$_project_name_env"
 
 
         if ($env:VIRTUAL_ENV) {
@@ -125,7 +125,7 @@ function CreateVirtualEnvironment {
         $_project_install_path = Join-Path -Path $_project_dir -ChildPath "install.ps1"
         if (-not (Test-Path -Path $_project_install_path)) {
             New-Item -ItemType File -Path $_project_install_path -Force
-            $s = 'Write-Host "Running ' + $_project_install_path + '..."' + " -ForegroundColor Yellow"
+            $s = 'Write-Information "Running ' + $_project_install_path + '..."' + " -ForegroundColor Yellow"
             Add-Content -Path $_project_install_path -Value $s
             Add-Content -Path $_project_install_path -Value "pip install --upgrade --force --no-cache-dir black"
             Add-Content -Path $_project_install_path -Value "pip install --upgrade --force --no-cache-dir flake8"
@@ -156,7 +156,7 @@ function CreateVirtualEnvironment {
         $_script_install_path = Join-Path -Path $_scripts_dir -ChildPath $_support_scripts[0]
         if (-not (Test-Path -Path $_script_install_path)) {
             # Create the script and write the lines
-            $s = 'Write-Host "Running ' + $_support_scripts[0] + '..."' + " -ForegroundColor Yellow"
+            $s = 'Write-Information "Running ' + $_support_scripts[0] + '..."' + " -ForegroundColor Yellow"
             Set-Content -Path $_script_install_path -Value $s
             Add-Content -Path $_script_install_path -Value "git init"
             $s = '& "' + "$_project_dir\install.ps1" + '"'
@@ -167,7 +167,7 @@ function CreateVirtualEnvironment {
         $_script_mandatory_path = Join-Path -Path $_scripts_dir -ChildPath $_support_scripts[1]
         if (-not (Test-Path $_script_mandatory_path)) {
             # Create the script and write the lines
-            $s = 'Write-Host "Running ' + $_support_scripts[1] + '..."' + " -ForegroundColor Yellow"
+            $s = 'Write-Information "Running ' + $_support_scripts[1] + '..."' + " -ForegroundColor Yellow"
             Set-Content -Path $_script_mandatory_path -Value $s
             Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_PY_VER = '$_python_version'"
             Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_INSTITUTION = '$_institution'"
@@ -180,7 +180,7 @@ function CreateVirtualEnvironment {
         $_custom_file_name = "venv_${_project_name}_setup_custom.ps1"
         $_script_custom_path = Join-Path $_scripts_dir -ChildPath ${_custom_file_name}
         if (-not (Test-Path $_script_custom_path)) {
-            $s = 'Write-Host "Running ' + $_custom_file_name + '..."' + " -ForegroundColor Yellow"
+            $s = 'Write-Information "Running ' + $_custom_file_name + '..."' + " -ForegroundColor Yellow"
             Set-Content -Path $_script_custom_path -Value $s
             Add-Content -Path $_script_custom_path -Value ''
             Add-Content -Path $_script_custom_path -Value '# Override global environment variables by setting the here.  Uncomment them and set the correct value or add a variable by replacing "??"'
@@ -200,25 +200,25 @@ function CreateVirtualEnvironment {
 }
 
 function DisplayEnvironmentVariables {
-    Write-Host ""
-    Write-Host "System Environment Variables"  -ForegroundColor Green
-    Write-Host "RTE_ENVIRONMENT:       $env:RTE_ENVIRONMENT"
-    Write-Host "PROJECTS_BASE_DIR:     $env:PROJECTS_BASE_DIR"
-    Write-Host "PROJECT_DIR:           $env:PROJECT_DIR"
-    Write-Host "SCRIPTS_DIR:           $env:SCRIPTS_DIR"
-    Write-Host "SECRETS_DIR:           $env:SECRETS_DIR"
-    Write-Host "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
-    Write-Host "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
-    Write-Host ""
-    Write-Host "Project Environment Variables"  -ForegroundColor Green
-    Write-Host "INSTALLER_PWD:        $env:INSTALLER_PWD"
-    Write-Host "INSTALLER_USERID:     $env:INSTALLER_USERID"
-    Write-Host "MYSQL_DATABASE:       $env:MYSQL_DATABASE"
-    Write-Host "MYSQL_HOST:           $env:MYSQL_HOST"
-    Write-Host "MYSQL_ROOT_PASSWORD:  $env:MYSQL_ROOT_PASSWORD"
-    Write-Host "MYSQL_TCP_PORT:       $env:MYSQL_TCP_PORT"
-    Write-Host ""
-    Write-Host "Git Information"  -ForegroundColor Green
+    Write-Information ""
+    Write-Information "System Environment Variables"  -ForegroundColor Green
+    Write-Information "RTE_ENVIRONMENT:       $env:RTE_ENVIRONMENT"
+    Write-Information "PROJECTS_BASE_DIR:     $env:PROJECTS_BASE_DIR"
+    Write-Information "PROJECT_DIR:           $env:PROJECT_DIR"
+    Write-Information "SCRIPTS_DIR:           $env:SCRIPTS_DIR"
+    Write-Information "SECRETS_DIR:           $env:SECRETS_DIR"
+    Write-Information "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
+    Write-Information "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
+    Write-Information ""
+    Write-Information "Project Environment Variables"  -ForegroundColor Green
+    Write-Information "INSTALLER_PWD:        $env:INSTALLER_PWD"
+    Write-Information "INSTALLER_USERID:     $env:INSTALLER_USERID"
+    Write-Information "MYSQL_DATABASE:       $env:MYSQL_DATABASE"
+    Write-Information "MYSQL_HOST:           $env:MYSQL_HOST"
+    Write-Information "MYSQL_ROOT_PASSWORD:  $env:MYSQL_ROOT_PASSWORD"
+    Write-Information "MYSQL_TCP_PORT:       $env:MYSQL_TCP_PORT"
+    Write-Information ""
+    Write-Information "Git Information"  -ForegroundColor Green
     git branch --all
 }
 
@@ -237,16 +237,16 @@ function MoveFileToArchiveIfExists {
 
         # Move the file to the archive directory
         Move-Item -Path $_script_path -Destination $_archive_dir -Force
-        Write-Host "Moved $($_script_path) to $($_archive_dir)."
+        Write-Information "Moved $($_script_path) to $($_archive_dir)."
     } else {
-        Write-Host "File $($_script_path) does not exist."
+        Write-Information "File $($_script_path) does not exist."
     }
 }
 
 
 function ShowHelp {
     $separator = "-" * 80
-    Write-Host $separator -ForegroundColor Cyan
+    Write-Information $separator -ForegroundColor Cyan
 
     # Introduction
 @"
@@ -255,9 +255,9 @@ of environment variables and command line parameters to set up the environment.
 If a 'pyproject.toml' file already exists in the project directory, Python modules
 will be installed accordingly. If the '_dev_mode' command line parameter is set
 to "Y", the modules in the [dev] section of the pyproject.toml will also be installed.
-"@ | Write-Host
+"@ | Write-Information
 
-    Write-Host $separator -ForegroundColor Cyan
+    Write-Information $separator -ForegroundColor Cyan
 
     # Project Linked PowerShell Scripts
 @"
@@ -285,9 +285,9 @@ to "Y", the modules in the [dev] section of the pyproject.toml will also be inst
     2. The three Support PowerShell Scripts are not pushed to the repository.  These files
        are specific to the macine it is installed on.  If the loca repository is in cloud
        storage, it will be synced to the othr installations of the user.
-"@ | Write-Host
+"@ | Write-Information
 
-    Write-Host $separator -ForegroundColor Cyan
+    Write-Information $separator -ForegroundColor Cyan
 
     # Environment Variables
 @"
@@ -301,9 +301,9 @@ to "Y", the modules in the [dev] section of the pyproject.toml will also be inst
     4. SCRIPTS_DIR: Directory where this script resides.
     5. VENV_BASE_DIR: Directory for virtual environments (e.g., c:\venv).
     6. VENV_PYTHON_BASE_DIR: Directory for Python installations (e.g., c:\Python).
-"@ | Write-Host
+"@ | Write-Information
 
-    Write-Host $separator -ForegroundColor Cyan
+    Write-Information $separator -ForegroundColor Cyan
 
     # Usage
 @"
@@ -318,13 +318,13 @@ to "Y", the modules in the [dev] section of the pyproject.toml will also be inst
     3. Institution:  Acronym for the institution owning the project.
     4. DevMode:      If "Y", installs [dev] modules from pyproject.toml.
     5. ResetScripts: If "Y", moves certain scripts to the Archive directory.
-"@ | Write-Host
+"@ | Write-Information
 
-    Write-Host $separator -ForegroundColor Cyan
+    Write-Information $separator -ForegroundColor Cyan
 }
 
 function ShowEnvVarHelp {
-    Write-Host "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
+    Write-Information "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
 
     $_env_vars = @(
         @("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT),
@@ -337,12 +337,12 @@ function ShowEnvVarHelp {
 
     foreach ($var in $_env_vars) {
         if ([string]::IsNullOrEmpty($var[1])) {
-            Write-Host $var[0] -ForegroundColor Red -NoNewline
-            Write-Host " - Not Set"
+            Write-Information $var[0] -ForegroundColor Red -NoNewline
+            Write-Information " - Not Set"
         } else {
-            Write-Host $var[0] -ForegroundColor Green -NoNewline
+            Write-Information $var[0] -ForegroundColor Green -NoNewline
             $s = " - Set to: " +  $var[1]
-            Write-Host $s
+            Write-Information $s
         }
     }
 }
@@ -363,10 +363,10 @@ function ReadYesOrNo {
 }
 
 # Script execution starts here
-Write-Host ''
-Write-Host ''
+Write-Information ''
+Write-Information ''
 $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-Write-Host "=[ START $dateTime ]==================================================" -ForegroundColor Blue
+Write-Information "=[ START $dateTime ]==================================================" -ForegroundColor Blue
 CreateVirtualEnvironment -_project_name $args[0] -_python_version $args[1] -_institution $args[2] -_dev_mode $args[3] -_reset $args[4]
 DisplayEnvironmentVariables
-Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
+Write-Information '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
