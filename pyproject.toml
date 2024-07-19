@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = 'venvit'
-version = '0.0.1'
+version = '5.3.1'
 authors = [
     { name = 'Hendrik du Toit', email = 'hendrik@brightedge.co.za' },
     { name = 'Henru du Toit', email = 'henru@brightedge.co.za' },
@@ -21,24 +21,19 @@ license = { file = 'LICENSE' }
 classifiers = [
     'Development Status :: 4 - Beta',
     'Intended Audience :: Developers',
-	'Topic :: Software Development',
-	'Topic :: Software Development :: Version Control',
-	'Topic :: Software Development :: Version Control :: Git',
+    'Topic :: Software Development',
+    'Topic :: Software Development :: Version Control',
+    'Topic :: Software Development :: Version Control :: Git',
     'Topic :: Utilities',
     'Programming Language :: Python :: 3.12',
-    'License :: OSI Approved :: MIT License'
+    'License :: OSI Approved :: MIT License',
 ]
 readme = { file = 'README.md', content-type = 'text/md' }
 requires-python = '<3.13'
-dependencies = [
-    'pre-commit',
-    'mdformat',
-    'rstcheck',
-]
+dependencies = ['pre-commit', 'mdformat', 'rstcheck']
 
 [project.optional-dependencies]
-dev = [
-]
+dev = []
 
 [project.urls]
 Changelog = 'https://github.com/BrightEdgeeServices/venvit/blob/enhancement/master/ReleaseNotes.md'
