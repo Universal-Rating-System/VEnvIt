@@ -248,63 +248,6 @@ function ShowHelp {
     $separator = "-" * 80
     Write-Information $separator -ForegroundColor Cyan
 
-    # Introduction
-@"
-This script, 'vn.ps1', creates a Python virtual environment. It uses a combination
-of environment variables and command line parameters to set up the environment.
-If a 'pyproject.toml' file already exists in the project directory, Python modules
-will be installed accordingly. If the '_dev_mode' command line parameter is set
-to "Y", the modules in the [dev] section of the pyproject.toml will also be installed.
-"@ | Write-Information
-
-    Write-Information $separator -ForegroundColor Cyan
-
-    # Project Linked PowerShell Scripts
-@"
-    Support PowerShell Scripts:
-    ----------------------------------
-    This script will create three additional PowerShell scripts. These scripts are
-    specific to the project and assist in the reinstallation and activation of the
-    virtual environment:
-
-    1. venv_'${project_name}'_install.ps1:
-        Contains specific installation instructions for this project. It is only called
-        during the installation (vn.ps1) of the virtual environment.
-
-    2. venv_'${project_name}'_setup_mandatory.ps1:
-        Contains mandatory instructions necessary for a successful initialization. It is
-        called during both installation (vn.ps1) and initialization (vi.ps1) of the
-        virtual environment.
-
-    3. venv_'${project_name}'_setup_custom.ps1:
-        An optional script for custom configuration instructions. It is called during
-        both installation (vn.ps1) and initialization (vi.ps1) of the virtual environment.
-
-    Notes:
-    1. '$project_name' is the first parameter for vn.ps1.
-    2. The three Support PowerShell Scripts are not pushed to the repository.  These files
-       are specific to the macine it is installed on.  If the loca repository is in cloud
-       storage, it will be synced to the othr installations of the user.
-"@ | Write-Information
-
-    Write-Information $separator -ForegroundColor Cyan
-
-    # Environment Variables
-@"
-    Environment Variables:
-    ----------------------
-    Prior to starting the PowerShell script, ensure these environment variables are set.
-
-    1. RTE_ENVIRONMENT: Sets the development environment. Possible values: loc_dev, github_dev, prod, etc.
-    2. PROJECTS_BASE_DIR: The directory for all projects (e.g., d:\Dropbox\Projects).
-    3. SECRETS_DIR: Directory for storing secrets (e.g., g:\Google Drive\Secrets).
-    4. SCRIPTS_DIR: Directory where this script resides.
-    5. VENV_BASE_DIR: Directory for virtual environments (e.g., c:\venv).
-    6. VENV_PYTHON_BASE_DIR: Directory for Python installations (e.g., c:\Python).
-"@ | Write-Information
-
-    Write-Information $separator -ForegroundColor Cyan
-
     # Usage
 @"
     Usage:
