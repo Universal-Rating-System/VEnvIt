@@ -2,9 +2,16 @@ param (
     [string]$release
 )
 
-# Check if the release parameter is provided
-if (-not $release) {
-    Write-Host "Usage: .\install.ps1 -release <release_tag>"
+function Test-Admin {
+    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $adminRole = [Security.Principal.WindowsBuiltInRole]::Administrator
+    $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
+    return $principal.IsInRole($adminRole)
+}
+
+if (-not (Test-Admin)) {
+    Write-Host "This script needs to be run as an administrator. Restarting with elevated privileges..."
+    Start-Process powershell.exe "-File `"$PSCommandPath`" -ArgumentList `"$release`"" -Verb RunAs
     exit
 }
 

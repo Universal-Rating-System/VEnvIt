@@ -46,11 +46,11 @@ Prior to starting the PowerShell script, ensure these environment variables are 
 
 | Variable Name | Description|
 |---|---|
-| RTE_ENVIRONMENT  | Sets the development environment. Possible values: loc_dev, github_dev, prod, etc. |
 | PROJECTS_BASE_DIR | The directory for all projects (e.g., d:\\Dropbox\\Projects). |
 | SECRETS_DIR | Directory for storing secrets (e.g., g:\\Google Drive\\Secrets). |
-| SCRIPTS_DIR | Directory where this script resides.
+| VENVIT_DIR | Directory where this script resides.
 | VENV_BASE_DIR | Directory for virtual environments (e.g., c:\\venv).
+| VENV_ENVIRONMENT  | Sets the development environment. Possible values: loc_dev, github_dev, prod, etc. |
 | VENV_PYTHON_BASE_DIR | Directory for Python installations (e.g., c:\\Python).
 
 ### Usage:
