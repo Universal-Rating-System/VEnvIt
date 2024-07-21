@@ -55,7 +55,7 @@ jobs:
           body_path: ${{ github.workspace }}/ReleaseNotes.md
           draft: false
           prerelease: false
-          files: installation_files.zip
+          files: installation_files.zip install.ps1
 
       # - name: Send release email notification
       #   uses: betterfor/action-send-mail@main
