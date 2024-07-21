@@ -45,7 +45,7 @@ jobs:
 
       - name: Create zip of PowerShell and config files
         run: |
-          zip -r production_files.zip *.ps1 *.cfg
+          zip -r installduction_files.zip *.ps1 *.cfg
 
       - name: Publish new release
         uses: softprops/action-gh-release@v2
@@ -55,7 +55,7 @@ jobs:
           body_path: ${{ github.workspace }}/ReleaseNotes.md
           draft: false
           prerelease: false
-          files: production_files.zip
+          files: installation_files.zip
 
       # - name: Send release email notification
       #   uses: betterfor/action-send-mail@main
