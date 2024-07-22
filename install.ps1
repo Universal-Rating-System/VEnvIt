@@ -25,21 +25,31 @@ $zipFilePath = "installation_files.zip"
 Write-Host "Downloading installation files from $url..."
 Invoke-WebRequest -Uri $url -OutFile $zipFilePath
 
-# Acquire user input for environment variables
-$VENV_ENVIRONMENT = Read-Host "Enter value for VENV_ENVIRONMENT"
-$PROJECTS_BASE_DIR = Read-Host "Enter value for PROJECTS_BASE_DIR"
-$VENVIT_DIR = Read-Host "Enter value for VENVIT_DIR"
-$SECRETS_DIR = Read-Host "Enter value for SECRETS_DIR"
-$VENV_BASE_DIR = Read-Host "Enter value for VENV_BASE_DIR"
-$VENV_PYTHON_BASE_DIR = Read-Host "Enter value for VENV_PYTHON_BASE_DIR"
+# Function to get or prompt for an environment variable
+function Get-Or-PromptEnvVar {
+    param (
+        [string]$varName,
+        [string]$promptText
+    )
+    $existingValue = [System.Environment]::GetEnvironmentVariable($varName, [System.EnvironmentVariableTarget]::Machine)
+    if ($existingValue) {
+        Write-Host "$varName is already set to $existingValue"
+        return $existingValue
+    } else {
+        $newValue = Read-Host $promptText
+        [System.Environment]::SetEnvironmentVariable($varName, $newValue, [System.EnvironmentVariableTarget]::Machine)
+        Write-Host "$varName set to $newValue"
+        return $newValue
+    }
+}
 
-# Set the System Properties environment variables permanently
-[System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $VENV_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $PROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $VENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $SECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $VENV_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $VENV_PYTHON_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
+# Acquire user input for environment variables if they are not already set
+$VENV_ENVIRONMENT = Get-Or-PromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "Enter value for VENV_ENVIRONMENT"
+$PROJECTS_BASE_DIR = Get-Or-PromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "Enter value for PROJECTS_BASE_DIR"
+$VENVIT_DIR = Get-Or-PromptEnvVar -varName "VENVIT_DIR" -promptText "Enter value for VENVIT_DIR"
+$SECRETS_DIR = Get-Or-PromptEnvVar -varName "SECRETS_DIR" -promptText "Enter value for SECRETS_DIR"
+$VENV_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_BASE_DIR" -promptText "Enter value for VENV_BASE_DIR"
+$VENV_PYTHON_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "Enter value for VENV_PYTHON_BASE_DIR"
 
 # Ensure the VENVIT_DIR and SECRETS_DIR directories exist
 if (-not (Test-Path -Path $VENVIT_DIR)) {
