@@ -1,37 +1,42 @@
 # RealTimeEvents Common
 
-Tools to create, initiate and remove Python virtual envirioments.
+A utility to create, initiate and remove Python virtual envirioments.
 
 ______________________________________________________________________
 
 ## Overview
 
-The repository has the following tools:
+The repository has the following tools and utilities:
 
 - vn.ps1 (Create a new virtual environment)
 - vi.ps1 (Initialize an existing virtual environment)
-- vr.ps1 (REmove a virtual environment)
+- vr.ps1 (Remove a virtual environment)
+- download.ps1 (Commands to initiate the installation)
+- install.ps1 (Install `venvit`)
 
 ## vn.ps1
 
 ### Introduction
 
-This script, `vn.ps1`, creates a Python virtual environment. It uses a combination of environment variables and command line parameters to set up the environment. If a `pyproject.toml` file already exists in the project directory, Python modules will be installed accordingly.
+This script, `vn.ps1`, creates a Python virtual environment. It uses a combination of environment variables and command line parameters to set up the environment. If a `pyproject.toml` file already exists in the project directory, Python modules will be installed accordingly, alternatively it will install a default set of development tools.
+
+- Pre-Commit
+- Black
+- flake8
 
 ### Project Linked PowerShell Configuration Scripts
 
-This script will create three additional PowerShell scripts. These scripts are specific to the project, support unique configuration options and assist in the reinstallation and activation of the virtual environment.  If the installation is a private installation, they can exist in the installation directory.  If the installation is for an Organization, the configuration scripts should be in a proivate directory e.g. the home directory of the user.
+It will also create three additional configuration PowerShell scripts. These scripts are specific to each project, support unique configuration options and assist in the reinstallation and activation of the virtual environment.  THey exist in a sub directory called `configs`.
 
-1. venv\_`${project_name}`\_install.ps1:
-   Contains specific installation instructions for this project. It is only called
-   during the installation (vn.ps1) of the virtual environment.
+1. \`venv\__project_name_\_install.ps1:
+   Specific installation instructions for this project. It is only called during the installation (vn.ps1) of the virtual environment.
 
-1. venv\_`${project_name}`\_setup_mandatory.ps1:
+1. venv\__project_name_\_setup_mandatory.ps1:
    Contains mandatory instructions necessary for a successful initialization. It is
    called during both installation (vn.ps1) and initialization (vi.ps1) of the
    virtual environment.
 
-1. venv\_`${project_name}`\_setup_custom.ps1:
+1. venv\__project_name_\_setup_custom.ps1:
    An optional script for custom configuration instructions. It is called during
    both installation (vn.ps1) and initialization (vi.ps1) of the virtual environment.
 
@@ -42,18 +47,26 @@ Notes:
 
 ### Environment Variables
 
-Prior to starting the PowerShell script, ensure these environment variables are set.
+The installation will set the following system environment variables.  Please see the description and instructions:
 
-| Variable Name | Description|
-|---|---|
-| PROJECTS_BASE_DIR | The directory for all projects (e.g., d:\\Dropbox\\Projects). |
-| SECRETS_DIR | Directory for storing secrets (e.g., g:\\Google Drive\\Secrets). |
-| VENVIT_DIR | Directory where this script resides.
-| VENV_BASE_DIR | Directory for virtual environments (e.g., c:\\venv).
-| VENV_ENVIRONMENT  | Sets the development environment. Possible values: loc_dev, github_dev, prod, etc. |
-| VENV_PYTHON_BASE_DIR | Directory for Python installations (e.g., c:\\Python).
+| System Environment Variable | Description                                                                                                                                                                                                                                                                                                                                                   |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PROJECTS_BASE_DIR           | The directory for all projects (e.g., d:\\Dropbox\\Projects). The idea is to separate the projects of various identities e.g. personal projects and projects of an organization.                                                                                                                                                                              |
+| SECRETS_DIR                 | Directory for storing secrets (e.g., g:\\Google Drive\\Secrets). The contents of this directory is private, should not be shared and are newver pushed to the repository.                                                                                                                                                                                     |
+| VENVIT_DIR                  | Installation directory where these script resides.  Potentially a shared drive in an organization.                                                                                                                                                                                                                                                            |
+| VENV_BASE_DIR               | The directory where the Python virtual environments are stored (e.g., C:\\venv) is different from the conventional practice of keeping virtual environment installation files within the project directory. Instead, all virtual environments are stored together in a separate directory. This directory should preferably not be a cloud storage directory. |
+| VENV_ENVIRONMENT            | Sets the development environment. Possible values include: loc_dev, github_dev, prod, etc. This value will be set differently in various environments to indicate the execution environment.                                                                                                                                                                  |
+| VENV_PYTHON_BASE_DIR        | Directory for Python installations (e.g., C:\\Python). Different versions of Python will be accessed during the creation of the virtual environments. For example, if VENV_PYTHON_BASE_DIR is set to C:\\Python, then Python 3.5 will be installed in C:\\Python\\Python35 and Python 3.12 in C:\\Python\\Python312.                                          |
 
-### Usage:
+### Preparation
+
+1. Create the shared drive VENVIT_DIR in an Organization installation.
+1. Remove any native Python installation and remove any reference of Python from the PATH.  This step is extremely important.
+1. Install the various versions of Python in e.g. c:\\Python\\Python39.  Do not:
+   - Add Python to the Path
+   -
+
+### Usage
 
 ```powershell
     vr.ps1 -h

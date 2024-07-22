@@ -2,7 +2,7 @@ ______________________________________________________________________
 
 name: BugFix Report
 about: An error or defect causing incorrect or unexpected behavior; typically fixed in regular development cycles.
-title: "\[BugFix\]: "
+title: '\[BugFix\]: '
 labels:
 
 - bugfix
@@ -10,7 +10,7 @@ labels:
 ______________________________________________________________________
 
 **Describe the problem**:
-\`
+
 **Command executed**:
 
 ```bash
