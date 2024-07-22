@@ -2,18 +2,18 @@ param (
     [string]$release
 )
 
-function Test-Admin {
-    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $adminRole = [Security.Principal.WindowsBuiltInRole]::Administrator
-    $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
-    return $principal.IsInRole($adminRole)
-}
+# function Test-Admin {
+#     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+#     $adminRole = [Security.Principal.WindowsBuiltInRole]::Administrator
+#     $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
+#     return $principal.IsInRole($adminRole)
+# }
 
-if (-not (Test-Admin)) {
-    Write-Host "This script needs to be run as an administrator. Restarting with elevated privileges..."
-    Start-Process powershell.exe "-File `"$PSCommandPath`" -ArgumentList `"$release`"" -Verb RunAs
-    exit
-}
+# if (-not (Test-Admin)) {
+#     Write-Host "This script needs to be run as an administrator. Restarting with elevated privileges..."
+#     Start-Process powershell.exe "-File `"$PSCommandPath`" -ArgumentList `"$release`"" -Verb RunAs
+#     exit
+# }
 
 # Define the URL for downloading the zip file
 $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$release/installation_files.zip"
@@ -42,9 +42,9 @@ $VENV_PYTHON_BASE_DIR = Read-Host "Enter value for VENV_PYTHON_BASE_DIR"
 # [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $VENV_PYTHON_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
 
 # Ensure the VENVIT_DIR and SECRETS_DIR directories exist
-# if (-not (Test-Path -Path $VENVIT_DIR)) {
-#     New-Item -ItemType Directory -Path $VENVIT_DIR | Out-Null
-# }
+if (-not (Test-Path -Path $VENVIT_DIR)) {
+    New-Item -ItemType Directory -Path $VENVIT_DIR | Out-Null
+}
 if (-not (Test-Path -Path $SECRETS_DIR)) {
     New-Item -ItemType Directory -Path $SECRETS_DIR | Out-Null
 }
