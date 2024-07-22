@@ -62,8 +62,8 @@ The installation will set the following system environment variables.  Please se
 
 1. Create the shared drive VENVIT_DIR in an Organization installation.
 1. Remove any native Python installation and remove any reference of Python from the PATH.  This step is extremely important.
-1. Install the various versions of Python in e.g. c:\\Python\\Python39.  Do not:
-   - Add Python to the Path
+1. Install the various versions of Python in e.g. c:\\Python\\Python39.
+   - **Do not** add Python to the Path
    -
 
 ### Usage
