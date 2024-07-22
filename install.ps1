@@ -47,6 +47,8 @@ if (-not (Test-Admin)) {
 Write-Host "Downloading installation files from $url..."
 Invoke-WebRequest -Uri $url -OutFile $zipFilePath
 
+Write-Information $separator -ForegroundColor Cyan
+
 # Acquire user input for environment variables if they are not already set
 Write-Host "Provide the values for the following environment variables:" -ForegroundColor Yellow
 $VENV_ENVIRONMENT = Get-Or-PromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "VENV_ENVIRONMENT: "
@@ -82,6 +84,8 @@ if (Test-Path -Path $sourceFilePath) {
 } else {
     Write-Host "env_var_dev.ps1 not found in $VENVIT_DIR."
 }
+
+Write-Information $separator -ForegroundColor Cyan
 
 # Remove the zip file after extraction
 Remove-Item -Path $zipFilePath -Force
