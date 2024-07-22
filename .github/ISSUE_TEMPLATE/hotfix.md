@@ -2,7 +2,7 @@ ______________________________________________________________________
 
 name: HotFix Report
 about: An urgent, critical fix applied directly to the live environment, often bypassing regular development cycles.
-title: "\[HotFix\]: "
+title: '\[HotFix\]: '
 labels:
 
 - hotfix
