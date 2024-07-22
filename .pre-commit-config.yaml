@@ -19,7 +19,7 @@ repos:
     rev: 0.7.17  # Use the ref you want to point at
     hooks:
       - id: mdformat
-        args: [--end-of-line, keep]
+        args: [--end-of-line, lf]
         additional_dependencies:
           - mdformat-black
           - mdformat-gfm
