@@ -34,17 +34,17 @@ $VENV_BASE_DIR = Read-Host "Enter value for VENV_BASE_DIR"
 $VENV_PYTHON_BASE_DIR = Read-Host "Enter value for VENV_PYTHON_BASE_DIR"
 
 # Set the System Properties environment variables permanently
-[System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $VENV_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $PROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $VENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $SECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $VENV_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $VENV_PYTHON_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $VENV_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $PROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $VENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $SECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $VENV_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $VENV_PYTHON_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
 
 # Ensure the VENVIT_DIR and SECRETS_DIR directories exist
-if (-not (Test-Path -Path $VENVIT_DIR)) {
-    New-Item -ItemType Directory -Path $VENVIT_DIR | Out-Null
-}
+# if (-not (Test-Path -Path $VENVIT_DIR)) {
+#     New-Item -ItemType Directory -Path $VENVIT_DIR | Out-Null
+# }
 if (-not (Test-Path -Path $SECRETS_DIR)) {
     New-Item -ItemType Directory -Path $SECRETS_DIR | Out-Null
 }
