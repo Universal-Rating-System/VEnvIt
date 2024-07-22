@@ -1,29 +1,7 @@
 param (
     [string]$release
 )
-
-function Test-Admin {
-    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $adminRole = [Security.Principal.WindowsBuiltInRole]::Administrator
-    $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
-    return $principal.IsInRole($adminRole)
-}
-
-# Check for administrative privileges
-if (-not (Test-Admin)) {
-    Write-Host "This script needs to be run as an administrator. Please run it in an elevated PowerShell session." -ForegroundColor Red
-    exit
-}
-
-# Define the URL for downloading the zip file
-$url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$release/installation_files.zip"
-
-# Define the path for the downloaded zip file
-$zipFilePath = "installation_files.zip"
-
-# Download the zip file
-Write-Host "Downloading installation files from $url..."
-Invoke-WebRequest -Uri $url -OutFile $zipFilePath
+$separator = "-" * 80
 
 # Function to get or prompt for an environment variable
 function Get-Or-PromptEnvVar {
@@ -43,7 +21,34 @@ function Get-Or-PromptEnvVar {
     }
 }
 
+function Test-Admin {
+    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $adminRole = [Security.Principal.WindowsBuiltInRole]::Administrator
+    $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
+    return $principal.IsInRole($adminRole)
+}
+
+# Script execution starts here
+Write-Information ''
+Write-Information ''
+$dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+Write-Host "=[ START $dateTime ]==================================================" -ForegroundColor Blue
+
+$url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$release/installation_files.zip"
+$zipFilePath = "installation_files.zip"
+
+# Check for administrative privileges
+if (-not (Test-Admin)) {
+    Write-Host "This script needs to be run as an administrator. Please run it in an elevated PowerShell session." -ForegroundColor Red
+    exit
+}
+
+# Download the zip file
+Write-Host "Downloading installation files from $url..."
+Invoke-WebRequest -Uri $url -OutFile $zipFilePath
+
 # Acquire user input for environment variables if they are not already set
+Write-Host "Provide the values for the following environment variables:" -ForegroundColor Yellow
 $VENV_ENVIRONMENT = Get-Or-PromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "Enter value for VENV_ENVIRONMENT"
 $PROJECTS_BASE_DIR = Get-Or-PromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "Enter value for PROJECTS_BASE_DIR"
 $VENVIT_DIR = Get-Or-PromptEnvVar -varName "VENVIT_DIR" -promptText "Enter value for VENVIT_DIR"
@@ -102,3 +107,7 @@ $scriptPath = $MyInvocation.MyCommand.Path
 Write-Host "Removing the install.ps1 script..."
 Remove-Item -Path $scriptPath -Force
 Write-Host "install.ps1 has been deleted."
+
+Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
+Write-Information ''
+Write-Information ''
