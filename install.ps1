@@ -29,8 +29,8 @@ function Test-Admin {
 }
 
 # Script execution starts here
-Write-Information ''
-Write-Information ''
+Write-Host ''
+Write-Host ''
 $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 Write-Host "=[ START $dateTime ]==================================================" -ForegroundColor Blue
 
@@ -109,5 +109,5 @@ Remove-Item -Path $scriptPath -Force
 Write-Host "install.ps1 has been deleted."  -ForegroundColor Green
 
 Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
-Write-Information ''
-Write-Information ''
+Write-Host ''
+Write-Host ''

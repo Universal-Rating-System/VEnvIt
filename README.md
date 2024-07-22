@@ -113,11 +113,13 @@ or
 ## Installation
 
 1. If you installing it for your organization i.e. a shared installation, create a shared drive i.e. on Google Drive, Dropbox or OneDrive and share the drive accordingly first.
+
 1. Paste the following script in a PowerShell.
 
-```powershell
-$tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" | ConvertFrom-Json)[0].tag_name
-Invoke-WebRequest -Uri "https://github.com/BrightEdgeeServices/venvit/releases/download/$tag/install.ps1" -OutFile "install.ps1"
-.\install.ps1 -release $tag
+   ```powershell
+   $tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" | ConvertFrom-Json)[0].tag_name
+   Invoke-WebRequest -Uri "https://github.com/BrightEdgeeServices/venvit/releases/download/$tag/install.ps1" -OutFile "install.ps1"
+   .\install.ps1 -release $tag
+   ```
 
-```
+1.
