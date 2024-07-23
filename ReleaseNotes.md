@@ -1,4 +1,4 @@
-# Release 5.3.2 - 5.3.28
+# Release 5.3.2 - 5.3.30
 
 ## General Changes
 
