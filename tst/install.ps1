@@ -47,7 +47,7 @@ if (-not (Test-Admin)) {
 Write-Host "Downloading installation files from $url..."
 Invoke-WebRequest -Uri $url -OutFile $zipFilePath
 
-Write-Information $separator -ForegroundColor Cyan
+Write-Host $separator -ForegroundColor Cyan
 
 # Acquire user input for environment variables if they are not already set
 Write-Host "Provide the values for the following environment variables:" -ForegroundColor Yellow
