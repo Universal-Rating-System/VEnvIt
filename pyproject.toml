@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = 'venvit'
-version = '5.3.30'
+version = '5.3.31'
 authors = [
     { name = 'Hendrik du Toit', email = 'hendrik@brightedge.co.za' },
     { name = 'Henru du Toit', email = 'henru@brightedge.co.za' },
@@ -32,7 +32,6 @@ readme = { file = 'README.md', content-type = 'text/md' }
 requires-python = '<3.13'
 dependencies = [
     'pre-commit',
-    # 'mdformat',
     'mdformat-gfm',
     'mdformat-frontmatter',
     'mdformat-footnote',
@@ -46,42 +45,11 @@ dev = []
 Changelog = 'https://github.com/BrightEdgeeServices/venvit/blob/enhancement/master/ReleaseNotes.md'
 Homepage = 'https://github.com/BrightEdgeeServices/venvit'
 
-# [tool.black]
-# line-length = 120
-# target-version = ["py312"]
-
 [tool.codespell]
 count = ''
 quiet-level = 2
 skip = 'documentation/Archive/*'
 ignore-words-list = 'space-holder'
-
-# [tool.coverage.run]
-# source = ['src', 'tests']
-
-# [tool.isort]
-# profile = "black"
-
-# [tool.pytest.ini_options]
-# addopts = ['-vv', '--ignore-glob=*\\Archive']
-# #addopts = ['--import-mode=importlib', "-v", "--cov=./", "--ignore-glob=*\\Archive", "--cov-report=html"]
-# markers = [
-#     "config: Run config tests",
-#     "dbdef: Run dbdef tests ",
-#     "select: Run a selection of tests",
-# ]
-# filterwarnings = [
-#     "ignore::DeprecationWarning",
-# ]
-# #python_functions = 'demo_setup'
-# testpaths = 'tests'
-
-
-# [tool.setuptools.packages.find]
-# where = ["src"]
-#include = ["rtecommon"]
-#exclude = ["additional*"]
-# namespaces = false
 
 [tool.setuptools.dynamic]
 readme = { file = ["README.md", "UPGRADE.md"] }
