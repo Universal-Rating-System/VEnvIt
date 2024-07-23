@@ -1,13 +1,10 @@
-______________________________________________________________________
-
+---
 name: Enhancement Request
 about: Planned improvement or addition to functionality; non-urgent.
-title: "\[Enhancement\]: "
+title: '[Enhancement]: '
 labels:
-
-- enhancement
-
-______________________________________________________________________
+  - enhancement
+---
 
 **Description of Feature or Improvement:**
 
