@@ -5,7 +5,7 @@
 $separator = "-" * 80
 
 # Function to run a script and check for errors
-function Run-Script {
+function Invoke-Scripts {
     param (
         [string]$scriptPath,
         [string]$arguments = ""
@@ -33,17 +33,17 @@ $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 Write-Host "=[ START $dateTime ]==================================================" -ForegroundColor Blue
 
 # Run Prepare.Tests.ps1
-Run-Script -scriptPath ".\Prepare.Tests.ps1"
+Invoke-Scripts -scriptPath ".\Prepare.Tests.ps1"
 
 Write-Host $separator -ForegroundColor Cyan
 
 # Run download.ps1
-Run-Script -scriptPath "..\src\download.ps1"
+Invoke-Scripts -scriptPath "..\src\download.ps1"
 
 Write-Host $separator -ForegroundColor Cyan
 
 # Run Results.Tests.ps1
-Run-Script -scriptPath ".\Results.Tests.ps1"
+Invoke-Scripts -scriptPath ".\Results.Tests.ps1"
 
 Write-Host $separator -ForegroundColor Cyan
 
