@@ -15,7 +15,7 @@ Invoke-WebRequest -Uri "https://github.com/BrightEdgeeServices/venvit/releases/d
 Write-Host "Downloaded install.ps1 to $tempDir"
 
 # Execute the install.ps1 script
-& $installScriptPath -release $tag -installScriptPath $installScriptPath
+& $installScriptPath -release $tag -installScriptDir $tempDir
 
 Remove-Item -Path $tempDir.FullName -Recurse -Force
 Write-Host "Temporary directory removed."
