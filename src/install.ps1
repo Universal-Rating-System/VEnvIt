@@ -1,5 +1,6 @@
 param (
     [string]$release
+    [string]$installScriptDir
 )
 $separator = "-" * 80
 
@@ -47,7 +48,7 @@ $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 Write-Host "=[ START $dateTime ]==================================================" -ForegroundColor Blue
 
 $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$release/installation_files.zip"
-$zipFilePath = "installation_files.zip"
+$zipFilePath = Join-Path -Path $installScriptDir.FullName -ChildPath "installation_files.zip"
 
 # Check for administrative privileges
 if (-not (Test-Admin)) {
