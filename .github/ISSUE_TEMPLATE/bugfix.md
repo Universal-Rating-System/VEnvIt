@@ -1,9 +1,11 @@
 ---
 name: BugFix Report
-about: An error or defect causing incorrect or unexpected behavior; typically fixed in regular development cycles.
-title: '[BugFix]: '
-labels:
-  - bugfix
+about: An error or defect causing incorrect or unexpected behavior; typically fixed
+  in regular development cycles.
+title: "[BugFix]: "
+labels: good first issue
+assignees: ''
+
 ---
 
 **Describe the problem**:
