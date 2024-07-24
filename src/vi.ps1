@@ -1,7 +1,7 @@
 function DisplayEnvironmentVariables {
     Write-Host ""
     Write-Host "System Environment Variables"  -ForegroundColor Green
-    Write-Host "RTE_ENVIRONMENT:       $env:RTE_ENVIRONMENT"
+    Write-Host "VENV_ENVIRONMENT:      $env:VENV_ENVIRONMENT"
     Write-Host "PROJECTS_BASE_DIR:     $env:PROJECTS_BASE_DIR"
     Write-Host "PROJECT_DIR:           $env:PROJECT_DIR"
     Write-Host "SCRIPTS_DIR:           $env:SCRIPTS_DIR"
@@ -34,7 +34,7 @@ function InitVirtualEnvironment {
     Write-Host "Initialize the  $_project_name virtual environment"
 
     # Check for required environment variables and display help if they're missing
-    if (-not $env:RTE_ENVIRONMENT -or -not $env:SCRIPTS_DIR -or -not $env:SECRETS_DIR -or -not $env:PROJECTS_BASE_DIR -or -not $env:VENV_BASE_DIR) {
+    if (-not $env:VENV_ENVIRONMENT -or -not $env:SCRIPTS_DIR -or -not $env:SECRETS_DIR -or -not $env:PROJECTS_BASE_DIR -or -not $env:VENV_BASE_DIR) {
         ShowEnvVarHelp
         return
     }
@@ -55,7 +55,7 @@ function InitVirtualEnvironment {
     & "${_scripts_dir}\venv_${_project_name}_setup_mandatory.ps1" $_project_name
     $_project_dir = $env:PROJECT_DIR
 
-    if ($env:RTE_ENVIRONMENT -eq "loc_dev") {
+    if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
         & "$_secrets_dir\env_var_dev.ps1"
     }
 
@@ -78,7 +78,7 @@ function ShowEnvVarHelp {
     Write-Host "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
 
     $_env_vars = @(
-        @("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT),
+        @("VENV_ENVIRONMENT", $env:VENV_ENVIRONMENT),
         @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
         @("SCRIPTS_DIR", "$env:SCRIPTS_DIR"),
         @("SECRETS_DIR", "$env:SECRETS_DIR"),
@@ -115,7 +115,7 @@ venv_${_project_name}_setup_custom .ps1 and venv_${_project_name}_setup_mandator
     ----------------------
     Prior to starting the PowerShell script, ensure these environment variables are set.
 
-    1. RTE_ENVIRONMENT:   Sets the development environment. Possible values: loc_dev, github_dev, prod, etc.
+    1. VENV_ENVIRONMENT:   Sets the development environment. Possible values: loc_dev, github_dev, prod, etc.
     2. PROJECTS_BASE_DIR: The directory for all projects (e.g., d:\Dropbox\Projects).
     3. SECRETS_DIR:       Directory for storing secrets (e.g., g:\Google Drive\Secrets).
     4. SCRIPTS_DIR:       Directory where this script resides.
@@ -138,7 +138,7 @@ function ShowEnvVarHelp {
     Write-Host "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
 
     $_env_vars = @(
-        @("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT),
+        @("VENV_ENVIRONMENT", $env:VENV_ENVIRONMENT),
         @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
         @("SCRIPTS_DIR", "$env:SCRIPTS_DIR"),
         @("SECRETS_DIR", "$env:SECRETS_DIR"),

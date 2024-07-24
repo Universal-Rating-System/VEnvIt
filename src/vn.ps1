@@ -29,16 +29,11 @@ function CreateVirtualEnvironment {
         [string]$_reset
     )
 
-    # Clear the screen
-    # Clear-Host
-
     # Show help if no project name is provided
     if (-not $_project_name -or $_project_name -eq "-h") {
             ShowHelp
         return
     }
-
-    Write-Host "Create new $_project_name virtual environment"
 
     # Check for required environment variables and display help if they're missing
     if (-not $env:VENV_ENVIRONMENT -or -not $env:VENVIT_DIR -or -not $env:SECRETS_DIR -or -not $env:PROJECTS_BASE_DIR -or -not $env:VENV_BASE_DIR -or -not $env:VENV_PYTHON_BASE_DIR) {
@@ -46,6 +41,7 @@ function CreateVirtualEnvironment {
         return
     }
 
+    # Configure the environment settings for local development environment
     $env:PROJECT_NAME = $_project_name
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
         & "$env:SECRETS_DIR\env_var_dev.ps1"
@@ -309,7 +305,8 @@ function ReadYesOrNo {
 Write-Host ''
 Write-Host ''
 $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-Write-Host "=[ START $dateTime ]==================================================" -ForegroundColor Blue
+Write-Host "=[ START $dateTime ]=======================================[ vn.ps1 ]=" -ForegroundColor Blue
+Write-Host "Create new $args[0] virtual environment"
 CreateVirtualEnvironment -_project_name $args[0] -_python_version $args[1] -_institution $args[2] -_dev_mode $args[3] -_reset $args[4]
 DisplayEnvironmentVariables
 Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
