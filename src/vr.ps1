@@ -92,7 +92,7 @@ script.
 
     Parameters:
         -h           Help
-        ProjectName: The name of the project.
+        ProjectName  The name of the project.
 "@ | Write-Host
 
     Write-Host $separator -ForegroundColor Cyan

@@ -68,13 +68,13 @@ or
 
 where:
 
-| Parameter    | Description                                                                                                                                           |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ProjectName  | The name of the project.                                                                                                                              |
-| PythonVer    | Python version for the virtual environment.                                                                                                           |
-| Institution  | Acronym for the institution owning the project.                                                                                                       |
-| DevMode      | \[y/n\] If "y", installs \[dev\] modules from pyproject.toml.                                                                                         |
-| ResetScripts | \[y/n\] If "y", it zip and move the venv\__project_name_\_install.ps1 and venv\__project_name_\_setup_mandatory.ps1 scripts to the Archive directory. |
+| Parameter    | Description                                                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ProjectName  | The name of the project.                                                                                                                               |
+| PythonVer    | Python version for the virtual environment.                                                                                                            |
+| Institution  | Acronym for the institution owning the project.                                                                                                        |
+| DevMode      | \[y\|n\] If "y", installs \[dev\] modules from pyproject.toml.                                                                                         |
+| ResetScripts | \[y\|n\] If "y", it zip and move the venv\__project_name_\_install.ps1 and venv\__project_name_\_setup_mandatory.ps1 scripts to the Archive directory. |
 
 ## vi.ps1
 
