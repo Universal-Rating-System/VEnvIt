@@ -1,6 +1,6 @@
 # VenvIt
 
-A utility to create, initiate and remove Python virtual envirioments.
+A utility using Python and PowerShell scripts to to create, initiate and remove envirioments and virtual environments.
 
 ## Overview
 
@@ -11,12 +11,13 @@ The repository has the following tools and utilities:
 - vr.ps1 (Remove a virtual environment)
 - download.ps1 (Commands to initiate the installation)
 - install.ps1 (Install `venvit`)
+- env_var_dev.ps1 (Sample environment configuration)
 
 ## vn.ps1
 
 ### Introduction
 
-This script, `vn.ps1`, creates a Python virtual environment. It uses a combination of environment variables and command line parameters to set up the environment. If a `pyproject.toml` file already exists in the project directory, Python modules will be installed accordingly, alternatively it will install a default set of development tools.
+This script, `vn.ps1`, creates a Python virtual environment. It uses a combination of environment variables and command line parameters to set up the environment. If the target project directory already exists and has a `pyproject.toml`, the Python modules will be installed accordingly, alternatively it will install a default set of development tools.
 
 - Pre-Commit
 - Black
@@ -46,11 +47,11 @@ The installation will set the following system environment variables.  Please se
 
 | System Environment Variable | Description                                                                                                                                                                                                                                                                                                                                               |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PROJECTS_BASE_DIR           | The parent/base directory for all projects (e.g., `D:\GoogleDrive\Projects`). The idea is to separate the projects of various identities, such as personal projects and projects of an organization.                                                                                                                                                      |
-| SECRETS_DIR                 | Directory for storing secrets (e.g., `D:\GoogleDrive\Secrets`). The contents of this directory are private, should not be shared, and should never be pushed to the repository.                                                                                                                                                                           |
-| VENVIT_DIR                  | Installation directory where these script reside.                                                                                                                                                                                                                                                                                                         |
-| VENV_BASE_DIR               | The directory where the Python virtual environments are stored (e.g., `C:\venv`) differs from the conventional practice of keeping virtual environment installation files within the project directory. Instead, all virtual environments are stored together in a separate directory. This directory should preferably not be a cloud storage directory. |
-| VENV_ENVIRONMENT            | Sets the development environment. Possible values include: `loc_dev`, `github_dev`, `prod`, etc. This value will be set differently in various environments to indicate the execution environment.                                                                                                                                                        |
+| PROJECTS_BASE_DIR           | The parent/base directory for all projects (e.g., `D:\GoogleDrive\Projects`). The idea is to separate the projects of various identities, such as personal projects and projects of an organization e.g. `\projects\company` and `\projects\myprojects`                                                                                                   |
+| SECRETS_DIR                 | Directory for storing secrets (e.g., `~.\Secrets`). The contents of this directory are private, should not be shared, and should never be pushed to the repository.                                                                                                                                                                                       |
+| VENVIT_DIR                  | Installation directory where these script reside e.g. `\venv`                                                                                                                                                                                                                                                                                             |
+| VENV_BASE_DIR               | The directory where the Python virtual environments are stored differs from the conventional practice of keeping virtual environment installation files within the project directory. Instead, all virtual environments are stored together in a separate directory (e.g., `c:\venv`). This directory should preferably not be a cloud storage directory. |
+| VENV_ENVIRONMENT            | Sets the variable to identify this environment. Possible values include: `loc_dev`, `github_dev`, `prod` or whatever you or the organization decide on. This value will be set differently in various environments to indicate the execution environment.                                                                                                 |
 | VENV_PYTHON_BASE_DIR        | Directory for Python installations (e.g., `C:\Python`). Different versions of Python will be accessed during the creation of the virtual environments. For example, if `VENV_PYTHON_BASE_DIR` is set to `C:\Python`, then Python 3.5 will be installed in `C:\Python\Python35` and Python 3.12 in `C:\Python\Python312`.                                  |
 
 ### Usage
@@ -67,11 +68,13 @@ or
 
 where:
 
-- ProjectName:  The name of the project.
-- PythonVer:    Python version for the virtual environment.
-- Institution:  Acronym for the institution owning the project.
-- DevMode:      \[y/n\] If "y", installs \[dev\] modules from pyproject.toml.
-- ResetScripts: \[y/n\] If "y", it zip and move the venv\__project_name_\_install.ps1 and venv\__project_name_\_setup_mandatory.ps1 scripts to the Archive directory.
+| Parameter    | Description                                                                                                                                           |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ProjectName  | The name of the project.                                                                                                                              |
+| PythonVer    | Python version for the virtual environment.                                                                                                           |
+| Institution  | Acronym for the institution owning the project.                                                                                                       |
+| DevMode      | \[y/n\] If "y", installs \[dev\] modules from pyproject.toml.                                                                                         |
+| ResetScripts | \[y/n\] If "y", it zip and move the venv\__project_name_\_install.ps1 and venv\__project_name_\_setup_mandatory.ps1 scripts to the Archive directory. |
 
 ## vi.ps1
 
@@ -91,7 +94,9 @@ or
 
 where:
 
-- ProjectName:  The name of the project.
+| Parameter   | Description              |
+| ----------- | ------------------------ |
+| ProjectName | The name of the project. |
 
 ## vr.ps1
 
@@ -107,25 +112,53 @@ script.
 or
 
 ```powershell
-    vi.ps1 ProjectName
+    vr.ps1 ProjectName
 ```
+
+where:
+
+| Parameter   | Description              |
+| ----------- | ------------------------ |
+| ProjectName | The name of the project. |
 
 ## Installation
 
 1. Decide on the values for the System Environment Variables.
 
-1. Remove any native Python installation and ensure that any references to Python are removed from the PATH. This step is vital for a successful installation..
+1. Remove any native Python installation and ensure that any references to any Python installation are removed from the PATH. This step is vital for a successful operation.
 
-1. Install the various versions of Python (e.g., `C:\Python\Python39`, `C:\Python\Python312`, etc.).
+1. Install the various versions of Python you intend to use (e.g., `C:\Python\Python39`, `C:\Python\Python312`, etc.).  Make sure tyou use the following settings on the different installation configuration pages.  Following are the options based on a Python 3.10 installation.
 
-   - **Do not** select the option to add Python to the PATH.
+   - [ ] **Do not** select "Use admin privileges when installaing py.exe".
+   - [ ] **Do not** select "Add python.exe" to the PATH.
+   - Use the "Customize installation".
+   - [ ] **Unselect** "py launcher".
+   - [ ] **Unselect** for all users (require admin proviledges).
+   - [ ] **Unselect** "Install Python3.10 for all users".
+   - [ ] **Unselect** "Create shortcuts for installed applications".
+   - [ ] **Unselect** "Add Python to environment variables".
+   - [x] **Select** "Precompile standard library".
+   - [x] **Select** "Download debugging tools".
+   - [x] **Select** "Download debug binaries (requires VS 2017 or later).
+   - Change the "Customize install location" to e.g. 'C:\\Python\\Python310'
 
-1. Paste the following script in a PowerShell.  It can also be found in the `download.ps1` script.
+1. Open a new **PowerShell with Administrator rights**.  Do not use an existing one.  Paste the following script in the **PowerShell with Administrator rights**.  The script below can also be found in the `download.ps1` script.
 
    ```powershell
+   # Create a temporary directory
+   $tempDir = New-Item -ItemType Directory -Path (Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath ([System.IO.Path]::GetRandomFileName()))
+   Write-Host "Created temporary directory: $tempDir"
    $tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" | ConvertFrom-Json)[0].tag_name
-   Invoke-WebRequest -Uri "https://github.com/BrightEdgeeServices/venvit/releases/download/$tag/install.ps1" -OutFile "install.ps1"
-   .\install.ps1 -release $tag
+
+   # Download the install.ps1 file to the temporary directory
+   $installScriptPath = Join-Path -Path $tempDir.FullName -ChildPath "install.ps1"
+   Invoke-WebRequest -Uri "https://github.com/BrightEdgeeServices/venvit/releases/download/$tag/install.ps1" -OutFile $installScriptPath
+   Write-Host "Downloaded install.ps1 to $tempDir"
+
+   # Execute the install.ps1 script
+   & $installScriptPath -release $tag -installScriptDir $tempDir
+   Remove-Item -Path $tempDir.FullName -Recurse -Force
+   Write-Host "Temporary directory removed."
 
    ```
 

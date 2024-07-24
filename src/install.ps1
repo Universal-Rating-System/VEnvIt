@@ -68,12 +68,12 @@ Write-Host $separator -ForegroundColor Cyan
 
 # Acquire user input for environment variables if they are not already set
 Write-Host "Provide the values for the following environment variables:" -ForegroundColor Yellow
-$VENV_ENVIRONMENT = Get-Or-PromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "VENV_ENVIRONMENT: "
-$PROJECTS_BASE_DIR = Get-Or-PromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "PROJECTS_BASE_DIR: "
-$VENVIT_DIR = Get-Or-PromptEnvVar -varName "VENVIT_DIR" -promptText "VENVIT_DIR: "
-$SECRETS_DIR = Get-Or-PromptEnvVar -varName "SECRETS_DIR" -promptText "SECRETS_DIR: "
-$VENV_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_BASE_DIR" -promptText "VENV_BASE_DIR: "
-$VENV_PYTHON_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "VENV_PYTHON_BASE_DIR: "
+$VENV_ENVIRONMENT = Get-Or-PromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "VENV_ENVIRONMENT"
+$PROJECTS_BASE_DIR = Get-Or-PromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "PROJECTS_BASE_DIR"
+$VENVIT_DIR = Get-Or-PromptEnvVar -varName "VENVIT_DIR" -promptText "VENVIT_DIR"
+$SECRETS_DIR = Get-Or-PromptEnvVar -varName "SECRETS_DIR" -promptText "SECRETS_DIR"
+$VENV_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_BASE_DIR" -promptText "VENV_BASE_DIR"
+$VENV_PYTHON_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "VENV_PYTHON_BASE_DIR"
 
 # Ensure the VENVIT_DIR and SECRETS_DIR directories exist
 if (-not (Test-Path -Path $VENVIT_DIR)) {
