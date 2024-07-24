@@ -162,4 +162,19 @@ where:
 
    ```
 
-1.
+1. Configure the env_var_dev.ps1 script in the SECRETS_DIR.
+
+   - Set the ports for the various Docker containers.
+   - Set the $env:MY_SCRT='AaBbCcDdE' combination to the correct name and value configured in GitHub.
+
+1. Confirm your installation:
+
+   1. Open a new PowerShell.
+
+   1. Check with the `gci:env` command if the environment variables were created and has the correct values.
+
+   1. ```powershell
+       vn TestProject 310 myorg Y Y
+      ```
+
+   1.
