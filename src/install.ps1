@@ -12,12 +12,12 @@ function Get-Or-PromptEnvVar {
     )
     $existingValue = [System.Environment]::GetEnvironmentVariable($varName, [System.EnvironmentVariableTarget]::Machine)
     if ($existingValue) {
-        Write-Host "$varName $existingValue"
+        Write-Host "$varName\: $existingValue"
         return $existingValue
     } else {
         $newValue = Read-Host $promptText
         [System.Environment]::SetEnvironmentVariable($varName, $newValue, [System.EnvironmentVariableTarget]::Machine)
-        Write-Host "$varName $newValue"
+        Write-Host "$varName\: $newValue"
         return $newValue
     }
 }
