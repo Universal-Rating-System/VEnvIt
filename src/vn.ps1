@@ -41,20 +41,20 @@ function CreateVirtualEnvironment {
     Write-Host "Create new $_project_name virtual environment"
 
     # Check for required environment variables and display help if they're missing
-    if (-not $env:RTE_ENVIRONMENT -or -not $env:SCRIPTS_DIR -or -not $env:SECRETS_DIR -or -not $env:PROJECTS_BASE_DIR -or -not $env:VENV_BASE_DIR -or -not $env:VENV_PYTHON_BASE_DIR) {
+    if (-not $env:VENV_ENVIRONMENT -or -not $env:VENVIT_DIR -or -not $env:SECRETS_DIR -or -not $env:PROJECTS_BASE_DIR -or -not $env:VENV_BASE_DIR -or -not $env:VENV_PYTHON_BASE_DIR) {
         ShowEnvVarHelp
         return
     }
 
     $env:PROJECT_NAME = $_project_name
-    if ($env:RTE_ENVIRONMENT -eq "loc_dev") {
+    if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
         & "$env:SECRETS_DIR\env_var_dev.ps1"
     }
 
     # Set local variables from environment variables
     $_python_base_dir = $env:VENV_PYTHON_BASE_DIR
     $_venv_base_dir = $env:VENV_BASE_DIR
-    $_scripts_dir = $env:SCRIPTS_DIR
+    $_venvit_dir = $env:VENVIT_DIR
     $_project_base_dir = $env:PROJECTS_BASE_DIR
     $_project_name = if (-not $_project_name) { Read-Host "Project name" } else { $_project_name }
     $_python_version = if (-not $_python_version) { Read-Host "Python version" } else { $_python_version }
@@ -86,7 +86,7 @@ function CreateVirtualEnvironment {
     Write-Host "Institution Accr:  $_institution"
     Write-Host "Dev Mode:          $_dev_mode"
     Write-Host "Reset project:     $_reset"
-    Write-Host "SCRIPTS_DIR:       $_scripts_dir"
+    Write-Host "VENVIT_DIR:        $_venvit_dir"
     Write-Host "PROJECTS_BASE_DIR: $_project_base_dir"
     Write-Host "INSTITUTION_DIR:   $_institution_dir"
     Write-Host "PROJECT_DIR:       $_project_dir"
@@ -144,16 +144,16 @@ function CreateVirtualEnvironment {
             "venv_${_project_name}_install.ps1",
             "venv_${_project_name}_setup_mandatory.ps1"
         )
-        $_archive_dir = Join-Path -Path $_scripts_dir -ChildPath "Archive"
+        $_archive_dir = Join-Path -Path $_venvit_dir -ChildPath "Archive"
         if ($_reset -eq "Y") {
             foreach ($_file_name in $_support_scripts) {
-                $_script_path = Join-Path -Path $_scripts_dir -ChildPath $_file_name
+                $_script_path = Join-Path -Path $_venvit_dir -ChildPath $_file_name
                 MoveFileToArchiveIfExists -_script_path $_script_path -_archive_dir $_archive_dir
             }
         }
 
         # Check if the install script does not exist
-        $_script_install_path = Join-Path -Path $_scripts_dir -ChildPath $_support_scripts[0]
+        $_script_install_path = Join-Path -Path $_venvit_dir -ChildPath $_support_scripts[0]
         if (-not (Test-Path -Path $_script_install_path)) {
             # Create the script and write the lines
             $s = 'Write-Host "Running ' + $_support_scripts[0] + '..."' + " -ForegroundColor Yellow"
@@ -164,7 +164,7 @@ function CreateVirtualEnvironment {
         }
 
         # Check if the mandatory setup script does not exist
-        $_script_mandatory_path = Join-Path -Path $_scripts_dir -ChildPath $_support_scripts[1]
+        $_script_mandatory_path = Join-Path -Path $_venvit_dir -ChildPath $_support_scripts[1]
         if (-not (Test-Path $_script_mandatory_path)) {
             # Create the script and write the lines
             $s = 'Write-Host "Running ' + $_support_scripts[1] + '..."' + " -ForegroundColor Yellow"
@@ -178,7 +178,7 @@ function CreateVirtualEnvironment {
 
         # Check if the custom setup script does not exist
         $_custom_file_name = "venv_${_project_name}_setup_custom.ps1"
-        $_script_custom_path = Join-Path $_scripts_dir -ChildPath ${_custom_file_name}
+        $_script_custom_path = Join-Path $_venvit_dir -ChildPath ${_custom_file_name}
         if (-not (Test-Path $_script_custom_path)) {
             $s = 'Write-Host "Running ' + $_custom_file_name + '..."' + " -ForegroundColor Yellow"
             Set-Content -Path $_script_custom_path -Value $s
@@ -202,10 +202,10 @@ function CreateVirtualEnvironment {
 function DisplayEnvironmentVariables {
     Write-Host ""
     Write-Host "System Environment Variables"  -ForegroundColor Green
-    Write-Host "RTE_ENVIRONMENT:       $env:RTE_ENVIRONMENT"
+    Write-Host "VENV_ENVIRONMENT:      $env:VENV_ENVIRONMENT"
     Write-Host "PROJECTS_BASE_DIR:     $env:PROJECTS_BASE_DIR"
     Write-Host "PROJECT_DIR:           $env:PROJECT_DIR"
-    Write-Host "SCRIPTS_DIR:           $env:SCRIPTS_DIR"
+    Write-Host "VENVIT_DIR:            $env:VENVIT_DIR"
     Write-Host "SECRETS_DIR:           $env:SECRETS_DIR"
     Write-Host "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
     Write-Host "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
@@ -256,11 +256,11 @@ function ShowHelp {
     vr.ps1 -h
 
     Parameters:
-    1. ProjectName:  The name of the project.
-    2. PythonVer:    Python version for the virtual environment.
-    3. Institution:  Acronym for the institution owning the project.
-    4. DevMode:      If "Y", installs [dev] modules from pyproject.toml.
-    5. ResetScripts: If "Y", moves certain scripts to the Archive directory.
+      ProjectName  The name of the project.
+      PythonVer    Python version for the virtual environment.
+      Institution  Acronym for the institution owning the project.
+      DevMode      [y|n] If "y", installs \[dev\] modules from pyproject.
+      ResetScripts [y|n] If "y", moves certain scripts to the Archive directory.
 "@ | Write-Host
 
     Write-Host $separator -ForegroundColor Cyan
@@ -270,9 +270,9 @@ function ShowEnvVarHelp {
     Write-Host "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
 
     $_env_vars = @(
-        @("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT),
+        @("VENV_ENVIRONMENT", $env:VENV_ENVIRONMENT),
         @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
-        @("SCRIPTS_DIR", "$env:SCRIPTS_DIR"),
+        @("VENVIT_DIR", "$env:VENVIT_DIR"),
         @("SECRETS_DIR", "$env:SECRETS_DIR"),
         @("VENV_BASE_DIR", "$env:VENV_BASE_DIR"),
         @("VENV_PYTHON_BASE_DIR", "$env:VENV_PYTHON_BASE_DIR")
