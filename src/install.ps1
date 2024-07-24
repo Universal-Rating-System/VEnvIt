@@ -45,7 +45,10 @@ function Remove-EnvVarIfExists {
 Write-Host ''
 Write-Host ''
 $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-Write-Host "=[ START $dateTime ]==================================================" -ForegroundColor Blue
+Write-Host "=[ START $dateTime ]==================================[ install.ps1 ]=" -ForegroundColor Blue
+Write-Host "Install venvit" -ForegroundColor Blue
+
+Write-Host $separator -ForegroundColor Cyan
 
 $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$release/installation_files.zip"
 $zipFilePath = Join-Path -Path $installScriptDir -ChildPath "installation_files.zip"
