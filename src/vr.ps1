@@ -91,11 +91,8 @@ script.
     vr.ps1 -h
 
     Parameters:
-    1. ProjectName:  The name of the project.
-    2. PythonVer:    Python version for the virtual environment.
-    3. Institution:  Acronym for the institution owning the project.
-    4. DevMode:      If "Y", installs [dev] modules from pyproject.toml.
-    5. ResetScripts: If "Y", moves certain scripts to the Archive directory.
+        -h           Help
+        ProjectName: The name of the project.
 "@ | Write-Host
 
     Write-Host $separator -ForegroundColor Cyan
