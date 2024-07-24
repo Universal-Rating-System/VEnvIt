@@ -102,7 +102,7 @@ if (Test-Path -Path $sourceFilePath) {
     Write-Host "env_var_dev.ps1 not found in $VENVIT_DIR."
 }
 
-Write-Information $separator -ForegroundColor Cyan
+Write-Host $separator -ForegroundColor Cyan
 
 # Remove the zip file after extraction
 Remove-Item -Path $zipFilePath -Force
