@@ -11,9 +11,27 @@ function Add-EnvVarIfNotExists {
     return $true
 }
 
+function Remove-EnvVarIfExists {
+    param (
+        [string]$varName
+    )
+    $existingValue = [System.Environment]::GetEnvironmentVariable($varName, [System.EnvironmentVariableTarget]::Machine)
+    if ($existingValue) {
+        [System.Environment]::SetEnvironmentVariable($varName, $null, [System.EnvironmentVariableTarget]::Machine)
+        Write-Host "$varName has been removed."
+    }
+    return $true
+}
+
 $rc = $true
 $rc = Add-EnvVarIfNotExists -varName "RTE_ENVIRONMENT" "loc_dev" -and $rc
 $rc = Add-EnvVarIfNotExists -varName "SCRIPTS_DIR" "g:\scripts" -and $rc
+$rc = Remove-EnvVarIfExists -varName "VENV_ENVIRONMENT" -and $rc
+$rc = Remove-EnvVarIfExists -varName "PROJECTS_BASE_DIR" -and $rc
+$rc = Remove-EnvVarIfExists -varName "VENVIT_DIR" -and $rc
+$rc = Remove-EnvVarIfExists -varName "SECRETS_DIR" -and $rc
+$rc = Remove-EnvVarIfExists -varName "VENV_BASE_DIR" -and $rc
+$rc = Remove-EnvVarIfExists -varName "VENV_PYTHON_BASE_DIR" -and $rc
 
 if ($rc) {
     exit 0
