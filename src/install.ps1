@@ -78,21 +78,21 @@ Write-Host $separator -ForegroundColor Cyan
 # Acquire user input for environment variables if they are not already set
 Write-Host "Provide the values for the following environment variables:" -ForegroundColor Yellow
     Get-Or-PromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "VENV_ENVIRONMENT"
-    $PROJECTS_BASE_DIR = Get-Or-PromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "PROJECTS_BASE_DIR"
-    $VENVIT_DIR = Get-Or-PromptEnvVar -varName "VENVIT_DIR" -promptText "VENVIT_DIR"
-    $VENV_SECRETS_DIR = Get-Or-PromptEnvVar -varName "VENV_SECRETS_DIR" -promptText "VENV_SECRETS_DIR"
-    $VENV_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_BASE_DIR" -promptText "VENV_BASE_DIR"
-    $VENV_PYTHON_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "VENV_PYTHON_BASE_DIR"
-    $VENV_CONFIG_DIR = Get-Or-PromptEnvVar -varName "VENV_CONFIG_DIR" -promptText "VENV_CONFIG_DIR"
+    $env:PROJECTS_BASE_DIR = Get-Or-PromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "PROJECTS_BASE_DIR"
+    $env:VENVIT_DIR = Get-Or-PromptEnvVar -varName "VENVIT_DIR" -promptText "VENVIT_DIR"
+    $env:VENV_SECRETS_DIR = Get-Or-PromptEnvVar -varName "VENV_SECRETS_DIR" -promptText "VENV_SECRETS_DIR"
+    $env:VENV_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_BASE_DIR" -promptText "VENV_BASE_DIR"
+    $env:VENV_PYTHON_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "VENV_PYTHON_BASE_DIR"
+    $env:VENV_CONFIG_DIR = Get-Or-PromptEnvVar -varName "VENV_CONFIG_DIR" -promptText "VENV_CONFIG_DIR"
 
 # Ensure the directories exist
 $_system_dirs = @(
-    @("PROJECTS_BASE_DIR", $PROJECTS_BASE_DIR),
-    @("VENV_ENVIRONMENT", $VENVIT_DIR),
-    @("PROJECTS_BASE_DIR", $VENV_SECRETS_DIR),
-    @("VENV_BASE_DIR", $VENV_BASE_DIR),
-    @("VENV_PYTHON_BASE_DIR", $VENV_PYTHON_BASE_DIR),
-    @("VENV_CONFIG_DIR", "$VENV_CONFIG_DIR")
+    @("PROJECTS_BASE_DIR", $env:PROJECTS_BASE_DIR),
+    @("VENV_ENVIRONMENT", $env:VENVIT_DIR),
+    @("PROJECTS_BASE_DIR", $env:VENV_SECRETS_DIR),
+    @("VENV_BASE_DIR", $env:VENV_BASE_DIR),
+    @("VENV_PYTHON_BASE_DIR", $env:VENV_PYTHON_BASE_DIR),
+    @("VENV_CONFIG_DIR", "$env:VENV_CONFIG_DIR")
 )
 foreach ($var in $_system_dirs) {
     if (-not (Test-Path -Path $var[1])) {
@@ -101,22 +101,22 @@ foreach ($var in $_system_dirs) {
 }
 
 # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
-Write-Host "Unzipping installation_files.zip to $VENVIT_DIR..."
-Expand-Archive -Path $zipFilePath -DestinationPath $VENVIT_DIR -Force
+Write-Host "Unzipping installation_files.zip to $env:VENVIT_DIR..."
+Expand-Archive -Path $zipFilePath -DestinationPath $env:VENVIT_DIR -Force
 
 # Move the dev_env_var.csv file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
-$sourceFilePath = Join-Path -Path $VENVIT_DIR -ChildPath "dev_env_var.csv"
-$destinationFilePath = Join-Path -Path $VENV_SECRETS_DIR -ChildPath "dev_env_var.csv"
+$sourceFilePath = Join-Path -Path $env:VENVIT_DIR -ChildPath "dev_env_var.csv"
+$destinationFilePath = Join-Path -Path $env:VENV_SECRETS_DIR -ChildPath "dev_env_var.csv"
 
 if (Test-Path -Path $sourceFilePath) {
     if (-not (Test-Path -Path $destinationFilePath)) {
-        Write-Host "Moving dev_env_var.csv to $VENV_SECRETS_DIR..."
+        Write-Host "Moving dev_env_var.csv to $env:VENV_SECRETS_DIR..."
         Move-Item -Path $sourceFilePath -Destination $destinationFilePath -Force
     } else {
-        Write-Host "dev_env_var.csv already exists in $VENV_SECRETS_DIR. It will not be overwritten."
+        Write-Host "dev_env_var.csv already exists in $env:VENV_SECRETS_DIR. It will not be overwritten."
     }
 } else {
-    Write-Host "dev_env_var.csv not found in $VENVIT_DIR."
+    Write-Host "dev_env_var.csv not found in $env:VENVIT_DIR."
 }
 
 Write-Host $separator -ForegroundColor Cyan
@@ -127,8 +127,8 @@ Write-Host "installation_files.zip has been deleted." -ForegroundColor Green
 
 # Add VENVIT_DIR to the System Path variable
 $path = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
-if ($path -notlike "*$VENVIT_DIR*") {
-    $newPath = "$path;$VENVIT_DIR"
+if ($path -notlike "*$env:VENVIT_DIR*") {
+    $newPath = "$path;$env:VENVIT_DIR"
     [System.Environment]::SetEnvironmentVariable("Path", $newPath, [System.EnvironmentVariableTarget]::Machine)
     Write-Host "VENVIT_DIR has been added to the System Path."  -ForegroundColor Green
 } else {
