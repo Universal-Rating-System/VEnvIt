@@ -100,7 +100,7 @@ function CreateVirtualEnvironment {
     $env:PROJECT_NAME = $_project_name
     $env:VENV_ORGANIZATION_NAME = $_organization
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
-        & "$env:VENV_SECRETS_DIR\env_var_dev.ps1"
+        & "$env:VENV_SECRETS_DIR\dev_env_var.csv"
     }
 
     # Determine project directory based on organization
