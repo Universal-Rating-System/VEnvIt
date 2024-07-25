@@ -77,28 +77,26 @@ Write-Host $separator -ForegroundColor Cyan
 
 # Acquire user input for environment variables if they are not already set
 Write-Host "Provide the values for the following environment variables:" -ForegroundColor Yellow
-$_system_env_vars = @(
-    @("VENV_ENVIRONMENT", "VENV_ENVIRONMENT"),
-    @("PROJECTS_BASE_DIR", "PROJECTS_BASE_DIR"),
-    @("VENVIT_DIR", "VENVIT_DIR"),
-    @("VENV_SECRETS_DIR", "VENV_SECRETS_DIR"),
-    @("VENV_BASE_DIR", "VENV_BASE_DIR"),
-    @("VENV_PYTHON_BASE_DIR", "VENV_PYTHON_BASE_DIR"),
-    @("VENV_CONFIG_DIR", "VENV_CONFIG_DIR")
-)
-foreach ($var in $_system_env_vars) {
-    Get-Or-PromptEnvVar -varName $var[0] -promptText $var[1]
-}
+    Get-Or-PromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "VENV_ENVIRONMENT"
+    $PROJECTS_BASE_DIR = Get-Or-PromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "PROJECTS_BASE_DIR"
+    $VENVIT_DIR = Get-Or-PromptEnvVar -varName "VENVIT_DIR" -promptText "VENVIT_DIR"
+    $VENV_SECRETS_DIR = Get-Or-PromptEnvVar -varName "VENV_SECRETS_DIR" -promptText "VENV_SECRETS_DIR"
+    $VENV_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_BASE_DIR" -promptText "VENV_BASE_DIR"
+    $VENV_PYTHON_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "VENV_PYTHON_BASE_DIR"
+    $VENV_CONFIG_DIR = Get-Or-PromptEnvVar -varName "VENV_CONFIG_DIR" -promptText "VENV_CONFIG_DIR"
 
 # Ensure the directories exist
 $_system_dirs = @(
-    @("VENV_ENVIRONMENT", $env:VENVIT_DIR),
-    @("PROJECTS_BASE_DIR", $env:VENV_SECRETS_DIR),
-    @("VENV_CONFIG_DIR", "$env:VENV_CONFIG_DIR")
+    @("PROJECTS_BASE_DIR", $PROJECTS_BASE_DIR),
+    @("VENV_ENVIRONMENT", $VENVIT_DIR),
+    @("PROJECTS_BASE_DIR", $VENV_SECRETS_DIR),
+    @("VENV_BASE_DIR", $VENV_BASE_DIR),
+    @("VENV_PYTHON_BASE_DIR", $VENV_PYTHON_BASE_DIR),
+    @("VENV_CONFIG_DIR", "$VENV_CONFIG_DIR")
 )
 foreach ($var in $_system_dirs) {
-    if (-not (Test-Path -Path $var)) {
-        New-Item -ItemType Directory -Path $var | Out-Null
+    if (-not (Test-Path -Path $var[1])) {
+        New-Item -ItemType Directory -Path $var[1] | Out-Null
     }
 }
 
