@@ -8,10 +8,8 @@ function RemoveVirtualEnvironment {
         return
     }
 
-    Write-Host "Remove new $_project_name virtual environment"
-
     # Check for required environment variables and display help if they're missing
-    if (-not $env:PROJECTS_BASE_DIR -or -not $env:SCRIPTS_DIR -or -not $env:VENV_BASE_DIR) {
+    if (-not $env:PROJECTS_BASE_DIR -or -not $env:VENVIT_DIR -or -not $env:VENV_BASE_DIR) {
         ShowEnvVarHelp
         return
     }
@@ -20,17 +18,17 @@ function RemoveVirtualEnvironment {
     deactivate
 
     # Construct the paths based on the script directory and project name
-    $script_path = Join-Path $env:SCRIPTS_DIR "venv_${_project_name}_install.ps1"
-    $mandatory_path = Join-Path $env:SCRIPTS_DIR "venv_${_project_name}_setup_mandatory.ps1"
-    $custom_path = Join-Path $env:SCRIPTS_DIR "venv_${_project_name}_setup_custom.ps1"
-    $archive_dir = Join-Path $env:SCRIPTS_DIR "Archive"
+    $venvit_path = Join-Path $env:VENVIT_DIR "venv_${_project_name}_install.ps1"
+    $mandatory_path = Join-Path $env:VENVIT_DIR "venv_${_project_name}_setup_mandatory.ps1"
+    $custom_path = Join-Path $env:VENVIT_DIR "venv_${_project_name}_setup_custom.ps1"
+    $archive_dir = Join-Path $env:VENVIT_DIR "Archive"
 
     # Move the files to the archive directory
-    if (Test-Path $script_path) {
-        Move-Item $script_path $archive_dir -ErrorAction SilentlyContinue -Force
-        Write-Host "Moved $script_path to $archive_dir"
+    if (Test-Path $venvit_path) {
+        Move-Item $venvit_path $archive_dir -ErrorAction SilentlyContinue -Force
+        Write-Host "Moved $venvit_path to $archive_dir"
     } else {
-        Write-Host "Not moved: $script_path (does not exist)."
+        Write-Host "Not moved: $venvit_path (does not exist)."
     }
 
     if (Test-Path $mandatory_path) {
@@ -80,7 +78,7 @@ script.
     Prior to starting the PowerShell script, ensure these environment variables are set.
 
     1. PROJECTS_BASE_DIR: The directory for all projects (e.g., d:\Dropbox\Projects).
-    2. SCRIPTS_DIR: Directory where this script resides.
+    2. VENVIT_DIR: Directory where this script resides.
     3. VENV_BASE_DIR: Directory for virtual environments (e.g., c:\venv).
 "@ | Write-Host
 
@@ -103,7 +101,7 @@ function ShowEnvVarHelp {
 
     $_env_vars = @(
         @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
-        @("SCRIPTS_DIR", "$env:SCRIPTS_DIR"),
+        @("VENVIT_DIR", "$env:VENVIT_DIR"),
         @("VENV_BASE_DIR", "$env:VENV_BASE_DIR")
     )
 
@@ -123,6 +121,7 @@ function ShowEnvVarHelp {
 Write-Host ''
 Write-Host ''
 $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-Write-Host "=[ START $dateTime ]==================================================" -ForegroundColor Blue
+Write-Host "=[ START $dateTime ]=======================================[ vr.ps1 ]=" -ForegroundColor Blue
+Write-Host "REmove the $args[0] virtual environment" -ForegroundColor Blue
 RemoveVirtualEnvironment -_project_name $args[0]
 Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
