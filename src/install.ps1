@@ -60,8 +60,14 @@ if (-not (Test-Admin)) {
 }
 
 # Remove historical (Batch) environment variables if they exist
-Remove-EnvVarIfExists -varName "RTE_ENVIRONMENT"
-Remove-EnvVarIfExists -varName "SCRIPTS_DIR"
+$_old_env_vars = @(
+    @("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT),
+    @("SCRIPTS_DIR", "$env:SCRIPTS_DIR")
+    @("SECRETS_DIR", "$env:SECRETS_DIR")
+)
+foreach ($var in $_old_env_vars) {
+    Remove-EnvVarIfExists -varName $var[0]
+}
 
 # Download the zip file
 Write-Host "Downloading installation files from $url..."
@@ -71,35 +77,44 @@ Write-Host $separator -ForegroundColor Cyan
 
 # Acquire user input for environment variables if they are not already set
 Write-Host "Provide the values for the following environment variables:" -ForegroundColor Yellow
-$VENV_ENVIRONMENT = Get-Or-PromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "VENV_ENVIRONMENT"
-$PROJECTS_BASE_DIR = Get-Or-PromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "PROJECTS_BASE_DIR"
-$VENVIT_DIR = Get-Or-PromptEnvVar -varName "VENVIT_DIR" -promptText "VENVIT_DIR"
-$SECRETS_DIR = Get-Or-PromptEnvVar -varName "SECRETS_DIR" -promptText "SECRETS_DIR"
-$VENV_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_BASE_DIR" -promptText "VENV_BASE_DIR"
-$VENV_PYTHON_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "VENV_PYTHON_BASE_DIR"
-
-# Ensure the VENVIT_DIR and SECRETS_DIR directories exist
-if (-not (Test-Path -Path $VENVIT_DIR)) {
-    New-Item -ItemType Directory -Path $VENVIT_DIR | Out-Null
+$_system_env_vars = @(
+    @("VENV_ENVIRONMENT", "VENV_ENVIRONMENT"),
+    @("PROJECTS_BASE_DIR", "PROJECTS_BASE_DIR"),
+    @("VENVIT_DIR", "VENVIT_DIR"),
+    @("VENV_SECRETS_DIR", "VENV_SECRETS_DIR"),
+    @("VENV_BASE_DIR", "VENV_BASE_DIR"),
+    @("VENV_PYTHON_BASE_DIR", "VENV_PYTHON_BASE_DIR"),
+    @("VENV_CONFIG_DIR", "VENV_CONFIG_DIR")
+)
+foreach ($var in $_system_env_vars) {
+    Get-Or-PromptEnvVar -varName $var[0] -promptText $var[1]
 }
-if (-not (Test-Path -Path $SECRETS_DIR)) {
-    New-Item -ItemType Directory -Path $SECRETS_DIR | Out-Null
+
+# Ensure the directories exist
+$_system_dirs = @(
+    @("VENV_ENVIRONMENT", $env:VENVIT_DIR),
+    @("PROJECTS_BASE_DIR", $env:VENV_SECRETS_DIR),
+    @("VENV_CONFIG_DIR", "$env:VENV_CONFIG_DIR")
+)
+foreach ($var in $_system_dirs) {
+    if (-not (Test-Path -Path $var)) {
+        New-Item -ItemType Directory -Path $var | Out-Null
 }
 
 # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
 Write-Host "Unzipping installation_files.zip to $VENVIT_DIR..."
 Expand-Archive -Path $zipFilePath -DestinationPath $VENVIT_DIR -Force
 
-# Move the env_var_dev.ps1 file from VENVIT_DIR to SECRETS_DIR if it does not already exist in SECRETS_DIR
-$sourceFilePath = Join-Path -Path $VENVIT_DIR -ChildPath "env_var_dev.ps1"
-$destinationFilePath = Join-Path -Path $SECRETS_DIR -ChildPath "env_var_dev.ps1"
+# Move the env_var_dev.csv file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
+$sourceFilePath = Join-Path -Path $VENVIT_DIR -ChildPath "env_var_dev.csv"
+$destinationFilePath = Join-Path -Path $VENV_SECRETS_DIR -ChildPath "env_var_dev.csv"
 
 if (Test-Path -Path $sourceFilePath) {
     if (-not (Test-Path -Path $destinationFilePath)) {
-        Write-Host "Moving env_var_dev.ps1 to $SECRETS_DIR..."
+        Write-Host "Moving env_var_dev.ps1 to $VENV_SECRETS_DIR..."
         Move-Item -Path $sourceFilePath -Destination $destinationFilePath -Force
     } else {
-        Write-Host "env_var_dev.ps1 already exists in $SECRETS_DIR. It will not be overwritten."
+        Write-Host "env_var_dev.ps1 already exists in $VENV_SECRETS_DIR. It will not be overwritten."
     }
 } else {
     Write-Host "env_var_dev.ps1 not found in $VENVIT_DIR."

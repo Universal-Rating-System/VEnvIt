@@ -1,7 +1,3 @@
-# param (
-#     [string]$tag
-# )
-
 $separator = "-" * 80
 
 # Function to run a script and check for errors

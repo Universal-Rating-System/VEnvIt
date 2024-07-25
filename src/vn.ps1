@@ -1,4 +1,37 @@
-# Define a function to handle creating a new virtual environment
+function ConfigureSystemEnvVar {
+
+    $_env_vars = @(
+        @("VENV_ENVIRONMENT", $env:VENV_ENVIRONMENT),
+        @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
+        @("VENVIT_DIR", "$env:VENVIT_DIR"),
+        @("VENV_SECRETS_DIR", "$env:VENV_SECRETS_DIR"),
+        @("VENV_CONFIG_DIR", "$env:VENV_CONFIG_DIR"),
+        @("VENV_BASE_DIR", "$env:VENV_BASE_DIR"),
+        @("VENV_PYTHON_BASE_DIR", "$env:VENV_PYTHON_BASE_DIR")
+    )
+
+    foreach ($var in $_env_vars) {
+        if ([string]::IsNullOrEmpty($var[1])) {
+            Write-Host $var[0] -ForegroundColor Red -NoNewline
+            Write-Host " - Not Set"
+        } else {
+            Write-Host $var[0] -ForegroundColor Green -NoNewline
+            $s = " - Set to: " +  $var[1]
+            Write-Host $s
+        }
+    }
+}
+
+function CreateDirIfNotExist {
+    param (
+        [string]$_dir
+    )
+    if (-not (Test-Path -Path $_dir)) {
+        New-Item -ItemType Directory -Path $_dir | Out-Null
+    }
+
+}
+
 function CreatePreCommitConfigYaml {
     $pre_commit_file_name = ".pre-commit-config.yaml"
     $pre_commit_path = Join-Path -Path $_project_dir -ChildPath $pre_commit_file_name
@@ -36,15 +69,16 @@ function CreateVirtualEnvironment {
     }
 
     # Check for required environment variables and display help if they're missing
-    if (-not $env:VENV_ENVIRONMENT -or -not $env:VENVIT_DIR -or -not $env:SECRETS_DIR -or -not $env:PROJECTS_BASE_DIR -or -not $env:VENV_BASE_DIR -or -not $env:VENV_PYTHON_BASE_DIR) {
+    if (
+        -not $env:VENV_ENVIRONMENT -or
+        -not $env:VENVIT_DIR -or
+        -not $env:VENV_SECRETS_DIR -or
+        -not $env:VENV_CONFIG_DIR -or
+        -not $env:PROJECTS_BASE_DIR -or
+        -not $env:VENV_BASE_DIR -or
+        -not $env:VENV_PYTHON_BASE_DIR) {
         ShowEnvVarHelp
         return
-    }
-
-    # Configure the environment settings for local development environment
-    $env:PROJECT_NAME = $_project_name
-    if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
-        & "$env:SECRETS_DIR\env_var_dev.ps1"
     }
 
     # Set local variables from environment variables
@@ -54,7 +88,7 @@ function CreateVirtualEnvironment {
     $_project_base_dir = $env:PROJECTS_BASE_DIR
     $_project_name = if (-not $_project_name) { Read-Host "Project name" } else { $_project_name }
     $_python_version = if (-not $_python_version) { Read-Host "Python version" } else { $_python_version }
-    $_organization = if (-not $_organization) { Read-Host "Institution" } else { $_organization }
+    $_organization = if (-not $_organization) { Read-Host "Organization" } else { $_organization }
     if (-not $_dev_mode -eq "Y" -or -not $_dev_mode -eq "N" -or [string]::IsNullOrWhiteSpace($_dev_mode)) {
         $_dev_mode = ReadYesOrNo -_prompt_text "Dev mode"
     }
@@ -62,32 +96,31 @@ function CreateVirtualEnvironment {
         $_reset = ReadYesOrNo -_prompt_text "Reset scripts"
     }
 
-    # Determine project directory based on organization
-    switch ($_organization) {
-        "PP" { $_organization_dir = Join-Path $_project_base_dir "PP" }
-        "RTE" { $_organization_dir = Join-Path $_project_base_dir "RTE" }
-        "RE" { $_organization_dir = Join-Path $_project_base_dir "ReahlExamples" }
-        "HdT" { $_organization_dir = Join-Path $_project_base_dir "HdT" }
-        "DdT" { $_organization_dir = Join-Path $_project_base_dir "DdT" }
-        "Citiq" { $_organization_dir = Join-Path $_project_base_dir "Citiq" }
-        default { $_organization_dir = Join-Path $_project_base_dir "BEE" }
+    # Configure the environment settings for local development environment
+    $env:PROJECT_NAME = $_project_name
+    $env:VENV_ORGANIZATION_NAME = $_organization
+    if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
+        & "$env:VENV_SECRETS_DIR\env_var_dev.ps1"
     }
+
+    # Determine project directory based on organization
+    $_organization_dir = Join-Path $_project_base_dir $env:VENV_ORGANIZATION_NAME
     # Create organization directory if it does not exist
     if (-not (Test-Path $_organization_dir)) {mkdir $_organization_dir}
     $_project_dir = Join-Path $_organization_dir $_project_name
 
     # Output configuration details
-    Write-Host "Project name:      $_project_name"
-    Write-Host "Python version:    $_python_version"
-    Write-Host "Institution Accr:  $_organization"
-    Write-Host "Dev Mode:          $_dev_mode"
-    Write-Host "Reset project:     $_reset"
-    Write-Host "VENVIT_DIR:        $_venvit_dir"
-    Write-Host "PROJECTS_BASE_DIR: $_project_base_dir"
-    Write-Host "INSTITUTION_DIR:   $_organization_dir"
-    Write-Host "PROJECT_DIR:       $_project_dir"
-    Write-Host "VENV_BASE_DIR:     $_venv_base_dir"
-    Write-Host "VENV_PYTHON_BASE:  $_python_base_dir"
+    Write-Host "Project name:       $_project_name"
+    Write-Host "Python version:     $_python_version"
+    Write-Host "Organization Accr:  $_organization"
+    Write-Host "Dev Mode:           $_dev_mode"
+    Write-Host "Reset project:      $_reset"
+    Write-Host "VENVIT_DIR:         $_venvit_dir"
+    Write-Host "PROJECTS_BASE_DIR:  $_project_base_dir"
+    Write-Host "INSTITUTION_DIR:    $_organization_dir"
+    Write-Host "PROJECT_DIR:        $_project_dir"
+    Write-Host "VENV_BASE_DIR:      $_venv_base_dir"
+    Write-Host "VENV_PYTHON_BASE:   $_python_base_dir"
 
     $_continue = ReadYesOrNo -_prompt_text "Continue"
 
@@ -193,6 +226,7 @@ function CreateVirtualEnvironment {
             Add-Content -Path $_script_custom_path -Value '#$env:MYSQL_ROOT_PASSWORD = "??"'
             Add-Content -Path $_script_custom_path -Value '#$env:MYSQL_TCP_PORT = ??'
         }
+        Write-Host $separator -ForegroundColor Cyan
         & $_script_mandatory_path
         Write-Host $separator -ForegroundColor Cyan
         & $_script_install_path
@@ -209,7 +243,7 @@ function DisplayEnvironmentVariables {
     Write-Host "PROJECTS_BASE_DIR:     $env:PROJECTS_BASE_DIR"
     Write-Host "PROJECT_DIR:           $env:PROJECT_DIR"
     Write-Host "VENVIT_DIR:            $env:VENVIT_DIR"
-    Write-Host "SECRETS_DIR:           $env:SECRETS_DIR"
+    Write-Host "VENV_SECRETS_DIR:      $env:VENV_SECRETS_DIR"
     Write-Host "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
     Write-Host "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
     Write-Host ""
@@ -246,6 +280,26 @@ function MoveFileToArchiveIfExists {
     }
 }
 
+function Read-EnvVarValueCsv {
+    param (
+        [string]$filePath
+    )
+
+    # Check if the file exists
+    if (-Not (Test-Path -Path $filePath)) {
+        Write-Host "The file '$filePath' does not exist." -ForegroundColor Red
+        return $null
+    }
+
+    # Read the CSV file and return the contents
+    try {
+        $csvContents = Import-Csv -Path $filePath
+        return $csvContents
+    } catch {
+        Write-Host "An error occurred while reading the CSV file: $_" -ForegroundColor Red
+        return $null
+    }
+}
 
 function ShowHelp {
     $separator = "-" * 80
@@ -255,15 +309,15 @@ function ShowHelp {
 @"
     Usage:
     ------
-    vn.ps1 ProjectName PythonVer Institution DevMode ResetScripts
+    vn.ps1 ProjectName PythonVer Organization DevMode ResetScripts
     vr.ps1 -h
 
     Parameters:
-      ProjectName  The name of the project.
-      PythonVer    Python version for the virtual environment.
-      Institution  Acronym for the organization owning the project.
-      DevMode      [y|n] If "y", installs \[dev\] modules from pyproject.
-      ResetScripts [y|n] If "y", moves certain scripts to the Archive directory.
+      ProjectName   The name of the project.
+      PythonVer     Python version for the virtual environment.
+      Organization  Acronym for the organization owning the project.
+      DevMode       [y|n] If "y", installs \[dev\] modules from pyproject.
+      ResetScripts  [y|n] If "y", moves certain scripts to the Archive directory.
 "@ | Write-Host
 
     Write-Host $separator -ForegroundColor Cyan
@@ -276,7 +330,7 @@ function ShowEnvVarHelp {
         @("VENV_ENVIRONMENT", $env:VENV_ENVIRONMENT),
         @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
         @("VENVIT_DIR", "$env:VENVIT_DIR"),
-        @("SECRETS_DIR", "$env:SECRETS_DIR"),
+        @("VENV_SECRETS_DIR", "$env:VENV_SECRETS_DIR"),
         @("VENV_BASE_DIR", "$env:VENV_BASE_DIR"),
         @("VENV_PYTHON_BASE_DIR", "$env:VENV_PYTHON_BASE_DIR")
     )
