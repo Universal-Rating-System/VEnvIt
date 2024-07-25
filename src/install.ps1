@@ -54,10 +54,10 @@ $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$release
 $zipFilePath = Join-Path -Path $installScriptDir -ChildPath "installation_files.zip"
 
 # Check for administrative privileges
-if (-not (Test-Admin)) {
-    Write-Host "This script needs to be run as an administrator. Please run it in an elevated PowerShell session." -ForegroundColor Red
-    exit
-}
+# if (-not (Test-Admin)) {
+#     Write-Host "This script needs to be run as an administrator. Please run it in an elevated PowerShell session." -ForegroundColor Red
+#     exit
+# }
 
 # Remove historical (Batch) environment variables if they exist
 $_old_env_vars = @(
@@ -99,6 +99,7 @@ $_system_dirs = @(
 foreach ($var in $_system_dirs) {
     if (-not (Test-Path -Path $var)) {
         New-Item -ItemType Directory -Path $var | Out-Null
+    }
 }
 
 # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
