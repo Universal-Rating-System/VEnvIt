@@ -104,19 +104,19 @@ foreach ($var in $_system_dirs) {
 Write-Host "Unzipping installation_files.zip to $VENVIT_DIR..."
 Expand-Archive -Path $zipFilePath -DestinationPath $VENVIT_DIR -Force
 
-# Move the env_var_dev.csv file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
-$sourceFilePath = Join-Path -Path $VENVIT_DIR -ChildPath "env_var_dev.csv"
-$destinationFilePath = Join-Path -Path $VENV_SECRETS_DIR -ChildPath "env_var_dev.csv"
+# Move the dev_env_var.csv file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
+$sourceFilePath = Join-Path -Path $VENVIT_DIR -ChildPath "dev_env_var.csv"
+$destinationFilePath = Join-Path -Path $VENV_SECRETS_DIR -ChildPath "dev_env_var.csv"
 
 if (Test-Path -Path $sourceFilePath) {
     if (-not (Test-Path -Path $destinationFilePath)) {
-        Write-Host "Moving env_var_dev.ps1 to $VENV_SECRETS_DIR..."
+        Write-Host "Moving dev_env_var.csv to $VENV_SECRETS_DIR..."
         Move-Item -Path $sourceFilePath -Destination $destinationFilePath -Force
     } else {
-        Write-Host "env_var_dev.ps1 already exists in $VENV_SECRETS_DIR. It will not be overwritten."
+        Write-Host "dev_env_var.csv already exists in $VENV_SECRETS_DIR. It will not be overwritten."
     }
 } else {
-    Write-Host "env_var_dev.ps1 not found in $VENVIT_DIR."
+    Write-Host "dev_env_var.csv not found in $VENVIT_DIR."
 }
 
 Write-Host $separator -ForegroundColor Cyan
