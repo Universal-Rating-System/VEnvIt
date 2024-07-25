@@ -62,6 +62,8 @@ function CreateVirtualEnvironment {
         $_reset = ReadYesOrNo -_prompt_text "Reset scripts"
     }
 
+    Write-Host $separator -ForegroundColor Cyan
+
     # Determine project directory based on institution
     switch ($_institution) {
         "PP" { $_institution_dir = Join-Path $_project_base_dir "PP" }
@@ -91,6 +93,8 @@ function CreateVirtualEnvironment {
 
     $_continue = ReadYesOrNo -_prompt_text "Continue"
 
+    Write-Host $separator -ForegroundColor Cyan
+
     if ($_continue -eq "Y") {
         Set-Location -Path $_institution_dir.Substring(0,2)
         Write-Host "$_python_base_dir\Python$_python_version\python -m venv --clear $_venv_base_dir\$_project_name_env"
@@ -108,15 +112,21 @@ function CreateVirtualEnvironment {
         & $_venv_base_dir"\"$_project_name"_env\Scripts\activate.ps1"
         python.exe -m pip install --upgrade pip
 
+        Write-Host $separator -ForegroundColor Cyan
+
         if (-not (Test-Path $_project_dir)) {
             New-Item -ItemType Directory -Path "$_project_dir" -Force
             New-Item -ItemType Directory -Path "$_project_dir\docs" -Force
         }
 
+        Write-Host $separator -ForegroundColor Cyan
+
         Set-Location -Path $_project_dir
         if (-not (Test-Path "$_project_dir\docs\requirements_docs.txt")) {
             New-Item -ItemType File -Path "$_project_dir\docs\requirements_docs.txt" -Force
         }
+
+        Write-Host $separator -ForegroundColor Cyan
 
         $_project_install_path = Join-Path -Path $_project_dir -ChildPath "install.ps1"
         if (-not (Test-Path -Path $_project_install_path)) {
@@ -305,8 +315,9 @@ function ReadYesOrNo {
 Write-Host ''
 Write-Host ''
 $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+$separator = "-" * 80
 Write-Host "=[ START $dateTime ]=======================================[ vn.ps1 ]=" -ForegroundColor Blue
-Write-Host "Create new $args[0] virtual environment"
+Write-Host "Create new ${args[0]} virtual environment" -ForegroundColor Blue
 CreateVirtualEnvironment -_project_name $args[0] -_python_version $args[1] -_institution $args[2] -_dev_mode $args[3] -_reset $args[4]
 DisplayEnvironmentVariables
 Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
