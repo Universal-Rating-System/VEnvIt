@@ -53,6 +53,7 @@ function InitVirtualEnvironment {
     & "${_venvit_dir}\venv_${_project_name}_setup_mandatory.ps1" $_project_name
     $_project_dir = $env:PROJECT_DIR
 
+    $env:PROJECT_NAME = $_project_name
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
         & "$_secrets_dir\env_var_dev.ps1"
     }
