@@ -24,7 +24,7 @@ function CreateVirtualEnvironment {
     param (
         [string]$_project_name,
         [string]$_python_version,
-        [string]$_institution,
+        [string]$_organization,
         [string]$_dev_mode,
         [string]$_reset
     )
@@ -54,7 +54,7 @@ function CreateVirtualEnvironment {
     $_project_base_dir = $env:PROJECTS_BASE_DIR
     $_project_name = if (-not $_project_name) { Read-Host "Project name" } else { $_project_name }
     $_python_version = if (-not $_python_version) { Read-Host "Python version" } else { $_python_version }
-    $_institution = if (-not $_institution) { Read-Host "Institution" } else { $_institution }
+    $_organization = if (-not $_organization) { Read-Host "Institution" } else { $_organization }
     if (-not $_dev_mode -eq "Y" -or -not $_dev_mode -eq "N" -or [string]::IsNullOrWhiteSpace($_dev_mode)) {
         $_dev_mode = ReadYesOrNo -_prompt_text "Dev mode"
     }
@@ -62,31 +62,29 @@ function CreateVirtualEnvironment {
         $_reset = ReadYesOrNo -_prompt_text "Reset scripts"
     }
 
-    Write-Host $separator -ForegroundColor Cyan
-
-    # Determine project directory based on institution
-    switch ($_institution) {
-        "PP" { $_institution_dir = Join-Path $_project_base_dir "PP" }
-        "RTE" { $_institution_dir = Join-Path $_project_base_dir "RTE" }
-        "RE" { $_institution_dir = Join-Path $_project_base_dir "ReahlExamples" }
-        "HdT" { $_institution_dir = Join-Path $_project_base_dir "HdT" }
-        "DdT" { $_institution_dir = Join-Path $_project_base_dir "DdT" }
-        "Citiq" { $_institution_dir = Join-Path $_project_base_dir "Citiq" }
-        default { $_institution_dir = Join-Path $_project_base_dir "BEE" }
+    # Determine project directory based on organization
+    switch ($_organization) {
+        "PP" { $_organization_dir = Join-Path $_project_base_dir "PP" }
+        "RTE" { $_organization_dir = Join-Path $_project_base_dir "RTE" }
+        "RE" { $_organization_dir = Join-Path $_project_base_dir "ReahlExamples" }
+        "HdT" { $_organization_dir = Join-Path $_project_base_dir "HdT" }
+        "DdT" { $_organization_dir = Join-Path $_project_base_dir "DdT" }
+        "Citiq" { $_organization_dir = Join-Path $_project_base_dir "Citiq" }
+        default { $_organization_dir = Join-Path $_project_base_dir "BEE" }
     }
-    # Create institution directory if it does not exist
-    if (-not (Test-Path $_institution_dir)) {mkdir $_institution_dir}
-    $_project_dir = Join-Path $_institution_dir $_project_name
+    # Create organization directory if it does not exist
+    if (-not (Test-Path $_organization_dir)) {mkdir $_organization_dir}
+    $_project_dir = Join-Path $_organization_dir $_project_name
 
     # Output configuration details
     Write-Host "Project name:      $_project_name"
     Write-Host "Python version:    $_python_version"
-    Write-Host "Institution Accr:  $_institution"
+    Write-Host "Institution Accr:  $_organization"
     Write-Host "Dev Mode:          $_dev_mode"
     Write-Host "Reset project:     $_reset"
     Write-Host "VENVIT_DIR:        $_venvit_dir"
     Write-Host "PROJECTS_BASE_DIR: $_project_base_dir"
-    Write-Host "INSTITUTION_DIR:   $_institution_dir"
+    Write-Host "INSTITUTION_DIR:   $_organization_dir"
     Write-Host "PROJECT_DIR:       $_project_dir"
     Write-Host "VENV_BASE_DIR:     $_venv_base_dir"
     Write-Host "VENV_PYTHON_BASE:  $_python_base_dir"
@@ -96,7 +94,7 @@ function CreateVirtualEnvironment {
     Write-Host $separator -ForegroundColor Cyan
 
     if ($_continue -eq "Y") {
-        Set-Location -Path $_institution_dir.Substring(0,2)
+        Set-Location -Path $_organization_dir.Substring(0,2)
         Write-Host "$_python_base_dir\Python$_python_version\python -m venv --clear $_venv_base_dir\$_project_name_env"
 
 
@@ -119,14 +117,10 @@ function CreateVirtualEnvironment {
             New-Item -ItemType Directory -Path "$_project_dir\docs" -Force
         }
 
-        Write-Host $separator -ForegroundColor Cyan
-
         Set-Location -Path $_project_dir
         if (-not (Test-Path "$_project_dir\docs\requirements_docs.txt")) {
             New-Item -ItemType File -Path "$_project_dir\docs\requirements_docs.txt" -Force
         }
-
-        Write-Host $separator -ForegroundColor Cyan
 
         $_project_install_path = Join-Path -Path $_project_dir -ChildPath "install.ps1"
         if (-not (Test-Path -Path $_project_install_path)) {
@@ -176,7 +170,7 @@ function CreateVirtualEnvironment {
             $s = 'Write-Host "Running ' + $_support_scripts[1] + '..."' + " -ForegroundColor Yellow"
             Set-Content -Path $_script_mandatory_path -Value $s
             Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_PY_VER = '$_python_version'"
-            Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_INSTITUTION = '$_institution'"
+            Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_INSTITUTION = '$_organization'"
             Add-Content -Path $_script_mandatory_path -Value "`$env:PYTHONPATH = '$_project_dir;$_project_dir\src;$_project_dir\src\$_project_name;$_project_dir\tests'"
             Add-Content -Path $_script_mandatory_path -Value "`$env:PROJECT_DIR = '$_project_dir'"
             Add-Content -Path $_script_mandatory_path -Value "`$env:PROJECT_NAME = '$_project_name'"
@@ -200,8 +194,11 @@ function CreateVirtualEnvironment {
             Add-Content -Path $_script_custom_path -Value '#$env:MYSQL_TCP_PORT = ??'
         }
         & $_script_mandatory_path
+        Write-Host $separator -ForegroundColor Cyan
         & $_script_install_path
+        Write-Host $separator -ForegroundColor Cyan
         & $_script_custom_path
+        Write-Host $separator -ForegroundColor Cyan
     }
 }
 
@@ -264,7 +261,7 @@ function ShowHelp {
     Parameters:
       ProjectName  The name of the project.
       PythonVer    Python version for the virtual environment.
-      Institution  Acronym for the institution owning the project.
+      Institution  Acronym for the organization owning the project.
       DevMode      [y|n] If "y", installs \[dev\] modules from pyproject.
       ResetScripts [y|n] If "y", moves certain scripts to the Archive directory.
 "@ | Write-Host
@@ -316,8 +313,9 @@ Write-Host ''
 Write-Host ''
 $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 $separator = "-" * 80
+$project_name = $args[0]
 Write-Host "=[ START $dateTime ]=======================================[ vn.ps1 ]=" -ForegroundColor Blue
-Write-Host "Create new ${args[0]} virtual environment" -ForegroundColor Blue
-CreateVirtualEnvironment -_project_name $args[0] -_python_version $args[1] -_institution $args[2] -_dev_mode $args[3] -_reset $args[4]
+Write-Host "Create new $project_name virtual environment" -ForegroundColor Blue
+CreateVirtualEnvironment -_project_name $args[0] -_python_version $args[1] -_organization $args[2] -_dev_mode $args[3] -_reset $args[4]
 DisplayEnvironmentVariables
 Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
