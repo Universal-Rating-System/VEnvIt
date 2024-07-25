@@ -46,7 +46,7 @@ jobs:
       - name: Create zip of PowerShell and config files
         run: |
           cd src
-          zip ../installation_files.zip *.ps1 *.cfg
+          zip ../installation_files.zip *.ps1 *.csv
 
       - name: Publish new release
         uses: softprops/action-gh-release@v2
