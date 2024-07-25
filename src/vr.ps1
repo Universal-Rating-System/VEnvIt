@@ -121,7 +121,8 @@ function ShowEnvVarHelp {
 Write-Host ''
 Write-Host ''
 $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+$project_name = $args[0]
 Write-Host "=[ START $dateTime ]=======================================[ vr.ps1 ]=" -ForegroundColor Blue
-Write-Host "REmove the $args[0] virtual environment" -ForegroundColor Blue
+Write-Host "REmove the $project_name virtual environment" -ForegroundColor Blue
 RemoveVirtualEnvironment -_project_name $args[0]
 Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan

@@ -18,9 +18,9 @@ $existingValue = [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [Sys
 if (-not $existingValue) {
     Write-Host "VENVIT_DIR does not exist." -ForegroundColor Red
 }
-$existingValue = [System.Environment]::GetEnvironmentVariable("SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine)
+$existingValue = [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine)
 if (-not $existingValue) {
-    Write-Host "SECRETS_DIR does not exist." -ForegroundColor Red
+    Write-Host "VENV_SECRETS_DIR does not exist." -ForegroundColor Red
 }
 $existingValue = [System.Environment]::GetEnvironmentVariable("VENV_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
 if (-not $existingValue) {
@@ -31,5 +31,5 @@ if (-not $existingValue) {
     Write-Host "VENV_PYTHON_BASE_DIR does not exist." -ForegroundColor Red
 }
 
-Remove-Item -Path $env:SECRETS_DIR -Recurse -Force
+Remove-Item -Path $env:VENV_SECRETS_DIR -Recurse -Force
 Remove-Item -Path $env:VENVIT_DIR -Recurse -Force
