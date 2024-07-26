@@ -84,6 +84,10 @@ function CreateVirtualEnvironment {
     # Create organization directory if it does not exist
     if (-not (Test-Path $_organization_dir)) {mkdir $_organization_dir}
     $_project_dir = Join-Path $_organization_dir $_project_name
+    if (-not (Test-Path $_project_dir)) {
+        mkdir $_project_dir | Out-Null
+        mkdir "$_project_dir\docs" | Out-Null
+    }
 
     # Output configuration details
     Write-Host "Project name:       $_project_name"
@@ -123,19 +127,20 @@ function CreateVirtualEnvironment {
 
         Write-Host $separator -ForegroundColor Cyan
 
-        if (-not (Test-Path $_project_dir)) {
-            New-Item -ItemType Directory -Path "$_project_dir" -Force
-            New-Item -ItemType Directory -Path "$_project_dir\docs" -Force
-        }
+        # if (-not (Test-Path $_project_dir)) {
+        #     New-Item -ItemType Directory -Path "$_project_dir" -Force | Out-Null
+        #     New-Item -ItemType Directory -Path "$_project_dir\docs" -Force | Out-Null
+        # }
 
         Set-Location -Path $_project_dir
         if (-not (Test-Path "$_project_dir\docs\requirements_docs.txt")) {
-            New-Item -ItemType File -Path "$_project_dir\docs\requirements_docs.txt" -Force
+            New-Item -ItemType File -Path "$_project_dir\docs\requirements_docs.txt" -Force | Out-Null
+
         }
 
         $_project_install_path = Join-Path -Path $_project_dir -ChildPath "install.ps1"
         if (-not (Test-Path -Path $_project_install_path)) {
-            New-Item -ItemType File -Path $_project_install_path -Force
+            New-Item -ItemType File -Path $_project_install_path -Force | Out-Null
             $s = 'Write-Host "Running ' + $_project_install_path + '..."' + " -ForegroundColor Yellow"
             Add-Content -Path $_project_install_path -Value $s
             Add-Content -Path $_project_install_path -Value "pip install --upgrade --force --no-cache-dir black"
@@ -143,7 +148,7 @@ function CreateVirtualEnvironment {
             Add-Content -Path $_project_install_path -Value "pip install --upgrade --force --no-cache-dir pre-commit"
             Add-Content -Path $_project_install_path -Value "pre-commit install"
             Add-Content -Path $_project_install_path -Value "pre-commit autoupdate"
-            Add-Content ""
+            Write-Information ""
             if($_dev_mode -eq "Y") {
                 Add-Content -Path $_project_install_path -Value 'if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) {pip install --no-cache-dir -e .[dev]}'
                 } else {
@@ -253,29 +258,6 @@ function MoveFileToArchiveIfExists {
         # Move the file to the archive directory
         Move-Item -Path $_script_path -Destination $_archive_dir -Force
         Write-Host "Moved $($_script_path) to $($_archive_dir)."
-    } else {
-        Write-Host "File $($_script_path) does not exist."
-    }
-}
-
-function Read-EnvVarValueCsv {
-    param (
-        [string]$filePath
-    )
-
-    # Check if the file exists
-    if (-Not (Test-Path -Path $filePath)) {
-        Write-Host "The file '$filePath' does not exist." -ForegroundColor Red
-        return $null
-    }
-
-    # Read the CSV file and return the contents
-    try {
-        $csvContents = Import-Csv -Path $filePath
-        return $csvContents
-    } catch {
-        Write-Host "An error occurred while reading the CSV file: $_" -ForegroundColor Red
-        return $null
     }
 }
 
