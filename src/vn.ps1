@@ -1,27 +1,3 @@
-function ConfigureSystemEnvVar {
-
-    $_env_vars = @(
-        @("VENV_ENVIRONMENT", $env:VENV_ENVIRONMENT),
-        @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
-        @("VENVIT_DIR", "$env:VENVIT_DIR"),
-        @("VENV_SECRETS_DIR", "$env:VENV_SECRETS_DIR"),
-        @("VENV_CONFIG_DIR", "$env:VENV_CONFIG_DIR"),
-        @("VENV_BASE_DIR", "$env:VENV_BASE_DIR"),
-        @("VENV_PYTHON_BASE_DIR", "$env:VENV_PYTHON_BASE_DIR")
-    )
-
-    foreach ($var in $_env_vars) {
-        if ([string]::IsNullOrEmpty($var[1])) {
-            Write-Host $var[0] -ForegroundColor Red -NoNewline
-            Write-Host " - Not Set"
-        } else {
-            Write-Host $var[0] -ForegroundColor Green -NoNewline
-            $s = " - Set to: " +  $var[1]
-            Write-Host $s
-        }
-    }
-}
-
 function CreateDirIfNotExist {
     param (
         [string]$_dir
@@ -100,7 +76,7 @@ function CreateVirtualEnvironment {
     $env:PROJECT_NAME = $_project_name
     $env:VENV_ORGANIZATION_NAME = $_organization
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
-        & "$env:VENV_SECRETS_DIR\dev_env_var.csv"
+        & "$env:VENV_SECRETS_DIR\dev_env_var.ps1"
     }
 
     # Determine project directory based on organization
@@ -112,15 +88,17 @@ function CreateVirtualEnvironment {
     # Output configuration details
     Write-Host "Project name:       $_project_name"
     Write-Host "Python version:     $_python_version"
-    Write-Host "Organization Accr:  $_organization"
+    Write-Host "Organization Name:  $_organization"
     Write-Host "Dev Mode:           $_dev_mode"
     Write-Host "Reset project:      $_reset"
     Write-Host "VENVIT_DIR:         $_venvit_dir"
     Write-Host "PROJECTS_BASE_DIR:  $_project_base_dir"
-    Write-Host "INSTITUTION_DIR:    $_organization_dir"
+    Write-Host "Organization dir:   $_organization_dir"
     Write-Host "PROJECT_DIR:        $_project_dir"
     Write-Host "VENV_BASE_DIR:      $_venv_base_dir"
     Write-Host "VENV_PYTHON_BASE:   $_python_base_dir"
+    Write-Host "VENV_ENVIRONMENT:   $env:VENV_ENVIRONMENT"
+    Write-Host "VENV_CONFIG_DIR:    $env:VENV_CONFIG_DIR"
 
     $_continue = ReadYesOrNo -_prompt_text "Continue"
 
@@ -177,16 +155,16 @@ function CreateVirtualEnvironment {
             "venv_${_project_name}_install.ps1",
             "venv_${_project_name}_setup_mandatory.ps1"
         )
-        $_archive_dir = Join-Path -Path $_venvit_dir -ChildPath "Archive"
+        $_archive_dir = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath "Archive"
         if ($_reset -eq "Y") {
             foreach ($_file_name in $_support_scripts) {
-                $_script_path = Join-Path -Path $_venvit_dir -ChildPath $_file_name
+                $_script_path = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath $_file_name
                 MoveFileToArchiveIfExists -_script_path $_script_path -_archive_dir $_archive_dir
             }
         }
 
         # Check if the install script does not exist
-        $_script_install_path = Join-Path -Path $_venvit_dir -ChildPath $_support_scripts[0]
+        $_script_install_path = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath $_support_scripts[0]
         if (-not (Test-Path -Path $_script_install_path)) {
             # Create the script and write the lines
             $s = 'Write-Host "Running ' + $_support_scripts[0] + '..."' + " -ForegroundColor Yellow"
@@ -197,13 +175,13 @@ function CreateVirtualEnvironment {
         }
 
         # Check if the mandatory setup script does not exist
-        $_script_mandatory_path = Join-Path -Path $_venvit_dir -ChildPath $_support_scripts[1]
+        $_script_mandatory_path = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath $_support_scripts[1]
         if (-not (Test-Path $_script_mandatory_path)) {
             # Create the script and write the lines
             $s = 'Write-Host "Running ' + $_support_scripts[1] + '..."' + " -ForegroundColor Yellow"
             Set-Content -Path $_script_mandatory_path -Value $s
             Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_PY_VER = '$_python_version'"
-            Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_INSTITUTION = '$_organization'"
+            Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_ORGANIZATION = '$_organization'"
             Add-Content -Path $_script_mandatory_path -Value "`$env:PYTHONPATH = '$_project_dir;$_project_dir\src;$_project_dir\src\$_project_name;$_project_dir\tests'"
             Add-Content -Path $_script_mandatory_path -Value "`$env:PROJECT_DIR = '$_project_dir'"
             Add-Content -Path $_script_mandatory_path -Value "`$env:PROJECT_NAME = '$_project_name'"
@@ -211,7 +189,7 @@ function CreateVirtualEnvironment {
 
         # Check if the custom setup script does not exist
         $_custom_file_name = "venv_${_project_name}_setup_custom.ps1"
-        $_script_custom_path = Join-Path $_venvit_dir -ChildPath ${_custom_file_name}
+        $_script_custom_path = Join-Path $env:VENV_CONFIG_DIR -ChildPath ${_custom_file_name}
         if (-not (Test-Path $_script_custom_path)) {
             $s = 'Write-Host "Running ' + $_custom_file_name + '..."' + " -ForegroundColor Yellow"
             Set-Content -Path $_script_custom_path -Value $s

@@ -55,7 +55,7 @@ function InitVirtualEnvironment {
 
     $env:PROJECT_NAME = $_project_name
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
-        & "$_secrets_dir\dev_env_var.csv"
+        & "$_secrets_dir\dev_env_var.ps1"
     }
 
     # Remove temporary directories from previous sessions

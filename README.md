@@ -11,7 +11,7 @@ The repository has the following tools and utilities:
 - vr.ps1 (Remove a virtual environment)
 - download.ps1 (Commands to initiate the installation)
 - install.ps1 (Install `venvit`)
-- dev_env_var.csv (Sample environment configuration)
+- dev_env_var.ps1 (Sample environment configuration)
 
 ## vn.ps1
 
@@ -157,7 +157,7 @@ where:
 
    ```
 
-1. Configure the dev_env_var.csv script in the SECRETS_DIR.
+1. Configure the dev_env_var.ps1 script in the SECRETS_DIR.
 
    - Set the ports for the various Docker containers.
    - Set the $env:MY_SCRT='AaBbCcDdE' combination to the correct name and value configured in GitHub.
