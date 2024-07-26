@@ -8,4 +8,4 @@ Remove-Item -Path $tempDir.FullName -Recurse -Force
 Unblock-File "$env:VENVIT_DIR\vn.ps1"
 Unblock-File "$env:VENVIT_DIR\vi.ps1"
 Unblock-File "$env:VENVIT_DIR\vr.ps1"
-Unblock-File "$env:VENV_CONFIG_DIR\dev_env_var.ps1"
+Unblock-File "$env:VENV_SECRETS_DIR\dev_env_var.ps1"
