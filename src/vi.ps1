@@ -6,6 +6,7 @@ function DisplayEnvironmentVariables {
     Write-Host "PROJECT_DIR:           $env:PROJECT_DIR"
     Write-Host "VENVIT_DIR:            $env:VENVIT_DIR"
     Write-Host "VENV_SECRETS_DIR:      $env:VENV_SECRETS_DIR"
+    Write-Host "VENV_CONFIG_DIR:       $env:VENV_CONFIG_DIR"
     Write-Host "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
     Write-Host "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
     Write-Host ""
@@ -40,6 +41,7 @@ function InitVirtualEnvironment {
     $_project_base_dir = $env:PROJECTS_BASE_DIR
     $_venvit_dir = $env:VENVIT_DIR
     $_secrets_dir = $env:VENV_SECRETS_DIR
+    $_config_dir = $env:VENV_CONFIG_DIR
     $_venv_base_dir = $env:VENV_BASE_DIR
     $_venv_dir = "$_venv_base_dir\${_project_name}_env"
 
@@ -50,7 +52,7 @@ function InitVirtualEnvironment {
         "No virtual environment is active."
     }
     & "$_venv_dir\Scripts\activate.ps1"
-    & "${_venvit_dir}\venv_${_project_name}_setup_mandatory.ps1" $_project_name
+    & "${_config_dir}\venv_${_project_name}_setup_mandatory.ps1" $_project_name
     $_project_dir = $env:PROJECT_DIR
 
     $env:PROJECT_NAME = $_project_name
@@ -70,7 +72,7 @@ function InitVirtualEnvironment {
         Set-Location -Path $_project_base_dir
     }
 
-    & "${_venvit_dir}\venv_${_project_name}_setup_custom.ps1" $_project_name
+    & "${_config_dir}\venv_${_project_name}_setup_custom.ps1" $_project_name
 }
 
 function ShowEnvVarHelp {
