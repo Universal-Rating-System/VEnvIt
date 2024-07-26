@@ -45,14 +45,14 @@ Notes:
 
 The installation will set the following system environment variables.  Please see the description and instructions:
 
-| System Environment Variable                    | Description                                                                                                                                                                                                                                                                                                                                               |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PROJECTS_BASE_DIR                              | The parent/base directory for all projects (e.g., `D:\GoogleDrive\Projects`). The idea is to separate the projects of various identities, such as personal projects and projects of an organization e.g. `\projects\company` and `\projects\myprojects`                                                                                                   |
-| VENV_VENV_VENV_VENV_VENV_VENV_VENV_SECRETS_DIR | Directory for storing secrets (e.g., `~.\Secrets`). The contents of this directory are private, should not be shared, and should never be pushed to the repository.                                                                                                                                                                                       |
-| VENVIT_DIR                                     | Installation directory where these script reside e.g. `\venv`                                                                                                                                                                                                                                                                                             |
-| VENV_BASE_DIR                                  | The directory where the Python virtual environments are stored differs from the conventional practice of keeping virtual environment installation files within the project directory. Instead, all virtual environments are stored together in a separate directory (e.g., `c:\venv`). This directory should preferably not be a cloud storage directory. |
-| VENV_ENVIRONMENT                               | Sets the variable to identify this environment. Possible values include: `loc_dev`, `github_dev`, `prod` or whatever you or the organization decide on. This value will be set differently in various environments to indicate the execution environment.                                                                                                 |
-| VENV_PYTHON_BASE_DIR                           | Directory for Python installations (e.g., `C:\Python`). Different versions of Python will be accessed during the creation of the virtual environments. For example, if `VENV_PYTHON_BASE_DIR` is set to `C:\Python`, then Python 3.5 will be installed in `C:\Python\Python35` and Python 3.12 in `C:\Python\Python312`.                                  |
+| System Environment Variable | Description                                                                                                                                                                                                                                                                                                                                               |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PROJECTS_BASE_DIR           | The parent/base directory for all projects (e.g., `D:\GoogleDrive\Projects`). The idea is to separate the projects of various identities, such as personal projects and projects of an organization e.g. `\projects\company` and `\projects\myprojects`                                                                                                   |
+| VENV_SECRETS_DIR            | Directory for storing secrets (e.g., `~.\Secrets`). The contents of this directory are private, should not be shared, and should never be pushed to the repository.                                                                                                                                                                                       |
+| VENVIT_DIR                  | Installation directory where these script reside e.g. `\venv`                                                                                                                                                                                                                                                                                             |
+| VENV_BASE_DIR               | The directory where the Python virtual environments are stored differs from the conventional practice of keeping virtual environment installation files within the project directory. Instead, all virtual environments are stored together in a separate directory (e.g., `c:\venv`). This directory should preferably not be a cloud storage directory. |
+| VENV_ENVIRONMENT            | Sets the variable to identify this environment. Possible values include: `loc_dev`, `github_dev`, `prod` or whatever you or the organization decide on. This value will be set differently in various environments to indicate the execution environment.                                                                                                 |
+| VENV_PYTHON_BASE_DIR        | Directory for Python installations (e.g., `C:\Python`). Different versions of Python will be accessed during the creation of the virtual environments. For example, if `VENV_PYTHON_BASE_DIR` is set to `C:\Python`, then Python 3.5 will be installed in `C:\Python\Python35` and Python 3.12 in `C:\Python\Python312`.                                  |
 
 ### Usage
 
@@ -154,10 +154,12 @@ where:
    Unblock-File "$env:VENVIT_DIR\vn.ps1"
    Unblock-File "$env:VENVIT_DIR\vi.ps1"
    Unblock-File "$env:VENVIT_DIR\vr.ps1"
+   Unblock-File "$env:VENV_SECRETS_DIR\dev_env_var.ps1"
+
 
    ```
 
-1. Configure the dev_env_var.ps1 script in the SECRETS_DIR.
+1. Configure the dev_env_var.ps1 script in the VENV_SECRETS_DIR.
 
    - Set the ports for the various Docker containers.
    - Set the $env:MY_SCRT='AaBbCcDdE' combination to the correct name and value configured in GitHub.
@@ -172,4 +174,22 @@ where:
        vn TestProject 310 myorg Y Y
       ```
 
-   1.
+   1. Check the following:
+
+      1. bla, bla, bla....
+
+   1. ```powershell
+       vi TestProject
+      ```
+
+   1. Check the following:
+
+      1. bla, bla, bla....
+
+   1. ```powershell
+       vr TestProject
+      ```
+
+   1. Check the following:
+
+      1. bla, bla, bla....
