@@ -88,8 +88,9 @@ Write-Host "Provide the values for the following environment variables:" -Foregr
 # Ensure the directories exist
 $_system_dirs = @(
     @("PROJECTS_BASE_DIR", $env:PROJECTS_BASE_DIR),
-    @("VENV_ENVIRONMENT", $env:VENVIT_DIR),
-    @("PROJECTS_BASE_DIR", $env:VENV_SECRETS_DIR),
+    @("VENVIT_DIR", $env:VENVIT_DIR),
+    @("VENV_SECRETS_DIR", $env:VENV_SECRETS_DIR),
+    @("PROJECTS_BASE_DIR", $env:PROJECTS_BASE_DIR),
     @("VENV_BASE_DIR", $env:VENV_BASE_DIR),
     @("VENV_PYTHON_BASE_DIR", $env:VENV_PYTHON_BASE_DIR),
     @("VENV_CONFIG_DIR", "$env:VENV_CONFIG_DIR")
