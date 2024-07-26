@@ -82,7 +82,9 @@ function CreateVirtualEnvironment {
     # Determine project directory based on organization
     $_organization_dir = Join-Path $_project_base_dir $env:VENV_ORGANIZATION_NAME
     # Create organization directory if it does not exist
-    if (-not (Test-Path $_organization_dir)) {mkdir $_organization_dir}
+    if (-not (Test-Path $_organization_dir)) {
+        mkdir $_organization_dir | Out-Null
+    }
     $_project_dir = Join-Path $_organization_dir $_project_name
     if (-not (Test-Path $_project_dir)) {
         mkdir $_project_dir | Out-Null
@@ -103,6 +105,7 @@ function CreateVirtualEnvironment {
     Write-Host "VENV_PYTHON_BASE:   $_python_base_dir"
     Write-Host "VENV_ENVIRONMENT:   $env:VENV_ENVIRONMENT"
     Write-Host "VENV_CONFIG_DIR:    $env:VENV_CONFIG_DIR"
+    Write-Host "VENV_SECRETS_DIR:    $env:VENV_SECRETS_DIR"
 
     $_continue = ReadYesOrNo -_prompt_text "Continue"
 
@@ -124,13 +127,6 @@ function CreateVirtualEnvironment {
         & $_python_base_dir\Python$_python_version\python -m venv --clear $_venv_base_dir\$_project_name"_env"
         & $_venv_base_dir"\"$_project_name"_env\Scripts\activate.ps1"
         python.exe -m pip install --upgrade pip
-
-        Write-Host $separator -ForegroundColor Cyan
-
-        # if (-not (Test-Path $_project_dir)) {
-        #     New-Item -ItemType Directory -Path "$_project_dir" -Force | Out-Null
-        #     New-Item -ItemType Directory -Path "$_project_dir\docs" -Force | Out-Null
-        # }
 
         Set-Location -Path $_project_dir
         if (-not (Test-Path "$_project_dir\docs\requirements_docs.txt")) {
@@ -227,6 +223,7 @@ function DisplayEnvironmentVariables {
     Write-Host "PROJECT_DIR:           $env:PROJECT_DIR"
     Write-Host "VENVIT_DIR:            $env:VENVIT_DIR"
     Write-Host "VENV_SECRETS_DIR:      $env:VENV_SECRETS_DIR"
+    Write-Host "VENV_CONFIG_DIR:       $env:VENV_CONFIG_DIR"
     Write-Host "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
     Write-Host "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
     Write-Host ""
@@ -291,6 +288,7 @@ function ShowEnvVarHelp {
         @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
         @("VENVIT_DIR", "$env:VENVIT_DIR"),
         @("VENV_SECRETS_DIR", "$env:VENV_SECRETS_DIR"),
+        @("VENV_CONFIG_DIR, $env:VENV_CONFIG_DIR"),
         @("VENV_BASE_DIR", "$env:VENV_BASE_DIR"),
         @("VENV_PYTHON_BASE_DIR", "$env:VENV_PYTHON_BASE_DIR")
     )
