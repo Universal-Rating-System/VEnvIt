@@ -22,6 +22,7 @@ function DisplayEnvironmentVariables {
     Write-Host "Git Information"  -ForegroundColor Green
     git branch --all
 }
+
 function InitVirtualEnvironment {
     param (
         [string]$_project_name
@@ -133,29 +134,6 @@ Write-Host $separator -ForegroundColor Cyan
     1. ProjectName:  The name of the project.
 "@ | Write-Host
 
-}
-
-function ShowEnvVarHelp {
-    Write-Host "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
-
-    $_env_vars = @(
-        @("VENV_ENVIRONMENT", $env:VENV_ENVIRONMENT),
-        @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
-        @("VENVIT_DIR", "$env:VENVIT_DIR"),
-        @("VENV_SECRETS_DIR", "$env:VENV_SECRETS_DIR"),
-        @("VENV_BASE_DIR", "$env:VENV_BASE_DIR")
-    )
-
-    foreach ($var in $_env_vars) {
-        if ([string]::IsNullOrEmpty($var[1])) {
-            Write-Host $var[0] -ForegroundColor Red -NoNewline
-            Write-Host " - Not Set"
-        } else {
-            Write-Host $var[0] -ForegroundColor Green -NoNewline
-            $s = " - Set to: " +  $var[1]
-            Write-Host $s
-        }
-    }
 }
 
 # Script execution starts here

@@ -1,16 +1,11 @@
 name: Deployment Pipeline
 
 on:
-  #  pull_request:
   push:
 
 jobs:
   Pre-Commit-and-Document-Check:
     uses: ./.github/workflows/01-pre-commit-and-document-check.yml
-
-  # Pre-Commit-and-Document-Check:
-  #   needs: Pre-Commit
-  #   uses: ./.github/workflows/02-check-documentation.yml
 
   # CI:
   #   needs: Check-Documentation

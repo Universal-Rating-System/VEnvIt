@@ -28,7 +28,6 @@ assignees: ''
 
 **Environment**:
 
-- gitit version:
 - Python version:
 - Operating System:
 - Install method (pip, source):

@@ -1,6 +1,13 @@
 # VenvIt
 
-A utility using Python and PowerShell scripts to to create, initiate and remove envirioments and virtual environments.
+A utility using Python and PowerShell scripts to create,
+initiate and remove environment variables and virtual environments.
+
+| **Category** | **Status' and Links**                                                                                                     |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| General      | [![][maintenance_y_img]][maintenance_y_lnk] [![][semver_pic]][semver_link]                                                |
+| CI           | [![][pre_commit_ci_img]][pre_commit_ci_lnk] [![][codecov_img]][codecov_lnk] [![][gha_docu_img]][gha_docu_lnk]             |
+| Github       | [![][gh_issues_img]][gh_issues_lnk] [![][gh_language_img]][gh_language_lnk] [![][gh_last_commit_img]][gh_last_commit_lnk] |
 
 ## Overview
 
@@ -9,9 +16,10 @@ The repository has the following tools and utilities:
 - vn.ps1 (Create a new virtual environment)
 - vi.ps1 (Initialize an existing virtual environment)
 - vr.ps1 (Remove a virtual environment)
-- download.ps1 (Commands to initiate the installation)
-- install.ps1 (Install `venvit`)
+- install.ps1 (Commands to initiate the installation)
+- complete_install.ps1 (Install `venvit`)
 - dev_env_var.ps1 (Sample environment configuration)
+- Some form of testing is introduced, but is rudimentary and more than incomplete.  The next step is to implement Pester.  See [Issue #1](https://github.com/BrightEdgeeServices/venvit/issues/1) and [Issue #2](https://github.com/BrightEdgeeServices/venvit/issues/2)
 
 ## vn.ps1
 
@@ -25,13 +33,17 @@ This script, `vn.ps1`, creates a Python virtual environment. It uses a combinati
 
 ### Project Linked PowerShell Configuration Scripts
 
-It will also create three additional configuration PowerShell scripts. These scripts are specific to each project, support unique configuration options, and assist in the reinstallation and activation of the virtual environment. They reside in a subdirectory called `configs`.
+It will also create three additional configuration PowerShell scripts.
+These scripts are specific to each project, support unique configuration options,
+and assist in the installation and activation of the virtual environment.
+They reside in a subdirectory called `configs`.
 
 1. venv\__project_name_\_install.ps1:
    Specific installation instructions for this project are provided. These instructions are only called during the installation (`vn.ps1`) of the virtual environment.
 
 1. venv\__project_name_\_setup_mandatory.ps1:
-   Contains mandatory instructions necessary for a successful initialization. It is called during both installation (`vn.ps1`) and initialization (`vi.ps1`) of the virtual environment.
+   Contains the mandatory instructions necessary for a successful initialization.
+   It is called during both installation (`vn.ps1`) and initialization (`vi.ps1`) of the virtual environment.
 
 1. venv\__project_name_\_setup_custom.ps1:
    An optional script for custom configuration instructions. It is called during both the installation (`vn.ps1`) and initialization (`vi.ps1`) of the virtual environment.
@@ -78,7 +90,8 @@ where:
 
 ## vi.ps1
 
-This script, `vi.ps1`, initializes an existing Python virtual environment. This include running the venv\__project_name_\_setup_custom.ps1 and venv\__project_name_\_setup_mandatory.ps1 scripts.
+This script, `vi.ps1`, initializes an existing Python virtual environment.
+This includes running the venv\__project_name_\_setup_custom.ps1 and venv\__project_name_\_setup_mandatory.ps1 scripts.
 
 ### Usage:
 
@@ -100,8 +113,11 @@ where:
 
 ## vr.ps1
 
-This script, `vr.ps1`, remove the installed Python virtual environment. This include removing the _VENV_BASE_DIR\\project_name_env_ directory,  zip and move the venv\__project_name_\_install.ps1, venv\__project_name_\_setup_mandatory.ps1 and venv\__project_name_\_setup_custom.ps1 scripts to the `Archive` directory.
-script.
+This script, `vr.ps1`, remove the installed Python virtual environment.
+This includes removing the _VENV_BASE_DIR\\project_name_env_ directory,
+zip and move the venv\__project_name_\_install.ps1,
+venv\__project_name_\_setup_mandatory.ps1 and venv\__project_name_\_setup_custom.ps1 scripts to the `Archive` directory.
+Script.
 
 ### Usage:
 
@@ -127,19 +143,19 @@ where:
 
 1. Remove any native Python installation and ensure that any references to any Python installation are removed from the PATH. This step is vital for a successful operation.
 
-1. Install the various versions of Python you intend to use (e.g., `C:\Python\Python39`, `C:\Python\Python312`, etc.).  Make sure tyou use the following settings on the different installation configuration pages.  Following are the options based on a Python 3.10 installation.
+1. Install the various versions of Python you intend to use (e.g., `C:\Python\Python39`, `C:\Python\Python312`, etc.).  Make sure you use the following settings on the different installation configuration pages.  Following are the options based on a Python 3.10 installation.
 
-   - [ ] **Do not** select "Use admin privileges when installaing py.exe".
+   - [ ] **Do not** select "Use admin privileges when installing py.exe."
    - [ ] **Do not** select "Add python.exe" to the PATH.
-   - Use the "Customize installation".
+   - Use the "Customize installation."
    - [ ] **Unselect** "py launcher".
-   - [ ] **Unselect** for all users (require admin proviledges).
-   - [ ] **Unselect** "Install Python3.10 for all users".
-   - [ ] **Unselect** "Create shortcuts for installed applications".
-   - [ ] **Unselect** "Add Python to environment variables".
-   - [x] **Select** "Precompile standard library".
-   - [x] **Select** "Download debugging tools".
-   - [x] **Select** "Download debug binaries (requires VS 2017 or later).
+   - [ ] **Unselect** for all users (require admin privileges).
+   - [ ] **Unselect** "Install Python3.10 for all users."
+   - [ ] **Unselect** "Create shortcuts for installed applications."
+   - [ ] **Unselect** "Add Python to environment variables."
+   - [x] **Select** "Precompile standard library."
+   - [x] **Select** "Download debugging tools."
+   - [x] **Select** "Download debug binaries (requires VS 2017 or later)."
    - Change the "Customize install location" to e.g. 'C:\\Python\\Python310'
 
 1. Open a new **PowerShell with Administrator rights**.  Do not use an existing one.  Paste the following script in the **PowerShell with Administrator rights**.  The script below can also be found in the `download.ps1` script.
@@ -155,7 +171,6 @@ where:
    Unblock-File "$env:VENVIT_DIR\vi.ps1"
    Unblock-File "$env:VENVIT_DIR\vr.ps1"
    Unblock-File "$env:VENV_SECRETS_DIR\dev_env_var.ps1"
-
 
    ```
 
@@ -176,7 +191,12 @@ where:
 
    1. Check the following:
 
-      1. bla, bla, bla....
+      1. The virtual environment is activated.
+      1. The current directory is `..\myorg\TestProject`.
+      1. The environment variables exist and have the correct values:
+         ```powershell
+            gci env:
+         ```
 
    1. ```powershell
        vi TestProject
@@ -184,7 +204,8 @@ where:
 
    1. Check the following:
 
-      1. bla, bla, bla....
+      1. The virtual environment is activated.
+      1. The current directory is `..\myorg\TestProject`.
 
    1. ```powershell
        vr TestProject
@@ -192,4 +213,21 @@ where:
 
    1. Check the following:
 
-      1. bla, bla, bla....
+      1. The virtual environment is deactivated.
+
+[codecov_img]: https://img.shields.io/codecov/c/gh/BrightEdgeeServices/venvit "CodeCov"
+[codecov_lnk]: (https://app.codecov.io/gh/BrightEdgeeServices/venvit) "CodeCov"
+[gha_docu_img]: https://img.shields.io/readthedocs/venvit "Read the Docs"
+[gha_docu_lnk]: https://github.com/BrightEdgeeServices/venvit/blob/master/.github/workflows/02-check-documentation.yml "Read the Docs"
+[gh_issues_img]: https://img.shields.io/github/issues-raw/BrightEdgeeServices/venvit "GitHub - Issue Counter"
+[gh_issues_lnk]: https://github.com/BrightEdgeeServices/venvit/issues "GitHub - Issue Counter"
+[gh_language_img]: https://img.shields.io/github/languages/top/BrightEdgeeServices/venvit "GitHub - Top Language"
+[gh_language_lnk]: https://github.com/BrightEdgeeServices/venvit "GitHub - Top Language"
+[gh_last_commit_img]: https://img.shields.io/github/last-commit/BrightEdgeeServices/venvit/master "GitHub - Last Commit"
+[gh_last_commit_lnk]: https://github.com/BrightEdgeeServices/venvit/commit/master "GitHub - Last Commit"
+[maintenance_y_img]: https://img.shields.io/badge/Maintenance%20Intended-%E2%9C%94-green.svg?style=flat-square "Maintenance - intended"
+[maintenance_y_lnk]: http://unmaintained.tech/ "Maintenance - intended"
+[pre_commit_ci_img]: https://img.shields.io/github/actions/workflow/status/BrightEdgeeServices/venvit/01-pre-commit-and-document-check.yml?label=pre-commit "Pre-Commit"
+[pre_commit_ci_lnk]: https://github.com/BrightEdgeeServices/venvit/blob/master/.github/workflows/01-pre-commit-and-document-check.yml "Pre-Commit"
+[semver_link]: https://semver.org/ "Sentic Versioning - 2.0.0"
+[semver_pic]: https://img.shields.io/badge/Semantic%20Versioning-2.0.0-brightgreen.svg?style=flat-square "Sentic Versioning - 2.0.0"

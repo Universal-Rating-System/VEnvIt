@@ -105,7 +105,7 @@ function CreateVirtualEnvironment {
     Write-Host "VENV_PYTHON_BASE:   $_python_base_dir"
     Write-Host "VENV_ENVIRONMENT:   $env:VENV_ENVIRONMENT"
     Write-Host "VENV_CONFIG_DIR:    $env:VENV_CONFIG_DIR"
-    Write-Host "VENV_SECRETS_DIR:    $env:VENV_SECRETS_DIR"
+    Write-Host "VENV_SECRETS_DIR:   $env:VENV_SECRETS_DIR"
 
     $_continue = ReadYesOrNo -_prompt_text "Continue"
 
@@ -258,6 +258,23 @@ function MoveFileToArchiveIfExists {
     }
 }
 
+function ReadYesOrNo {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$_prompt_text
+    )
+    do
+    {
+        $inputValue = Read-Host "$_prompt_text (Y/n)"
+        $inputValue = $inputValue.ToUpper()
+        if (-not $inputValue)
+        {
+            $inputValue = 'Y'
+        }
+    } while ($inputValue -ne 'Y' -and $inputValue -ne 'N')
+    return $inputValue
+}
+
 function ShowHelp {
     $separator = "-" * 80
     Write-Host $separator -ForegroundColor Cyan
@@ -303,21 +320,6 @@ function ShowEnvVarHelp {
             Write-Host $s
         }
     }
-}
-
-function ReadYesOrNo {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$_prompt_text
-    )
-    do {
-        $inputValue = Read-Host "$_prompt_text (Y/n)"
-        $inputValue = $inputValue.ToUpper()
-        if (-not $inputValue) {
-            $inputValue = 'Y'
-        }
-    } while ($inputValue -ne 'Y' -and $inputValue -ne 'N')
-    return $inputValue
 }
 
 # Script execution starts here
