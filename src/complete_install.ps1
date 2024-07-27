@@ -45,7 +45,7 @@ function Remove-EnvVarIfExists {
 Write-Host ''
 Write-Host ''
 $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-Write-Host "=[ START $dateTime ]=========================[ complete_install.ps1 ]=" -ForegroundColor Blue
+Write-Host "=[ START $dateTime ]=========================[ conclude_install.ps1 ]=" -ForegroundColor Blue
 Write-Host "Install venvit" -ForegroundColor Blue
 
 Write-Host $separator -ForegroundColor Cyan
@@ -143,9 +143,9 @@ Write-Host "Installation and configuration are complete."  -ForegroundColor Gree
 
 # Remove the install.ps1 script
 $scriptPath = $MyInvocation.MyCommand.Path
-Write-Host "Removing the install.ps1 script..."  -ForegroundColor Green
+Write-Host "Removing the conclude_install.ps1 script..."  -ForegroundColor Green
 Remove-Item -Path $scriptPath -Force
-Write-Host "install.ps1 has been deleted."  -ForegroundColor Green
+Write-Host "conclude_install.ps1 has been deleted."  -ForegroundColor Green
 
 Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
 Write-Host ''
