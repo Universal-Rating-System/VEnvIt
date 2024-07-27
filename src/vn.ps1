@@ -105,7 +105,7 @@ function CreateVirtualEnvironment {
     Write-Host "VENV_PYTHON_BASE:   $_python_base_dir"
     Write-Host "VENV_ENVIRONMENT:   $env:VENV_ENVIRONMENT"
     Write-Host "VENV_CONFIG_DIR:    $env:VENV_CONFIG_DIR"
-    Write-Host "VENV_SECRETS_DIR:    $env:VENV_SECRETS_DIR"
+    Write-Host "VENV_SECRETS_DIR:   $env:VENV_SECRETS_DIR"
 
     $_continue = ReadYesOrNo -_prompt_text "Continue"
 

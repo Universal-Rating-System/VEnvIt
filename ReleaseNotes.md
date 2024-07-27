@@ -25,7 +25,7 @@
 - Rename the RTE_ENVIRONMENT environment variable to VENV_ENVIRONMENT.
 - Rename the SCRIPTS_DIR environment variable to VENVIT_DIR.
 - Rename the SECRETS_DIR environment variable to VENV_SECRETS_DIR.
-- Add the VENV_CONFIG_DIR environment variable for greater flexibility to implement shared installations in a organization.
+- Add the VENV_CONFIG_DIR environment variable for greater flexibility to implement shared installations in an organization.
 - Improved the display of messages to the console.
 - Moved the bulk of the help functions to `README.md`.
 - Improved the `usage` clauses in the help.

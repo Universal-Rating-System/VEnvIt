@@ -20,7 +20,7 @@ labels:
 
 **Anything else we need to know?**:
 
-**Why is this a hotfix and not a bugfix i.e. describe the impact on the production system.**:
+**Why is this a hotfix and not a bugfix i.e., describe the impact on the production system.**:
 
 **Environment**:
 

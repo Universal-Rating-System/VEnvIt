@@ -75,7 +75,7 @@ jobs:
                 <col style="text-align:left">
               </colgroup>
               <tr>
-                <th style="text-align: center; border-bottom-style: double; border-right-style: double; border-rigth-width: 1px; border-bottom-width: 3px">Description</th>
+                <th style="text-align: center; border-bottom-style: double; border-right-style: double; border-right-width: 1px; border-bottom-width: 3px">Description</th>
                 <th style="text-align: center; border-bottom-style: double; border-left-style: double; border-bottom-width: 3px; border-left-width: 1px">Detail</th>
               </tr>
               <tr>

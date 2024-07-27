@@ -16,6 +16,8 @@ labels:
 
 **New Release Checks:**
 
+- [ ] Remove warnings, errors and spelling reported by IDE.
+- [ ] Update / remove ToDo's
 - [ ] Commented code is not useful anymore are removed.
 - [ ] Commented GitHub Workflows scripts for testing purposes are restored.
 - [ ] Functions/methods/variables in modules are in alphabetical order (if possible).
