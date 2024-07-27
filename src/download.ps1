@@ -3,7 +3,9 @@ $tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venv
 $installScriptPath = Join-Path -Path $tempDir.FullName -ChildPath "install.ps1"
 Invoke-WebRequest -Uri "https://github.com/BrightEdgeeServices/venvit/releases/download/$tag/install.ps1" -OutFile $installScriptPath
 & $installScriptPath -release $tag -installScriptDir $tempDir
-# The next line is used for testing purposes.  It will executhe installation.ps1 in the development directory and not the downloaded  copy.
+# The next line is used for testing purposes.  It will executhe installation.ps1 in
+# the development directory and not the downloaded copy.  Once Pester is installed,
+# it should be redundant.
 # & "D:\Dropbox\Projects\BEE\venvit\src\install.ps1" -release $tag -installScriptDir "D:\Dropbox\Projects\BEE\venvit\"
 Remove-Item -Path $tempDir.FullName -Recurse -Force
 Unblock-File "$env:VENVIT_DIR\vn.ps1"

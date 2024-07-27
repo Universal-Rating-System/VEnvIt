@@ -53,11 +53,11 @@ Write-Host $separator -ForegroundColor Cyan
 $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$release/installation_files.zip"
 $zipFilePath = Join-Path -Path $installScriptDir -ChildPath "installation_files.zip"
 
-# Check for administrative privileges
-# if (-not (Test-Admin)) {
-#     Write-Host "This script needs to be run as an administrator. Please run it in an elevated PowerShell session." -ForegroundColor Red
-#     exit
-# }
+Check for administrative privileges
+if (-not (Test-Admin)) {
+    Write-Host "This script needs to be run as an administrator. Please run it in an elevated PowerShell session." -ForegroundColor Red
+    exit
+}
 
 # Remove historical (Batch) environment variables if they exist
 $_old_env_vars = @(

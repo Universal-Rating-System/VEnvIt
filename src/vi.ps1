@@ -22,6 +22,7 @@ function DisplayEnvironmentVariables {
     Write-Host "Git Information"  -ForegroundColor Green
     git branch --all
 }
+
 function InitVirtualEnvironment {
     param (
         [string]$_project_name

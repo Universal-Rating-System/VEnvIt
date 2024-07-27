@@ -35,4 +35,3 @@ $env:MYSQL_DATABASE='mydb'
 # Correct next environment variable to reflect the correct name and value.
 # This secret is the token setup in GitHub that enables you to push to the repositories.
 $env:MY_SCRT='AaBbCcDdE'
-
