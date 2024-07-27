@@ -1,7 +1,7 @@
 $tempDir = New-Item -ItemType Directory -Path (Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath ([System.IO.Path]::GetRandomFileName()))
 $tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" | ConvertFrom-Json)[0].tag_name
 $installScriptPath = Join-Path -Path $tempDir.FullName -ChildPath "install.ps1"
-Invoke-WebRequest -Uri "https://github.com/BrightEdgeeServices/venvit/releases/download/$tag/install.ps1" -OutFile $installScriptPath
+Invoke-WebRequest -Uri "https://github.com/BrightEdgeeServices/venvit/releases/download/$tag/complete_install.ps1" -OutFile $installScriptPath
 & $installScriptPath -release $tag -installScriptDir $tempDir
 # The next line is used for testing purposes.  It will executhe installation.ps1 in
 # the development directory and not the downloaded copy.  Once Pester is installed,
