@@ -56,7 +56,7 @@ jobs:
           prerelease: false
           files: |
             installation_files.zip
-            ./src/install.ps1
+            ./src/compete_install.ps1
 
       - name: Send release email notification
         uses: betterfor/action-send-mail@main
