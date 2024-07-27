@@ -2,6 +2,12 @@
 
 A utility using Python and PowerShell scripts to to create, initiate and remove envirioments and virtual environments.
 
+| **Category** | **Links**                                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| General      | [![][maintenance_y_img]][maintenance_y_lnk] [![][semver_pic]][semver_link]                                                |
+| CI           | [![][pre_commit_ci_img]][pre_commit_ci_lnk] [![][codecov_img]][codecov_lnk] [![][gha_docu_img]][gha_docu_lnk]             |
+| Github       | [![][gh_issues_img]][gh_issues_lnk] [![][gh_language_img]][gh_language_lnk] [![][gh_last_commit_img]][gh_last_commit_lnk] |
+
 ## Overview
 
 The repository has the following tools and utilities:
@@ -156,7 +162,6 @@ where:
    Unblock-File "$env:VENVIT_DIR\vr.ps1"
    Unblock-File "$env:VENV_SECRETS_DIR\dev_env_var.ps1"
 
-
    ```
 
 1. Configure the dev_env_var.ps1 script in the VENV_SECRETS_DIR.
@@ -193,3 +198,20 @@ where:
    1. Check the following:
 
       1. bla, bla, bla....
+
+[codecov_img]: https://img.shields.io/codecov/c/gh/BrightEdgeeServices/venvit "CodeCov"
+[codecov_lnk]: (https://app.codecov.io/gh/BrightEdgeeServices/venvit) "CodeCov"
+[gha_docu_img]: https://img.shields.io/readthedocs/venvit "Read the Docs"
+[gha_docu_lnk]: https://github.com/BrightEdgeeServices/venvit/blob/master/.github/workflows/02-check-documentation.yml "Read the Docs"
+[gh_issues_img]: https://img.shields.io/github/issues-raw/BrightEdgeeServices/venvit "GitHub - Issue Counter"
+[gh_issues_lnk]: https://github.com/BrightEdgeeServices/venvit/issues "GitHub - Issue Counter"
+[gh_language_img]: https://img.shields.io/github/languages/top/BrightEdgeeServices/venvit "GitHub - Top Language"
+[gh_language_lnk]: https://github.com/BrightEdgeeServices/venvit "GitHub - Top Language"
+[gh_last_commit_img]: https://img.shields.io/github/last-commit/BrightEdgeeServices/venvit/master "GitHub - Last Commit"
+[gh_last_commit_lnk]: https://github.com/BrightEdgeeServices/venvit/commit/master "GitHub - Last Commit"
+[maintenance_y_img]: https://img.shields.io/badge/Maintenance%20Intended-%E2%9C%94-green.svg?style=flat-square "Maintenance - intended"
+[maintenance_y_lnk]: http://unmaintained.tech/ "Maintenance - intended"
+[pre_commit_ci_img]: https://img.shields.io/github/actions/workflow/status/BrightEdgeeServices/venvit/01-pre-commit-and-document-check.yml?label=pre-commit "Pre-Commit"
+[pre_commit_ci_lnk]: https://github.com/BrightEdgeeServices/venvit/blob/master/.github/workflows/01-pre-commit-and-document-check.yml "Pre-Commit"
+[semver_link]: https://semver.org/ "Sentic Versioning - 2.0.0"
+[semver_pic]: https://img.shields.io/badge/Semantic%20Versioning-2.0.0-brightgreen.svg?style=flat-square "Sentic Versioning - 2.0.0"

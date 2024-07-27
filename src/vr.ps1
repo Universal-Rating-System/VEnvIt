@@ -56,6 +56,31 @@ function RemoveVirtualEnvironment {
     }
 }
 
+function ShowEnvVarHelp {
+    Write-Host "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
+
+    $_env_vars = @(
+        @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
+        @("VENVIT_DIR", "$env:VENVIT_DIR"),
+        @("VENV_BASE_DIR", "$env:VENV_BASE_DIR")
+    )
+
+    foreach ($var in $_env_vars)
+    {
+        if ( [string]::IsNullOrEmpty($var[1]))
+        {
+            Write-Host $var[0] -ForegroundColor Red -NoNewline
+            Write-Host " - Not Set"
+        }
+        else
+        {
+            Write-Host $var[0] -ForegroundColor Green -NoNewline
+            $s = " - Set to: " + $var[1]
+            Write-Host $s
+        }
+    }
+}
+
 function ShowHelp {
     $separator = "-" * 80
     Write-Host $separator -ForegroundColor Cyan
@@ -94,27 +119,6 @@ script.
 "@ | Write-Host
 
     Write-Host $separator -ForegroundColor Cyan
-}
-
-function ShowEnvVarHelp {
-    Write-Host "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
-
-    $_env_vars = @(
-        @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
-        @("VENVIT_DIR", "$env:VENVIT_DIR"),
-        @("VENV_BASE_DIR", "$env:VENV_BASE_DIR")
-    )
-
-    foreach ($var in $_env_vars) {
-        if ([string]::IsNullOrEmpty($var[1])) {
-            Write-Host $var[0] -ForegroundColor Red -NoNewline
-            Write-Host " - Not Set"
-        } else {
-            Write-Host $var[0] -ForegroundColor Green -NoNewline
-            $s = " - Set to: " +  $var[1]
-            Write-Host $s
-        }
-    }
 }
 
 # Script execution starts here
