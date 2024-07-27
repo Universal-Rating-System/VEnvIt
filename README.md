@@ -181,7 +181,12 @@ where:
 
    1. Check the following:
 
-      1. bla, bla, bla....
+      1. The virtual environment is activated.
+      1. The current directory is `..\myorg\TestProject`.
+      1. The environment variables exist and have the correct values:
+         ```powershell
+            gci env:
+         ```
 
    1. ```powershell
        vi TestProject
@@ -189,7 +194,8 @@ where:
 
    1. Check the following:
 
-      1. bla, bla, bla....
+      1. The virtual environment is activated.
+      1. The current directory is `..\myorg\TestProject`.
 
    1. ```powershell
        vr TestProject
@@ -197,7 +203,7 @@ where:
 
    1. Check the following:
 
-      1. bla, bla, bla....
+      1. The virtual environment is deactivated.
 
 [codecov_img]: https://img.shields.io/codecov/c/gh/BrightEdgeeServices/venvit "CodeCov"
 [codecov_lnk]: (https://app.codecov.io/gh/BrightEdgeeServices/venvit) "CodeCov"
