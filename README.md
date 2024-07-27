@@ -17,7 +17,7 @@ The repository has the following tools and utilities:
 - vi.ps1 (Initialize an existing virtual environment)
 - vr.ps1 (Remove a virtual environment)
 - install.ps1 (Commands to initiate the installation)
-- complete_install.ps1 (Install `venvit`)
+- conclude_install.ps1 (Install `venvit`)
 - dev_env_var.ps1 (Sample environment configuration)
 - Some form of testing is introduced, but is rudimentary and more than incomplete.  The next step is to implement Pester.  See [Issue #1](https://github.com/BrightEdgeeServices/venvit/issues/1) and [Issue #2](https://github.com/BrightEdgeeServices/venvit/issues/2)
 
