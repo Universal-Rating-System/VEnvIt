@@ -2,7 +2,7 @@
 
 A utility using Python and PowerShell scripts to to create, initiate and remove envirioments and virtual environments.
 
-| **Category** | **Links**                                                                                                                 |
+| **Category** | **Status' and Links**                                                                                                     |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | General      | [![][maintenance_y_img]][maintenance_y_lnk] [![][semver_pic]][semver_link]                                                |
 | CI           | [![][pre_commit_ci_img]][pre_commit_ci_lnk] [![][codecov_img]][codecov_lnk] [![][gha_docu_img]][gha_docu_lnk]             |

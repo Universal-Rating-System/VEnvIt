@@ -9,6 +9,7 @@
 ## GitHub
 
 - Reformat the ISSUE_TEMPLATE's.
+- Add `New Release` issue template.
 - Combine `Pre-Commit` and `Check-Documentation` workflows into 'Pre-Commit-and-Document-Check'
 - Add a numbered prefix to the workflow file names.
 - Removed `CI` workflow, since no formal testing is done.  When Pester is employed, it will be commissioned again.
