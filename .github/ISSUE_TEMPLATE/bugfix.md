@@ -28,7 +28,7 @@ labels:
 
 - Python version:
 - Operating System:
-- Install method (pip, source):
+- VenvIt Version:
 
 **Ticket Nr**
 
