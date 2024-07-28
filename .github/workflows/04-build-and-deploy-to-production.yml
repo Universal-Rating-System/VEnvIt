@@ -43,8 +43,9 @@ jobs:
 
       - name: Create zip of PowerShell and config files
         run: |
+          zip ./installation_files.zip README.md LICENCE ReReleaseNotes.md installpythontools.ps1
           cd src
-          zip ../installation_files.zip *.ps1 *.csv
+          zip ../installation_files.zip *.ps1 *.
 
       - name: Publish new release
         uses: softprops/action-gh-release@v2
