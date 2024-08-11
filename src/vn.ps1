@@ -29,6 +29,25 @@ repos:
     Set-Content -Path $pre_commit_path -Value $content
 }
 
+function CreateProjectDir {
+    if (-not (Test-Path $_project_dir)) {
+        mkdir $_project_dir | Out-Null
+        mkdir "$_project_dir\docs" | Out-Null
+        return $false
+    }
+    return $true
+}
+
+function CreateProjectStructure {
+    Set-Location -Path $requirements_dir
+    CreateProjectDir
+    InitGit
+    $requirements_dir = "$_project_dir\docs\requirements_docs.txt"
+    if (-not (Test-Path requirements_dir)) {
+        New-Item -ItemType File -Path $requirements_dir -Force | Out-Null
+    }
+}
+
 function CreateVirtualEnvironment {
     param (
         [string]$_project_name,
@@ -86,10 +105,6 @@ function CreateVirtualEnvironment {
         mkdir $_organization_dir | Out-Null
     }
     $_project_dir = Join-Path $_organization_dir $_project_name
-    if (-not (Test-Path $_project_dir)) {
-        mkdir $_project_dir | Out-Null
-        mkdir "$_project_dir\docs" | Out-Null
-    }
 
     # Output configuration details
     Write-Host "Project name:       $_project_name"
@@ -128,11 +143,7 @@ function CreateVirtualEnvironment {
         & $_venv_base_dir"\"$_project_name"_env\Scripts\activate.ps1"
         python.exe -m pip install --upgrade pip
 
-        Set-Location -Path $_project_dir
-        if (-not (Test-Path "$_project_dir\docs\requirements_docs.txt")) {
-            New-Item -ItemType File -Path "$_project_dir\docs\requirements_docs.txt" -Force | Out-Null
-
-        }
+        CreateProjectStructure
 
         $_project_install_path = Join-Path -Path $_project_dir -ChildPath "install.ps1"
         if (-not (Test-Path -Path $_project_install_path)) {
@@ -239,6 +250,33 @@ function DisplayEnvironmentVariables {
     git branch --all
 }
 
+# TODO
+# I stopped here because the effort became to big.  The following has to happen:
+# 1. See [Improve organizational support](https://github.com/BrightEdgeeServices/venvit/issues/7)
+# 2. Implement this change [Automate GitHub setup for new repository](https://github.com/BrightEdgeeServices/venvit/issues/6)
+function InitGit{
+    GITHUB_USER="your-username"
+REPO_NAME="your-repo-name"
+TOKEN="your-github-token"
+
+# Check if the repository exists
+REPO_CHECK=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $TOKEN" https://api.github.com/repos/$GITHUB_USER/$REPO_NAME)
+
+if [ $REPO_CHECK -eq 404 ]; then
+  echo "Repository does not exist. Creating a new repository..."
+
+  # Create the repository
+  curl -H "Authorization: token $TOKEN" https://api.github.com/user/repos -d "{\"name\":\"$REPO_NAME\", \"private\":false}"
+
+  # Add the remote and push
+  git remote add origin https://github.com/$GITHUB_USER/$REPO_NAME.git
+  git push -u origin main
+else
+  echo "Repository already exists."
+  git push -u origin main
+fi
+
+}
 function MoveFileToArchiveIfExists {
     param (
         [string]$_script_path,
