@@ -52,4 +52,4 @@ skip = 'documentation/Archive/*'
 ignore-words-list = 'space-holder'
 
 [tool.setuptools.dynamic]
-readme = { file = ["README.md", "UPGRADE.md"] }
+readme = { file = ["README.md"] }
