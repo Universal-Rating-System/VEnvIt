@@ -30,6 +30,5 @@ assignees: ''
 - Operating System:
 - Install method (pip, source):
 
-**Ticket Nr**
-
+**Git Branch Name**
 <!--Will be provided by owner -->

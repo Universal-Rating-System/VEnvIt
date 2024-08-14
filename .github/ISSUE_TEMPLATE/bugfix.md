@@ -32,6 +32,5 @@ assignees: ''
 - Operating System:
 - VenvIt Version:
 
-**Ticket Nr**
-
+**Git Branch Name**
 <!--Will be provided by owner -->

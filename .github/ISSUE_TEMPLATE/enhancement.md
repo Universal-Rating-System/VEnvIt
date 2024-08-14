@@ -11,6 +11,5 @@ assignees: ''
 
 **Proposed Solution:**
 
-**Ticket Nr**
-
+**Git Branch Name**
 <!--Will be provided by owner -->
