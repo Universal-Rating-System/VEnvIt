@@ -2,10 +2,10 @@
 
 ## General Changes
 
-
 ## Ticket Included
 
 1. BEE-00096 | venvit | Update README with missing information
+
 ______________________________________________________________________
 
 # Release 6.0.0

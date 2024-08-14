@@ -1,11 +1,9 @@
 ---
 name: HotFix Report
-about: An urgent, critical fix applied directly to the live environment, often bypassing
-  regular development cycles.
-title: "[HotFix]: "
+about: An urgent, critical fix applied directly to the live environment, often bypassing regular development cycles.
+title: '[HotFix]: '
 labels: ''
 assignees: ''
-
 ---
 
 **What happened**:
@@ -31,4 +29,5 @@ assignees: ''
 - Install method (pip, source):
 
 **Git Branch Name**
+
 <!--Will be provided by owner -->

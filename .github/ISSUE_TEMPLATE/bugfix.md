@@ -1,11 +1,9 @@
 ---
 name: BugFix Report
-about: An error or defect causing incorrect or unexpected behavior; typically fixed
-  in regular development cycles.
-title: "[BugFix]: "
+about: An error or defect causing incorrect or unexpected behavior; typically fixed in regular development cycles.
+title: '[BugFix]: '
 labels: good first issue
 assignees: ''
-
 ---
 
 **Describe the problem**:
@@ -33,4 +31,5 @@ assignees: ''
 - VenvIt Version:
 
 **Git Branch Name**
+
 <!--Will be provided by owner -->
