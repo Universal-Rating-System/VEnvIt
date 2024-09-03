@@ -1,9 +1,9 @@
 ---
 name: New Release
 about: Planned improvement or addition to functionality; non-urgent.
-title: '[Enhancement]: Release v'
+title: '[Release]: Release v'
 labels:
-  - enhancement
+  - release
 ---
 
 ## Tickets / branches included
