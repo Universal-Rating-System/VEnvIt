@@ -144,7 +144,7 @@ function CreateVirtualEnvironment {
         & $_venv_base_dir"\"$_project_name"_env\Scripts\activate.ps1"
         python.exe -m pip install --upgrade pip
 
-        CreateProjectStructure
+        # CreateProjectStructure
 
         $_project_install_path = Join-Path -Path $_project_dir -ChildPath "install.ps1"
         if (-not (Test-Path -Path $_project_install_path)) {
@@ -257,27 +257,27 @@ function DisplayEnvironmentVariables {
 # 2. Implement this change [Automate GitHub setup for new repository](https://github.com/BrightEdgeeServices/venvit/issues/6)
 function InitGit{
     GITHUB_USER="your-username"
-REPO_NAME="your-repo-name"
-TOKEN="your-github-token"
+    REPO_NAME="your-repo-name"
+    TOKEN="your-github-token"
 
-# Check if the repository exists
-REPO_CHECK=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $TOKEN" https://api.github.com/repos/$GITHUB_USER/$REPO_NAME)
+    # Check if the repository exists
+    REPO_CHECK=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $TOKEN" https://api.github.com/repos/$GITHUB_USER/$REPO_NAME)
 
-if ( $REPO_CHECK -eq 404 ) { then
-  Write-Output  "Repository does not exist. Creating a new repository..."
+    if ( $REPO_CHECK -eq 404 ) { then
+    Write-Output  "Repository does not exist. Creating a new repository..."
 
-  # Create the repository
-  Invoke-WebRequest -H "Authorization: token $TOKEN" https://api.github.com/user/repos -d "{\"name\":\"$REPO_NAME\", \"private\":false}"
+    # Create the repository
+    Invoke-WebRequest -H "Authorization: token $TOKEN" https://api.github.com/user/repos -d "{\"name\":\"$REPO_NAME\", \"private\":false}"
 
-  # Add the remote and push
-  git remote add origin https://github.com/$GITHUB_USER/$REPO_NAME.git
-  git push -u origin main
-} else {
-    Write-Output "Repository already exists."
+    # Add the remote and push
+    git remote add origin https://github.com/$GITHUB_USER/$REPO_NAME.git
     git push -u origin main
+    } else {
+        Write-Output "Repository already exists."
+        git push -u origin main
+    }
 }
 
-}
 function MoveFileToArchiveIfExists {
     param (
         [string]$_script_path,
