@@ -22,5 +22,6 @@ docs/build/
 docs/_build/
 docs/source/generated/
 htmlcov/
+*.code-workspace
 tmp/
 

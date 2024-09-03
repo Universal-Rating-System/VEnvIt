@@ -19,7 +19,7 @@ repos:
     rev: 0.7.17  # Use the ref you want to point at
     hooks:
       - id: mdformat
-        args: [--end-of-line, lf, ReleaseNotes.md, README.md]
+        args: [ --end-of-line, lf, ReleaseNotes.md, README.md, .github/ISSUE_TEMPLATE/bugfix.md ]
         additional_dependencies:
           - mdformat-black
           - mdformat-gfm
@@ -29,7 +29,7 @@ repos:
     rev: v2.3.0
     hooks:
       - id: codespell
-        args: [--write, --toml, pyproject.toml]
+        args: [ --write, --toml, pyproject.toml ]
         additional_dependencies:
           - tomli
 

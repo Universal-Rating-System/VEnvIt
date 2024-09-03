@@ -1,16 +1,15 @@
 ---
 name: Enhancement Request
 about: Planned improvement or addition to functionality; non-urgent.
-title: "[Enhancement]: "
+title: '[Enhancement]: '
 labels: enhancement
 assignees: ''
-
 ---
 
-**Description of Feature or Improvement:**
+## Description of Feature or Improvement
 
-**Proposed Solution:**
+## Proposed Solution
 
-**Ticket Nr**
+## Branch Name
 
 <!--Will be provided by owner -->

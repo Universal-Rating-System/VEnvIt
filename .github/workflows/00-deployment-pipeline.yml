@@ -8,7 +8,7 @@ jobs:
     uses: ./.github/workflows/01-pre-commit-and-document-check.yml
 
   # CI:
-  #   needs: Check-Documentation
+  #   needs: Pre-Commit-and-Document-Check
   #   uses: ./.github/workflows/03-ci.yml
   #   secrets: inherit
 

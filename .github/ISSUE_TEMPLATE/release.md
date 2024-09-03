@@ -6,15 +6,15 @@ labels:
   - enhancement
 ---
 
-**Tickets / branches included:**
+## Tickets / branches included
 
 - [](<>)
 
-**Ticket Nr**
+## Ticket Nr
 
 <!--Will be provided by owner -->
 
-**New Release Checks:**
+## New Release Checks
 
 - [ ] Remove warnings, errors and spelling reported by IDE.
 - [ ] Update / remove ToDo's

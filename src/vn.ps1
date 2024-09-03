@@ -1,3 +1,4 @@
+
 function CreateDirIfNotExist {
     param (
         [string]$_dir
@@ -262,19 +263,19 @@ TOKEN="your-github-token"
 # Check if the repository exists
 REPO_CHECK=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $TOKEN" https://api.github.com/repos/$GITHUB_USER/$REPO_NAME)
 
-if [ $REPO_CHECK -eq 404 ]; then
-  echo "Repository does not exist. Creating a new repository..."
+if ( $REPO_CHECK -eq 404 ) { then
+  Write-Output  "Repository does not exist. Creating a new repository..."
 
   # Create the repository
-  curl -H "Authorization: token $TOKEN" https://api.github.com/user/repos -d "{\"name\":\"$REPO_NAME\", \"private\":false}"
+  Invoke-WebRequest -H "Authorization: token $TOKEN" https://api.github.com/user/repos -d "{\"name\":\"$REPO_NAME\", \"private\":false}"
 
   # Add the remote and push
   git remote add origin https://github.com/$GITHUB_USER/$REPO_NAME.git
   git push -u origin main
-else
-  echo "Repository already exists."
-  git push -u origin main
-fi
+} else {
+    Write-Output "Repository already exists."
+    git push -u origin main
+}
 
 }
 function MoveFileToArchiveIfExists {
