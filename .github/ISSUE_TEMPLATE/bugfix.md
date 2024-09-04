@@ -36,3 +36,16 @@ assignees: ''
 ## Branch Name
 
 <!--Will be provided by owner -->
+
+## Checks
+
+- [ ] Remove warnings, errors and spelling reported by IDE.
+- [ ] Update / remove ToDo's
+- [ ] Commented code is not useful anymore are removed.
+- [ ] Commented GitHub Workflows scripts for testing purposes are restored.
+- [ ] Functions/methods/variables in modules are in alphabetical order (if possible).
+- [ ] Pre-Commit successful.
+- [ ] CI successful.
+- [ ] CodeCov above 99% or justifiably less.
+- [ ] Badges are correct.
+- [ ] Changed current branch to `master`.

@@ -12,4 +12,10 @@ assignees: ''
 
 ## Branch Name
 
-<!--Will be provided by owner -->
+## New Release Checks
+
+- [ ] Commented GitHub Workflows scripts for testing purposes are restored.
+- [ ] CI successful.
+- [ ] CodeCov above 99% or justifiably less.
+- [ ] Changed current branch to `master`.
+- [ ] Deleted related development branches.

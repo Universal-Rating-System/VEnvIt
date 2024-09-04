@@ -10,9 +10,7 @@ labels:
 
 - [](<>)
 
-## Ticket Nr
-
-<!--Will be provided by owner -->
+## Branch Name
 
 ## New Release Checks
 

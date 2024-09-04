@@ -2,7 +2,7 @@
 name: HotFix Report
 about: An urgent, critical fix applied directly to the live environment, often bypassing regular development cycles.
 title: '[HotFix]: '
-labels: ''
+labels: hotfix
 assignees: ''
 ---
 
@@ -18,9 +18,9 @@ assignees: ''
 # Put your MCVE code here
 ```
 
-## Anything else we need to know?\*\*:
+## Anything else we need to know?:
 
-## Why is this a hotfix and not a bugfix
+## Why is this a hotfix and not a bugfix?
 
 <!-- Describe the impact on the production system -->
 
@@ -29,7 +29,14 @@ assignees: ''
 - Python version:
 - Operating System:
 - Install method (pip, source):
+- venvit Version:
 
 ## Branch Name
 
-<!--Will be provided by owner -->
+## New Release Checks
+
+- [ ] Commented GitHub Workflows scripts for testing purposes are restored.
+- [ ] CI successful.
+- [ ] CodeCov above 99% or justifiably less.
+- [ ] Changed current branch to `master`.
+- [ ] Deleted related development branches.

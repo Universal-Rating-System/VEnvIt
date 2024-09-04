@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  Build-and-Deploy-to-Production:
+  build:
     runs-on: ${{ matrix.os }}
 
     permissions:
@@ -17,6 +17,52 @@ jobs:
       fail-fast: true
       matrix:
         os: [ 'ubuntu-latest' ]
+        python-version: [ '3.12' ]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
+
+      - name: Configure Poetry
+        run: |
+          poetry config http-basic.github.com x-access-token ${{ secrets.GH_REPO_ACCESS_BY_OWN_APPS }}
+
+      - name: Install dependencies using Poetry
+        run: poetry install
+
+      - name: Build the application using Poetry
+        run: poetry build
+
+      - name: Run tests or additional checks
+        run: poetry run pytest  # Replace it with your test command
+
+  merge:
+    needs: build
+    runs-on: ${{ matrix.os }}
+
+    permissions:
+      id-token: write
+      contents: write
+      issues: write
+      pull-requests: write
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ 'ubuntu-latest' ]
+        python-version: [ '3.12' ]
 
     steps:
       - name: Check out repository
@@ -26,8 +72,8 @@ jobs:
 
       - name: Set Git identity
         run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
 
       - name: Merge into master
         id: merge
@@ -41,13 +87,29 @@ jobs:
         run: |
           git push origin master
 
+  publish:
+    needs: merge
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ 'ubuntu-latest' ]
+        python-version: [ '3.12' ]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Create zip of PowerShell and config files
         run: |
           zip ./installation_files.zip README.md LICENCE ReReleaseNotes.md installpythontools.ps1
           cd src
           zip ../installation_files.zip *.ps1 *.
 
-      - name: Publish new release
+      - name: New release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ vars.GITHUB_HEAD_REF }}

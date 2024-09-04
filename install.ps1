@@ -1,4 +1,4 @@
-Write-Host "Running D:\Dropbox\Projects\BEE\venvit\install.ps1..." -ForegroundColor Yellow
+Write-Host "Running $env:PROJECT_DIR\install.ps1..."  -ForegroundColor Yellow
 pip install --upgrade --force --no-cache-dir black
 pip install --upgrade --force --no-cache-dir flake8
 pip install --upgrade --force --no-cache-dir pre-commit
