@@ -1,23 +1,34 @@
 [build-system]
-requires = [
-    "build",
-    "pytest-runner",
-    "setuptools >= 68",
-    "toml",
-    "setuptools-git >= 1.1",
-]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.black]
+line-length = 120
+target-version = ["py312"]
+
+[tool.codespell]
+count = ''
+quiet-level = 2
+skip = 'documentation/Archive/*'
+ignore-words-list = 'space-holder'
+
+[tool.coverage.run]
+source = ['src', 'tests']
+
+[tool.isort]
+profile = "black"
+
+[tool.poetry]
 name = 'venvit'
 version = '6.0.0'
-authors = [
-    { name = 'Hendrik du Toit', email = 'hendrik@brightedge.co.za' },
-    { name = 'Henru du Toit', email = 'henru@brightedge.co.za' },
-    { name = 'Dirk du Toit', email = 'dirk@brightedge.co.za' },
-]
 description = 'Tools for creating Python virtual environments.'
-license = { file = 'LICENSE' }
+authors = [
+    "Hendrik du Toit <hendrik@brightedge.co.za>",
+    "Henru du Toit <henru@brightedge.co.za>",
+    "Dirk du Toit <dirk@brightedge.co.za>"
+]
+license = "file:LICENSE"
+readme = "README.md"
 classifiers = [
     'Development Status :: 4 - Beta',
     'Intended Audience :: Developers',
@@ -28,28 +39,40 @@ classifiers = [
     'Programming Language :: Python :: 3.12',
     'License :: OSI Approved :: MIT License',
 ]
-readme = { file = 'README.md', content-type = 'text/md' }
-requires-python = '<3.13'
-dependencies = [
-    'pre-commit',
-    'mdformat-gfm',
-    'mdformat-frontmatter',
-    'mdformat-footnote',
-    'rstcheck',
+# documentation = "https://readthedocs.org"
+homepage = 'https://github.com/BrightEdgeeServices/venvit'
+repository = "https://github.com/RealTimeEvents/rtecommon.git"
+
+[tool.poetry.dependencies]
+python = "^3.12.2"
+pydantic-settings = "^2.4.0"
+mysql-connector-python = "^9.0.0"
+pydantic = "^2.8.2"
+sqlalchemy = "==1.4.52"
+
+[tool.poetry.group.dev.dependencies]
+mdformat-gfm = "^0.3.6"
+mdformat-frontmatter = "^2.0.8"
+mdformat-footnote = "^0.1.1"
+rstcheck = "^6.2.4"
+black = "^24.8.0"
+flake8 = "^7.1.1"
+pre-commit = "^3.8.0"
+
+[tool.poetry.urls]
+issues = "https://github.com/BrightEdgeeServices/venvit/issues"
+changelog = 'https://github.com/BrightEdgeeServices/venvit/blob/enhancement/master/ReleaseNotes.md'
+
+[tool.pytest.ini_options]
+addopts = ['-vv', '--ignore-glob=*\\Archive']
+#addopts = ['--import-mode=importlib', "-v", "--cov=./", "--ignore-glob=*\\Archive", "--cov-report=html"]
+markers = [
+    "config: Run config tests",
+    "dbdef: Run dbdef tests ",
+    "select: Run a selection of tests",
 ]
-
-[project.optional-dependencies]
-dev = []
-
-[project.urls]
-Changelog = 'https://github.com/BrightEdgeeServices/venvit/blob/enhancement/master/ReleaseNotes.md'
-Homepage = 'https://github.com/BrightEdgeeServices/venvit'
-
-[tool.codespell]
-count = ''
-quiet-level = 2
-skip = 'documentation/Archive/*'
-ignore-words-list = 'space-holder'
-
-[tool.setuptools.dynamic]
-readme = { file = ["README.md"] }
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+pythonpath = ['src', 'src/rtedb', 'tests']
+testpaths = 'tests'
