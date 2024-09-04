@@ -39,10 +39,6 @@ jobs:
 
     - name: Run Pester Tests
       run: |
-        # $config = New-PesterConfiguration
-        # $config.Run.Path = "."
-        # $config.CodeCoverage.Enabled = $true
-        # $config.TestResult.Enabled = $true
         $testResults = Invoke-Pester -Path "./tests" -PassThru
         if ($testResults.FailedCount -gt 0) {
           throw "There are failing tests!"
