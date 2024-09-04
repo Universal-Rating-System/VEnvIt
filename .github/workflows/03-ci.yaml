@@ -21,19 +21,32 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    # - name: Set up PowerShell
+      # uses: actions/setup-powershell@v3
+
     - name: Install Pester
       shell: pwsh
       run: Install-Module -Name Pester -Force -Scope CurrentUser
 
+    # - name: Run Pester Tests
+    #   working-directory: ./solution
+    #   run: |
+    #     $config = New-PesterConfiguration
+    #     $config.Run.Path = "."
+    #     $config.CodeCoverage.Enabled = $true
+    #     $config.TestResult.Enabled = $true
+    #     Invoke-Pester -Configuration $config
+
     - name: Run Pester Tests
-      working-directory: ./solution
       run: |
-        # Run Pester tests with Code Coverage
         $config = New-PesterConfiguration
         $config.Run.Path = "."
         $config.CodeCoverage.Enabled = $true
         $config.TestResult.Enabled = $true
-        Invoke-Pester -Configuration $config
+        $testResults = Invoke-Pester -Path "./tests" -PassThru -Configuration $config
+        if ($testResults.FailedCount -gt 0) {
+          throw "There are failing tests!"
+        }
 
     - name: Upload code coverage report
       if: ${{ success() }}
@@ -41,4 +54,5 @@ jobs:
       with:
         name: code-coverage-report
         path: solution\coverage.xml
+
 
