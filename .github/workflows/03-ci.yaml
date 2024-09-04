@@ -9,13 +9,14 @@ jobs:
     env:
       GH_REPO_ACCESS_BY_OWN_APPS: ${{ secrets.GH_REPO_ACCESS_BY_OWN_APPS }}
       VENV_ENVIRONMENT: ${{vars.VENV_ENVIRONMENT}}
+
     strategy:
       fail-fast: true
       matrix:
         #        python-version: ['3.8', '3.9', '3.10', '3.11']
-        python-version: [ '3.12' ]
+        # python-version: [ '3.12' ]
         #        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        os: [ 'ubuntu-latest' ]
+        os: [ 'windows-latest' ]
 
     steps:
     - name: Checkout code
