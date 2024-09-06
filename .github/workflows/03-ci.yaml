@@ -55,6 +55,10 @@ jobs:
         report_name: venvit_pester_tests
         report_title: VenvIt Pester Tests
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        coverage_paths: tests,src
+        coverage_report_name: venvit_code_coverage_report
+        coverage_report_title: VenvIt Code Coverage Report
+
 
     - name: Dump Pester Test Results
       # shell: pwsh
