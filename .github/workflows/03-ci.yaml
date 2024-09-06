@@ -64,6 +64,7 @@ jobs:
         Write-Host 'Total Tests FAILED.....:  ${{ steps.test_module.outputs.failed_count }}'
         if (${{ steps.test_module.outputs.failed_count }} -gt 0) {
           throw "There are failing tests!"
+        }
 
     - name: Upload code coverage report
       if: ${{ success() }}
