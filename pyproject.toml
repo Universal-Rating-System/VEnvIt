@@ -21,11 +21,9 @@ profile = "black"
 [tool.poetry]
 name = 'venvit'
 version = '6.0.0'
-description = 'Tools for creating Python virtual environments.'
+description = 'Tools for creating, maintaining and automating Python virtual environments.'
 authors = [
     "Hendrik du Toit <hendrik@brightedge.co.za>",
-    "Henru du Toit <henru@brightedge.co.za>",
-    "Dirk du Toit <dirk@brightedge.co.za>"
 ]
 license = "file:LICENSE"
 readme = "README.md"
@@ -58,6 +56,13 @@ rstcheck = "^6.2.4"
 black = "^24.8.0"
 flake8 = "^7.1.1"
 pre-commit = "^3.8.0"
+
+[tool.poetry.metadata]
+maintainers = [
+    "Hendrik du Toit <hendrik@brightedge.co.za>",
+    "Henru du Toit <henru@brightedge.co.za>",
+    "Dirk du Toit <dirk@brightedge.co.za>"
+]
 
 [tool.poetry.urls]
 issues = "https://github.com/BrightEdgeeServices/venvit/issues"
