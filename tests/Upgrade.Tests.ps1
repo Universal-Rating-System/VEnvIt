@@ -36,7 +36,7 @@ Describe 'Upgrade.ps1 Tests' {
         Set-Content -Path $latestManifestPath -Value $latestManifestContent
     }
 
-    after all {
+    AfterAll {
         # Clean up temporary files
         Remove-Item -Path $currentManifestPath -Force
         Remove-Item -Path $latestManifestPath -Force
