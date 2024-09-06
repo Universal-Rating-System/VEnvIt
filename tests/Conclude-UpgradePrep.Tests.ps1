@@ -1,7 +1,7 @@
 ﻿# Upgrade.Tests.ps1
 
 BeforeAll {
-    . "$PSScriptRoot\..\src\Upgrade.ps1"
+    . "$PSScriptRoot\..\src\Conclude-UpgradePrep.ps1"
 }
 
 Describe 'Upgrade.ps1 Tests' {
