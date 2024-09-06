@@ -1,6 +1,6 @@
 param (
     [string]$release,
-    [string]$installScriptDir
+    [string]$sourceScriptDir
 )
 $separator = "-" * 80
 

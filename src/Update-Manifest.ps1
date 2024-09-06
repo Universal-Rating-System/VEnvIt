@@ -73,7 +73,7 @@ function Update-Manifest {
 
     # Construct the paths for pyproject.toml and manifest.psd1 based on the provided directory
     $pyprojectPath = Join-Path -Path $directory -ChildPath "pyproject.toml"
-    $manifestPath = Join-Path -Path $directory -ChildPath "manifest.psd1"
+    $manifestPath = Join-Path -Path $directory -ChildPath "Manifest.psd1"
 
     # Check if pyproject.toml exists
     if (Test-Path -Path $pyprojectPath) {
