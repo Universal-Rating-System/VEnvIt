@@ -64,13 +64,6 @@
     flake8 = "^7.1.1"
     pre-commit = "^3.8.0"
 
-[tool.poetry.metadata]
-    maintainers = [
-        "Hendrik du Toit <hendrik@brightedge.co.za>",
-        "Henru du Toit <henru@brightedge.co.za>",
-        "Dirk du Toit <dirk@brightedge.co.za>",
-    ]
-
 [tool.poetry.urls]
     issues = "https://github.com/BrightEdgeeServices/venvit/issues"
     changelog = 'https://github.com/BrightEdgeeServices/venvit/blob/enhancement/master/ReleaseNotes.md'
