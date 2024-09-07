@@ -115,7 +115,7 @@ jobs:
 
       - name: Create zip of PowerShell and config files
         run: |
-          zip ./installation_files.zip README.md LICENCE ReReleaseNotes.md installpythontools.ps1
+          zip ./installation_files.zip ./README.md ./LICENCE ./ReleaseNotes.md ./Manifest.psd1
           cd src
           zip ../installation_files.zip *.ps1 *.
 
