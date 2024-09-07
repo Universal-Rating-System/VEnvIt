@@ -377,3 +377,4 @@ if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {
     CreateVirtualEnvironment -_project_name $args[0] -_python_version $args[1] -_organization $args[2] -_dev_mode $args[3] -_reset $args[4]
     DisplayEnvironmentVariables
     Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
+}
