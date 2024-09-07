@@ -76,11 +76,14 @@ jobs:
           git config --global user.email 'action@github.com'
 
       - name: Create Manifest
-        shell: pswd
+        shell: pwsh
         run: |
           & ./Update-Manifest.ps1 .
+
+      - name: Add Manifest to Repo
+        run: |
           git add "./Manifest.psd1"
-          git commit -m "add latest manifest"
+          git commit -m "Add latest manifest"
 
       - name: Merge into master
         id: merge
