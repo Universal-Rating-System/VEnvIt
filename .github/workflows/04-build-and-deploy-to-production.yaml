@@ -78,7 +78,7 @@ jobs:
       - name: Create Manifest
         shell: pwsh
         run: |
-          & ./Update-Manifest.ps1 .
+          & ./src/Update-Manifest.ps1 .
 
       - name: Add Manifest to Repo
         run: |
