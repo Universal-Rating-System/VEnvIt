@@ -90,20 +90,23 @@ jobs:
       - name: Add Manifest to Repo
         run: |
           git add -f "./Manifest.psd1"
-          git commit -m "Add latest manifest"
-          git push origin master || echo "No changes to commit."
-          git push origin master || echo "Nothing to push."
+          if git diff-index --quiet HEAD --; then
+            echo "No changes to commit."
+          else
+            git commit -m "Add latest manifest"
+            git push origin master
+          fi
 
 
       - name: Merge into master
-        id: merge
+        id: merge_into_master
         run: |
           # git checkout master
           git merge --no-ff $GITHUB_REF
         continue-on-error: false
 
       - name: Push to master
-        if: steps.merge.outcome == 'success'
+        if: steps.merge_into_master.outcome == 'success'
         run: |
           git push origin master
 
