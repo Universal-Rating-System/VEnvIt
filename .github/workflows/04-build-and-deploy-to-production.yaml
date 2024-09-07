@@ -28,51 +28,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Set up Python
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: ${{ matrix.python-version }}
-
-      # - name: Install Poetry
-      #   run: |
-      #     curl -sSL https://install.python-poetry.org | python3 -
-      #     echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
-
-      # - name: Configure Poetry
-      #   run: |
-      #     poetry config http-basic.github.com x-access-token ${{ secrets.GH_REPO_ACCESS_BY_OWN_APPS }}
-
-      # - name: Install dependencies using Poetry
-      #   run: poetry install
-
-      # - name: Build the application using Poetry
-        # run: poetry build
-
-      # - name: Run tests or additional checks
-      #   run: poetry run pytest  # Replace it with your test command
-
-  # merge:
-    # needs: build
-    # runs-on: ${{ matrix.os }}
-
-    # permissions:
-    #   id-token: write
-    #   contents: write
-    #   issues: write
-    #   pull-requests: write
-
-    # strategy:
-    #   fail-fast: true
-    #   matrix:
-    #     os: [ 'ubuntu-latest' ]
-    #     python-version: [ '3.12' ]
-
-    # steps:
-      # - name: Check out repository
-      #   uses: actions/checkout@v4
-      #   with:
-      #     fetch-depth: 0
-
       - name: Set Git identity
         run: |
           git config --global user.name 'GitHub Action'
@@ -109,22 +64,6 @@ jobs:
         if: steps.merge_into_master.outcome == 'success'
         run: |
           git push origin master
-
-  # publish:
-  #   needs: merge
-  #   runs-on: ${{ matrix.os }}
-
-  #   strategy:
-  #     fail-fast: true
-  #     matrix:
-  #       os: [ 'ubuntu-latest' ]
-  #       python-version: [ '3.12' ]
-
-  #   steps:
-  #     - name: Check out repository
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
 
       - name: Create zip of PowerShell and config files
         run: |
