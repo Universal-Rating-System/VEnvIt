@@ -89,9 +89,11 @@ jobs:
 
       - name: Add Manifest to Repo
         run: |
-          git add  -f "./Manifest.psd1"
+          git add -f "./Manifest.psd1"
           git commit -m "Add latest manifest"
-          git push origin master
+          git push origin master || echo "No changes to commit."
+          git push origin master || echo "Nothing to push."
+
 
       - name: Merge into master
         id: merge
