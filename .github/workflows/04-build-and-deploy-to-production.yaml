@@ -78,7 +78,7 @@ jobs:
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
 
-      - name: Checkout the correct branch
+      - name: Checkout master
         run: |
           git checkout master
 
@@ -96,7 +96,7 @@ jobs:
       - name: Merge into master
         id: merge
         run: |
-          git checkout master
+          # git checkout master
           git merge --no-ff $GITHUB_REF
         continue-on-error: false
 
@@ -123,9 +123,9 @@ jobs:
 
       - name: Create zip of PowerShell and config files
         run: |
-          zip ./installation_files.zip ./README.md ./LICENSE ./ReleaseNotes.md ./Manifest.psd1
+          zip ./Installation-Files.zip ./README.md ./LICENSE ./ReleaseNotes.md ./Manifest.psd1
           cd src
-          zip ../installation_files.zip *.ps1 *.
+          zip ../Installation-Files.zip *.ps1
 
       - name: New release
         uses: softprops/action-gh-release@v2
@@ -136,7 +136,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            installation_files.zip
+            Installation-Files.zip
             ./src/Conclude-Install.ps1
             ./Manifest.psd1
 
