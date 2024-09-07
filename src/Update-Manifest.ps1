@@ -47,33 +47,14 @@ function Convert-PyprojectToml {
     }
 }
 
-# Function to create a manifest.psd1
-function New-ManifestPsd1 {
+function Invoke-UpdateManifest {
     param (
-        [string]$filePath,
-        [hashtable]$data
-    )
-
-    $content = @"
-@{
-    ModuleVersion = '$($data.Version)'
-    Author        = '$($data.Authors)'
-    Description   = '$($data.Description)'
-}
-"@
-
-    Set-Content -Path $filePath -Value $content
-}
-
-# Main function that accepts a directory parameter and constructs the paths
-function Update-Manifest {
-    param (
-        [string]$directory  # Root directory parameter
+        [string]$config_base_dir  # Root directory parameter
     )
 
     # Construct the paths for pyproject.toml and manifest.psd1 based on the provided directory
-    $pyprojectPath = Join-Path -Path $directory -ChildPath "pyproject.toml"
-    $manifestPath = Join-Path -Path $directory -ChildPath "Manifest.psd1"
+    $pyprojectPath = Join-Path -Path $config_base_dir -ChildPath "pyproject.toml"
+    $manifestPath = Join-Path -Path $config_base_dir -ChildPath "Manifest.psd1"
 
     # Check if pyproject.toml exists
     if (Test-Path -Path $pyprojectPath) {
@@ -95,23 +76,57 @@ function Update-Manifest {
     }
 }
 
-# Script execution starts here
-# This block is ONLY executed if the script is run directly, not dot-sourced i.e. by Pester
-if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {
+function New-ManifestPsd1 {
     param (
-        [string]$base_dir
+        [string]$filePath,
+        [hashtable]$data
     )
-    Write-Host ''
-    Write-Host ''
-    $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Write-Host "=[ START $dateTime ]=========================[ Update-Manifest.ps1 ]=" -ForegroundColor Blue
-    Write-Host "Update manifest" -ForegroundColor Blue
 
-    if (-not $base_dir) {
-        throw "The parameter -base_dir is required."
-    }
-    Update-Manifest -directory $base_dir
-    Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
-    Write-Host ''
-    Write-Host ''
+    $content = @"
+@{
+    ModuleVersion = '$($data.Version)'
+    Author        = '$($data.Authors)'
+    Description   = '$($data.Description)'
 }
+"@
+
+    Set-Content -Path $filePath -Value $content
+}
+
+# Main function that accepts a directory parameter and constructs the paths
+function Show-Help {
+    $separator = "-" * 80
+    Write-Host $separator -ForegroundColor Cyan
+
+    # Introduction
+    @"
+Update the manifest for the project from the pyproject.toml files.
+"@ | Write-Host
+    Write-Host $separator -ForegroundColor Cyan
+    @"
+    Usage:
+    ------
+    Update-Manifest.ps1 config_base_dir
+    Update-Manifest.ps1 -h | --help
+
+    where:
+      config_base_dir:  Location of the pyproject.toml configuration file.
+"@ | Write-Host
+
+}
+
+Write-Host ''
+Write-Host ''
+$dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+Write-Host "=[ START $dateTime ]=========================[ Update-Manifest.ps1 ]=" -ForegroundColor Blue
+Write-Host "Update manifest" -ForegroundColor Blue
+# The script should not run if it is invoked by Pester
+if ($args.Count -eq 0 -or $args[0] -eq "-h" -or $args[0] -eq "--help") {
+    Show-Help
+}
+else {
+        Invoke-UpdateManifest -config_base_dir $args[0]
+}
+Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
+Write-Host ''
+Write-Host ''

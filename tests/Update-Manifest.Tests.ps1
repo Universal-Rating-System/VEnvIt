@@ -70,11 +70,11 @@ authors = [
         }
     }
 
-    # Test for Update-Manifest function
-    Describe "Update-Manifest function" {
+    # Test for Invoke-UpdateManifest function
+    Describe "Invoke-UpdateManifest function" {
         It "Should create manifest.psd1 if pyproject.toml exists and is valid" {
             # Call the function with the path to the temporary directory
-            Update-Manifest -directory $tempDir.FullName
+            Invoke-UpdateManifest -config_base_dir $tempDir.FullName
 
             # Verify that the manifest.psd1 was created
             $manifestPath = Join-Path -Path $tempDir.FullName -ChildPath "manifest.psd1"

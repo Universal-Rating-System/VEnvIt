@@ -1,0 +1,28 @@
+{
+  "configurations": [
+    {
+      "name": "Update-Manifest .",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Update-Manifest.ps1",
+      "args": [
+        "."
+      ]
+    },
+    {
+      "name": "Update-Manifest -h",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Update-Manifest.ps1",
+      "args": [
+        "-h"
+      ]
+    },
+    {
+      "name": "Update-Manifest noParam",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Update-Manifest.ps1"
+    }
+  ]
+}
