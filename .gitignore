@@ -24,5 +24,6 @@ docs/build/
 docs/_build/
 docs/source/generated/
 htmlcov/
+Manifest.psd1
 tmp/
 
