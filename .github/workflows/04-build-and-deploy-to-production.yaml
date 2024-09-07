@@ -48,27 +48,27 @@ jobs:
       # - name: Run tests or additional checks
       #   run: poetry run pytest  # Replace it with your test command
 
-  merge:
-    needs: build
-    runs-on: ${{ matrix.os }}
+  # merge:
+    # needs: build
+    # runs-on: ${{ matrix.os }}
 
-    permissions:
-      id-token: write
-      contents: write
-      issues: write
-      pull-requests: write
+    # permissions:
+    #   id-token: write
+    #   contents: write
+    #   issues: write
+    #   pull-requests: write
 
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ 'ubuntu-latest' ]
-        python-version: [ '3.12' ]
+    # strategy:
+    #   fail-fast: true
+    #   matrix:
+    #     os: [ 'ubuntu-latest' ]
+    #     python-version: [ '3.12' ]
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    # steps:
+      # - name: Check out repository
+      #   uses: actions/checkout@v4
+      #   with:
+      #     fetch-depth: 0
 
       - name: Set Git identity
         run: |
@@ -97,21 +97,21 @@ jobs:
         run: |
           git push origin master
 
-  publish:
-    needs: merge
-    runs-on: ${{ matrix.os }}
+  # publish:
+  #   needs: merge
+  #   runs-on: ${{ matrix.os }}
 
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ 'ubuntu-latest' ]
-        python-version: [ '3.12' ]
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       os: [ 'ubuntu-latest' ]
+  #       python-version: [ '3.12' ]
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  #   steps:
+  #     - name: Check out repository
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
 
       - name: Create zip of PowerShell and config files
         run: |
