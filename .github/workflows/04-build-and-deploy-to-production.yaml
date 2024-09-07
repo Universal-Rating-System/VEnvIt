@@ -19,6 +19,9 @@ jobs:
         os: [ 'ubuntu-latest' ]
         python-version: [ '3.12' ]
 
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -82,9 +85,9 @@ jobs:
 
       - name: Add Manifest to Repo
         run: |
-          git add -f "./Manifest.psd1"
+          git add  -f "./Manifest.psd1"
           git commit -m "Add latest manifest"
-          git push
+          git push origin HEAD
 
       - name: Merge into master
         id: merge
