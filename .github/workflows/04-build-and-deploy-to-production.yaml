@@ -78,6 +78,10 @@ jobs:
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
 
+      - name: Checkout the correct branch
+        run: |
+          git checkout master
+
       - name: Create Manifest
         shell: pwsh
         run: |
@@ -87,7 +91,7 @@ jobs:
         run: |
           git add  -f "./Manifest.psd1"
           git commit -m "Add latest manifest"
-          git push origin HEAD
+          git push origin master
 
       - name: Merge into master
         id: merge
