@@ -25,22 +25,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
+      # - name: Set up Python
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: ${{ matrix.python-version }}
 
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
+      # - name: Install Poetry
+      #   run: |
+      #     curl -sSL https://install.python-poetry.org | python3 -
+      #     echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Configure Poetry
-        run: |
-          poetry config http-basic.github.com x-access-token ${{ secrets.GH_REPO_ACCESS_BY_OWN_APPS }}
+      # - name: Configure Poetry
+      #   run: |
+      #     poetry config http-basic.github.com x-access-token ${{ secrets.GH_REPO_ACCESS_BY_OWN_APPS }}
 
-      - name: Install dependencies using Poetry
-        run: poetry install
+      # - name: Install dependencies using Poetry
+      #   run: poetry install
 
       # - name: Build the application using Poetry
         # run: poetry build
