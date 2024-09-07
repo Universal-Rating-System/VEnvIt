@@ -19,6 +19,9 @@ jobs:
         os: [ 'ubuntu-latest' ]
         python-version: [ '3.12' ]
 
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -75,6 +78,10 @@ jobs:
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
 
+      - name: Checkout the correct branch
+        run: |
+          git checkout master
+
       - name: Create Manifest
         shell: pwsh
         run: |
@@ -82,8 +89,9 @@ jobs:
 
       - name: Add Manifest to Repo
         run: |
-          git add -f "./Manifest.psd1"
+          git add  -f "./Manifest.psd1"
           git commit -m "Add latest manifest"
+          git push origin master
 
       - name: Merge into master
         id: merge
@@ -115,7 +123,7 @@ jobs:
 
       - name: Create zip of PowerShell and config files
         run: |
-          zip ./installation_files.zip ./README.md ./LICENCE ./ReleaseNotes.md ./Manifest.psd1
+          zip ./installation_files.zip ./README.md ./LICENSE ./ReleaseNotes.md ./Manifest.psd1
           cd src
           zip ../installation_files.zip *.ps1 *.
 
