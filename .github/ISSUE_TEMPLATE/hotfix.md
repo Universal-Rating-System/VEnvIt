@@ -1,18 +1,16 @@
 ---
 name: HotFix Report
-about: An urgent, critical fix applied directly to the live environment, often bypassing
-  regular development cycles.
-title: "[HotFix]: "
-labels: ''
+about: An urgent, critical fix applied directly to the live environment, often bypassing regular development cycles.
+title: '[HotFix]: '
+labels: hotfix
 assignees: ''
-
 ---
 
-**What happened**:
+## What happened
 
-**What you expected to happen**:
+## What you expected to happen
 
-**Minimal Complete Verifiable Example**:
+## Minimal Complete Verifiable Example
 
 <!-- See http://matthewrocklin.com/blog/work/2018/02/28/minimal-bug-reports or https://stackoverflow.com/help/mcve for an example -->
 
@@ -20,16 +18,25 @@ assignees: ''
 # Put your MCVE code here
 ```
 
-**Anything else we need to know?**:
+## Anything else we need to know?:
 
-**Why is this a hotfix and not a bugfix i.e., describe the impact on the production system.**:
+## Why is this a hotfix and not a bugfix?
 
-**Environment**:
+<!-- Describe the impact on the production system -->
+
+## Environment
 
 - Python version:
 - Operating System:
 - Install method (pip, source):
+- venvit Version:
 
-**Ticket Nr**
+## Branch Name
 
-<!--Will be provided by owner -->
+## New Release Checks
+
+- [ ] Commented GitHub Workflows scripts for testing purposes are restored.
+- [ ] CI successful.
+- [ ] CodeCov above 99% or justifiably less.
+- [ ] Changed current branch to `master`.
+- [ ] Deleted related development branches.

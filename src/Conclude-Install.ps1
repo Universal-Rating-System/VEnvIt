@@ -1,6 +1,6 @@
 param (
     [string]$release,
-    [string]$installScriptDir
+    [string]$sourceScriptDir
 )
 $separator = "-" * 80
 
@@ -46,7 +46,7 @@ Write-Host ''
 Write-Host ''
 $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 Write-Host "=[ START $dateTime ]=========================[ conclude_install.ps1 ]=" -ForegroundColor Blue
-Write-Host "Install venvit" -ForegroundColor Blue
+Write-Host "Install venvit $release" -ForegroundColor Blue
 
 Write-Host $separator -ForegroundColor Cyan
 

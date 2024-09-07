@@ -1,3 +1,4 @@
+
 function CreateDirIfNotExist {
     param (
         [string]$_dir
@@ -29,6 +30,25 @@ repos:
     Set-Content -Path $pre_commit_path -Value $content
 }
 
+function CreateProjectDir {
+    if (-not (Test-Path $_project_dir)) {
+        mkdir $_project_dir | Out-Null
+        mkdir "$_project_dir\docs" | Out-Null
+        return $false
+    }
+    return $true
+}
+
+function CreateProjectStructure {
+    Set-Location -Path $requirements_dir
+    CreateProjectDir
+    InitGit
+    $requirements_dir = "$_project_dir\docs\requirements_docs.txt"
+    if (-not (Test-Path requirements_dir)) {
+        New-Item -ItemType File -Path $requirements_dir -Force | Out-Null
+    }
+}
+
 function CreateVirtualEnvironment {
     param (
         [string]$_project_name,
@@ -40,7 +60,7 @@ function CreateVirtualEnvironment {
 
     # Show help if no project name is provided
     if (-not $_project_name -or $_project_name -eq "-h") {
-            ShowHelp
+        ShowHelp
         return
     }
 
@@ -86,10 +106,6 @@ function CreateVirtualEnvironment {
         mkdir $_organization_dir | Out-Null
     }
     $_project_dir = Join-Path $_organization_dir $_project_name
-    if (-not (Test-Path $_project_dir)) {
-        mkdir $_project_dir | Out-Null
-        mkdir "$_project_dir\docs" | Out-Null
-    }
 
     # Output configuration details
     Write-Host "Project name:       $_project_name"
@@ -112,14 +128,15 @@ function CreateVirtualEnvironment {
     Write-Host $separator -ForegroundColor Cyan
 
     if ($_continue -eq "Y") {
-        Set-Location -Path $_organization_dir.Substring(0,2)
+        Set-Location -Path $_organization_dir.Substring(0, 2)
         Write-Host "$_python_base_dir\Python$_python_version\python -m venv --clear $_venv_base_dir\$_project_name_env"
 
 
         if ($env:VIRTUAL_ENV) {
             "Virtual environment is active at: $env:VIRTUAL_ENV, deactivating"
             deactivate
-            } else {
+        }
+        else {
             "No virtual environment is active."
         }
 
@@ -128,11 +145,7 @@ function CreateVirtualEnvironment {
         & $_venv_base_dir"\"$_project_name"_env\Scripts\activate.ps1"
         python.exe -m pip install --upgrade pip
 
-        Set-Location -Path $_project_dir
-        if (-not (Test-Path "$_project_dir\docs\requirements_docs.txt")) {
-            New-Item -ItemType File -Path "$_project_dir\docs\requirements_docs.txt" -Force | Out-Null
-
-        }
+        # CreateProjectStructure
 
         $_project_install_path = Join-Path -Path $_project_dir -ChildPath "install.ps1"
         if (-not (Test-Path -Path $_project_install_path)) {
@@ -145,11 +158,13 @@ function CreateVirtualEnvironment {
             Add-Content -Path $_project_install_path -Value "pre-commit install"
             Add-Content -Path $_project_install_path -Value "pre-commit autoupdate"
             Write-Information ""
-            if($_dev_mode -eq "Y") {
+            if ($_dev_mode -eq "Y") {
                 Add-Content -Path $_project_install_path -Value 'if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) {pip install --no-cache-dir -e .[dev]}'
-                } else {
-                    Add-Content -Path $_project_install_path -Value 'if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) {pip install --no-cache-dir -e .}'
-            }        }
+            }
+            else {
+                Add-Content -Path $_project_install_path -Value 'if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) {pip install --no-cache-dir -e .}'
+            }
+        }
         if (-not (Test-Path "$_project_dir\.pre-commit-config.yaml")) { CreatePreCommitConfigYaml }
 
         $_support_scripts = @(
@@ -217,7 +232,7 @@ function CreateVirtualEnvironment {
 
 function DisplayEnvironmentVariables {
     Write-Host ""
-    Write-Host "System Environment Variables"  -ForegroundColor Green
+    Write-Host "System Environment Variables" -ForegroundColor Green
     Write-Host "VENV_ENVIRONMENT:      $env:VENV_ENVIRONMENT"
     Write-Host "PROJECTS_BASE_DIR:     $env:PROJECTS_BASE_DIR"
     Write-Host "PROJECT_DIR:           $env:PROJECT_DIR"
@@ -227,7 +242,7 @@ function DisplayEnvironmentVariables {
     Write-Host "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
     Write-Host "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
     Write-Host ""
-    Write-Host "Project Environment Variables"  -ForegroundColor Green
+    Write-Host "Project Environment Variables" -ForegroundColor Green
     Write-Host "INSTALLER_PWD:        $env:INSTALLER_PWD"
     Write-Host "INSTALLER_USERID:     $env:INSTALLER_USERID"
     Write-Host "MYSQL_DATABASE:       $env:MYSQL_DATABASE"
@@ -235,8 +250,37 @@ function DisplayEnvironmentVariables {
     Write-Host "MYSQL_ROOT_PASSWORD:  $env:MYSQL_ROOT_PASSWORD"
     Write-Host "MYSQL_TCP_PORT:       $env:MYSQL_TCP_PORT"
     Write-Host ""
-    Write-Host "Git Information"  -ForegroundColor Green
+    Write-Host "Git Information" -ForegroundColor Green
     git branch --all
+}
+
+# TODO
+# I stopped here because the effort became to big.  The following has to happen:
+# 1. See [Improve organizational support](https://github.com/BrightEdgeeServices/venvit/issues/7)
+# 2. Implement this change [Automate GitHub setup for new repository](https://github.com/BrightEdgeeServices/venvit/issues/6)
+function InitGit {
+    GITHUB_USER="your-username"
+    REPO_NAME="your-repo-name"
+    TOKEN="your-github-token"
+
+    # Check if the repository exists
+    REPO_CHECK=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $TOKEN" https://api.github.com/repos/$GITHUB_USER/$REPO_NAME)
+
+    if ( $REPO_CHECK -eq 404 ) {
+        then
+        Write-Output "Repository does not exist. Creating a new repository..."
+
+        # Create the repository
+        Invoke-WebRequest -H "Authorization: token $TOKEN" https://api.github.com/user/repos -d "{\"name\":\"$REPO_NAME\", \"private\":false}"
+
+        # Add the remote and push
+        git remote add origin https://github.com/$GITHUB_USER/$REPO_NAME.git
+        git push -u origin main
+    }
+    else {
+        Write-Output "Repository already exists."
+        git push -u origin main
+    }
 }
 
 function MoveFileToArchiveIfExists {
@@ -263,12 +307,10 @@ function ReadYesOrNo {
         [Parameter(Mandatory = $true)]
         [string]$_prompt_text
     )
-    do
-    {
+    do {
         $inputValue = Read-Host "$_prompt_text (Y/n)"
         $inputValue = $inputValue.ToUpper()
-        if (-not $inputValue)
-        {
+        if (-not $inputValue) {
             $inputValue = 'Y'
         }
     } while ($inputValue -ne 'Y' -and $inputValue -ne 'N')
@@ -280,7 +322,7 @@ function ShowHelp {
     Write-Host $separator -ForegroundColor Cyan
 
     # Usage
-@"
+    @"
     Usage:
     ------
     vn.ps1 ProjectName PythonVer Organization DevMode ResetScripts
@@ -314,22 +356,25 @@ function ShowEnvVarHelp {
         if ([string]::IsNullOrEmpty($var[1])) {
             Write-Host $var[0] -ForegroundColor Red -NoNewline
             Write-Host " - Not Set"
-        } else {
+        }
+        else {
             Write-Host $var[0] -ForegroundColor Green -NoNewline
-            $s = " - Set to: " +  $var[1]
+            $s = " - Set to: " + $var[1]
             Write-Host $s
         }
     }
 }
 
 # Script execution starts here
-Write-Host ''
-Write-Host ''
-$dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-$separator = "-" * 80
-$project_name = $args[0]
-Write-Host "=[ START $dateTime ]=======================================[ vn.ps1 ]=" -ForegroundColor Blue
-Write-Host "Create new $project_name virtual environment" -ForegroundColor Blue
-CreateVirtualEnvironment -_project_name $args[0] -_python_version $args[1] -_organization $args[2] -_dev_mode $args[3] -_reset $args[4]
-DisplayEnvironmentVariables
-Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
+if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {
+    Write-Host ''
+    Write-Host ''
+    $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $separator = "-" * 80
+    $project_name = $args[0]
+    Write-Host "=[ START $dateTime ]=======================================[ vn.ps1 ]=" -ForegroundColor Blue
+    Write-Host "Create new $project_name virtual environment" -ForegroundColor Blue
+    CreateVirtualEnvironment -_project_name $args[0] -_python_version $args[1] -_organization $args[2] -_dev_mode $args[3] -_reset $args[4]
+    DisplayEnvironmentVariables
+    Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
+}

@@ -1,20 +1,18 @@
 ---
 name: New Release
 about: Planned improvement or addition to functionality; non-urgent.
-title: '[Enhancement]: Release v'
+title: '[Release]: Release v'
 labels:
-  - enhancement
+  - release
 ---
 
-**Tickets / branches included:**
+## Tickets / branches included
 
 - [](<>)
 
-**Ticket Nr**
+## Branch Name
 
-<!--Will be provided by owner -->
-
-**New Release Checks:**
+## New Release Checks
 
 - [ ] Remove warnings, errors and spelling reported by IDE.
 - [ ] Update / remove ToDo's

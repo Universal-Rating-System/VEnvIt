@@ -4,12 +4,13 @@
 .idea/
 .pytest_cache/
 .run/
-.vscode/
+# .vscode/ Propagate the local VS Code settings
 _build/
-build/
+*.code-workspace
 *.db
 *.egg-info/
 *.sqlite
+*.code-workspace
 *-workspace
 **/*.egg-info/
 **/__pycache__/
@@ -17,6 +18,7 @@ build/
 **/desktop.ini
 **/*.py.isorted
 **/VersionArchive/
+build/
 dist/
 docs/build/
 docs/_build/

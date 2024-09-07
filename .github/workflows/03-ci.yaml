@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  workflow_call:
+
+jobs:
+  CI:
+    runs-on: ${{matrix.os}}
+    env:
+      GH_REPO_ACCESS_BY_OWN_APPS: ${{ secrets.GH_REPO_ACCESS_BY_OWN_APPS }}
+      VENV_ENVIRONMENT: ${{vars.VENV_ENVIRONMENT}}
+
+    strategy:
+      fail-fast: true
+      matrix:
+        #        python-version: ['3.8', '3.9', '3.10', '3.11']
+        # python-version: [ '3.12' ]
+        #        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        os: [ 'windows-latest' ]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # - name: Set up PowerShell
+      # uses: actions/setup-powershell@v3
+
+    - name: Install Pester
+      shell: pwsh
+      run: Install-Module -Name Pester -Force -Scope CurrentUser
+
+    # - name: Run Pester Tests
+    #   working-directory: ./solution
+    #   run: |
+    #     $config = New-PesterConfiguration
+    #     $config.Run.Path = "."
+    #     $config.CodeCoverage.Enabled = $true
+    #     $config.TestResult.Enabled = $true
+    #     Invoke-Pester -Configuration $config
+
+    # - name: Run Pester Tests
+    #   run: |
+    #     $testResults = Invoke-Pester -Path "./tests" -PassThru
+    #     if ($testResults.FailedCount -gt 0) {
+    #       throw "There are failing tests!"
+    #     }
+
+    - name: Run and Create Pester Report
+      id: test_module
+      uses: zyborg/pester-tests-report@v1
+      with:
+        include_paths: tests
+        # exclude_paths: tests/powershell1,tests/powershell2
+        # exclude_tags: skip_ci
+        report_name: venvit_pester_tests
+        report_title: VenvIt Pester Tests
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        coverage_paths: tests,src
+        coverage_report_name: venvit_code_coverage_report
+        coverage_report_title: VenvIt Code Coverage Report
+
+
+    - name: Dump Pester Test Results
+      shell: pwsh
+      run: |
+        Write-Host 'Total Tests Executed...:  ${{ steps.test_module.outputs.total_count }}'
+        Write-Host 'Total Tests PASSED.....:  ${{ steps.test_module.outputs.passed_count }}'
+        Write-Host 'Total Tests FAILED.....:  ${{ steps.test_module.outputs.failed_count }}'
+        if (${{ steps.test_module.outputs.failed_count }} -gt 0) {
+          throw "There are failing tests!"
+        }
+
+    - name: Upload code coverage report
+      if: ${{ success() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: code-coverage-report
+        path: ${{ steps.test_module.outputs.coverage_results_path }}
+
