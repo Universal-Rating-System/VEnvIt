@@ -82,7 +82,7 @@ jobs:
 
       - name: Add Manifest to Repo
         run: |
-          git add "./Manifest.psd1"
+          git add -f "./Manifest.psd1"
           git commit -m "Add latest manifest"
 
       - name: Merge into master
