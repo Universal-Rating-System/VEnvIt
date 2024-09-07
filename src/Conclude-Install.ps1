@@ -14,7 +14,8 @@ function Get-Or-PromptEnvVar {
     if ($existingValue) {
         Write-Host $varName": "$existingValue
         return $existingValue
-    } else {
+    }
+    else {
         $newValue = Read-Host $promptText
         [System.Environment]::SetEnvironmentVariable($varName, $newValue, [System.EnvironmentVariableTarget]::Machine)
         # Write-Host "$varName\: $newValue"
@@ -50,8 +51,8 @@ Write-Host "Install venvit $release" -ForegroundColor Blue
 
 Write-Host $separator -ForegroundColor Cyan
 
-$url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$release/installation_files.zip"
-$zipFilePath = Join-Path -Path $installScriptDir -ChildPath "installation_files.zip"
+$url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$release/Installation-Files.zip"
+$zipFilePath = Join-Path -Path $installScriptDir -ChildPath "Installation-Files.zip"
 
 # Check for administrative privileges
 if (-not (Test-Admin)) {
@@ -77,13 +78,13 @@ Write-Host $separator -ForegroundColor Cyan
 
 # Acquire user input for environment variables if they are not already set
 Write-Host "Provide the values for the following environment variables:" -ForegroundColor Yellow
-    Get-Or-PromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "VENV_ENVIRONMENT"
-    $env:PROJECTS_BASE_DIR = Get-Or-PromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "PROJECTS_BASE_DIR"
-    $env:VENVIT_DIR = Get-Or-PromptEnvVar -varName "VENVIT_DIR" -promptText "VENVIT_DIR"
-    $env:VENV_SECRETS_DIR = Get-Or-PromptEnvVar -varName "VENV_SECRETS_DIR" -promptText "VENV_SECRETS_DIR"
-    $env:VENV_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_BASE_DIR" -promptText "VENV_BASE_DIR"
-    $env:VENV_PYTHON_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "VENV_PYTHON_BASE_DIR"
-    $env:VENV_CONFIG_DIR = Get-Or-PromptEnvVar -varName "VENV_CONFIG_DIR" -promptText "VENV_CONFIG_DIR"
+Get-Or-PromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "VENV_ENVIRONMENT"
+$env:PROJECTS_BASE_DIR = Get-Or-PromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "PROJECTS_BASE_DIR"
+$env:VENVIT_DIR = Get-Or-PromptEnvVar -varName "VENVIT_DIR" -promptText "VENVIT_DIR"
+$env:VENV_SECRETS_DIR = Get-Or-PromptEnvVar -varName "VENV_SECRETS_DIR" -promptText "VENV_SECRETS_DIR"
+$env:VENV_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_BASE_DIR" -promptText "VENV_BASE_DIR"
+$env:VENV_PYTHON_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "VENV_PYTHON_BASE_DIR"
+$env:VENV_CONFIG_DIR = Get-Or-PromptEnvVar -varName "VENV_CONFIG_DIR" -promptText "VENV_CONFIG_DIR"
 
 # Ensure the directories exist
 $_system_dirs = @(
@@ -102,7 +103,7 @@ foreach ($var in $_system_dirs) {
 }
 
 # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
-Write-Host "Unzipping installation_files.zip to $env:VENVIT_DIR..."
+Write-Host "Unzipping Installation-Files.zip to $env:VENVIT_DIR..."
 Expand-Archive -Path $zipFilePath -DestinationPath $env:VENVIT_DIR -Force
 
 # Move the dev_env_var.ps1 file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
@@ -113,10 +114,12 @@ if (Test-Path -Path $sourceFilePath) {
     if (-not (Test-Path -Path $destinationFilePath)) {
         Write-Host "Moving dev_env_var.ps1 to $env:VENV_SECRETS_DIR..."
         Move-Item -Path $sourceFilePath -Destination $destinationFilePath -Force
-    } else {
+    }
+    else {
         Write-Host "dev_env_var.ps1 already exists in $env:VENV_SECRETS_DIR. It will not be overwritten."
     }
-} else {
+}
+else {
     Write-Host "dev_env_var.ps1 not found in $env:VENVIT_DIR."
 }
 
@@ -124,28 +127,29 @@ Write-Host $separator -ForegroundColor Cyan
 
 # Remove the zip file after extraction
 Remove-Item -Path $zipFilePath -Force
-Write-Host "installation_files.zip has been deleted." -ForegroundColor Green
+Write-Host "Installation-Files.zip has been deleted." -ForegroundColor Green
 
 # Add VENVIT_DIR to the System Path variable
 $path = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
 if ($path -notlike "*$env:VENVIT_DIR*") {
     $newPath = "$path;$env:VENVIT_DIR"
     [System.Environment]::SetEnvironmentVariable("Path", $newPath, [System.EnvironmentVariableTarget]::Machine)
-    Write-Host "VENVIT_DIR has been added to the System Path."  -ForegroundColor Green
-} else {
-    Write-Host "VENVIT_DIR is already in the System Path."  -ForegroundColor Green
+    Write-Host "VENVIT_DIR has been added to the System Path." -ForegroundColor Green
+}
+else {
+    Write-Host "VENVIT_DIR is already in the System Path." -ForegroundColor Green
 }
 
-Write-Host "Environment variables have been set successfully."  -ForegroundColor Green
+Write-Host "Environment variables have been set successfully." -ForegroundColor Green
 
 # Confirmation message
-Write-Host "Installation and configuration are complete."  -ForegroundColor Green
+Write-Host "Installation and configuration are complete." -ForegroundColor Green
 
 # Remove the install.ps1 script
 $scriptPath = $MyInvocation.MyCommand.Path
-Write-Host "Removing the conclude_install.ps1 script..."  -ForegroundColor Green
+Write-Host "Removing the conclude_install.ps1 script..." -ForegroundColor Green
 Remove-Item -Path $scriptPath -Force
-Write-Host "conclude_install.ps1 has been deleted."  -ForegroundColor Green
+Write-Host "conclude_install.ps1 has been deleted." -ForegroundColor Green
 
 Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
 Write-Host ''

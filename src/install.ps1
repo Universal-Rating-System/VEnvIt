@@ -7,7 +7,7 @@ Invoke-WebRequest -Uri "https://github.com/BrightEdgeeServices/venvit/releases/d
 # Invoke-WebRequest -Uri "https://github.com/BrightEdgeeServices/venvit/releases/download/$tag/Manifest.psd1" -OutFile $latestManifestScriptPath
 # & "$env:VENVIT_DIR\\Conclude-UpgradePrep.ps1" -currentManifestPath $currentManifestPath -latestManifestPath $latestManifestPath
 & $sourceScriptPath -release $tag -sourceScriptDir $tempDir
-# & "D:\Dropbox\Projects\BEE\venvit\src\install.ps1" -release $tag -sourceScriptDir "D:\Dropbox\Projects\BEE\venvit\"
+# & "D:\Dropbox\Projects\BEE\venvit\src\Install.ps1" -release $tag -sourceScriptDir "D:\Dropbox\Projects\BEE\venvit\"
 Remove-Item -Path $tempDir.FullName -Recurse -Force
 Unblock-File "$env:VENVIT_DIR\vn.ps1"
 Unblock-File "$env:VENVIT_DIR\vi.ps1"
