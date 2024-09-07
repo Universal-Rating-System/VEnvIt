@@ -129,8 +129,8 @@ jobs:
           prerelease: false
           files: |
             installation_files.zip
-            ./src/conclude_install.ps1
-            ./manifest.psd1
+            ./src/Conclude-Install.ps1
+            ./Manifest.psd1
 
       # - name: Send release email notification
       #   uses: betterfor/action-send-mail@main
