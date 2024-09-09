@@ -74,8 +74,8 @@ jobs:
       - name: New release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ vars.GITHUB_HEAD_REF }}
-          name: ${{ vars.GITHUB_HEAD_REF }}
+          # tag_name: ${{ vars.GITHUB_HEAD_REF }}
+          # name: ${{ vars.GITHUB_HEAD_REF }}
           body_path: ${{ github.workspace }}/ReleaseNotes.md
           draft: false
           prerelease: false

@@ -112,7 +112,6 @@ Update the manifest for the project from the pyproject.toml files.
     where:
       config_base_dir:  Location of the pyproject.toml configuration file.
 "@ | Write-Host
-
 }
 
 Write-Host ''

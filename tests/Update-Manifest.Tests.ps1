@@ -1,5 +1,4 @@
 ﻿BeforeAll {
-    # $base_dir = "C:\Test"
     . "$PSScriptRoot\..\src\Update-Manifest.ps1"
 }
 
