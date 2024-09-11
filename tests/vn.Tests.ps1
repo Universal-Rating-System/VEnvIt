@@ -1,7 +1,7 @@
 Describe 'VenvNew' {
     Context CreateDirIfNotExist {
         BeforeEach {
-            . $PSScriptRoot\..\src\vn.ps1 -h
+            . "$PSScriptRoot\..\src\vn.ps1 -h"
             $originalLocation = Get-Location
 
             # Navigate to a test directory
