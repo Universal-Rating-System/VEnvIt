@@ -1,4 +1,26 @@
+param (
+    [Parameter(Mandatory = $true, Position = 0)]
+    [string]$ProjectName,
 
+    [Parameter(Mandatory = $false, Position = 1)]
+    [ValidateSet("305", "306", "307", "308", "309", "310", "311", "312", "313")]
+    [string]$PythonVer,
+
+    [Parameter(Mandatory = $false, Position = 2)]
+    [string]$Organization,
+
+    [Parameter(Mandatory = $false, Position = 3)]
+    [ValidateSet("y", "n", "Y", "N")]
+    [String]$ResetScripts,
+
+    [Parameter(Mandatory = $false)]
+    [ValidateSet("y", "n", "Y", "N")]
+    [String]$DevMode = "Y",
+
+    [Parameter(Mandatory = $false)]
+    [ValidateSet("y", "n", "Y", "N")]
+    [String]$MultiUser = "Y"
+)
 function CreateDirIfNotExist {
     param (
         [string]$_dir
@@ -51,15 +73,15 @@ function CreateProjectStructure {
 
 function CreateVirtualEnvironment {
     param (
-        [string]$_project_name,
-        [string]$_python_version,
-        [string]$_organization,
-        [string]$_dev_mode,
-        [string]$_reset
+        [string]$ProjectName,
+        [string]$PythonVer,
+        [string]$Organization,
+        [string]$DevMode,
+        [string]$ResetScripts
     )
 
     # Show help if no project name is provided
-    if (-not $_project_name -or $_project_name -eq "-h") {
+    if (-not $ProjectName -or $ProjectName -eq "-h") {
         ShowHelp
         return
     }
@@ -78,47 +100,43 @@ function CreateVirtualEnvironment {
     }
 
     # Set local variables from environment variables
-    $_python_base_dir = $env:VENV_PYTHON_BASE_DIR
-    $_venv_base_dir = $env:VENV_BASE_DIR
-    $_venvit_dir = $env:VENVIT_DIR
-    $_project_base_dir = $env:PROJECTS_BASE_DIR
-    $_project_name = if (-not $_project_name) { Read-Host "Project name" } else { $_project_name }
-    $_python_version = if (-not $_python_version) { Read-Host "Python version" } else { $_python_version }
-    $_organization = if (-not $_organization) { Read-Host "Organization" } else { $_organization }
-    if (-not $_dev_mode -eq "Y" -or -not $_dev_mode -eq "N" -or [string]::IsNullOrWhiteSpace($_dev_mode)) {
-        $_dev_mode = ReadYesOrNo -_prompt_text "Dev mode"
+    # $ProjectName = if (-not $ProjectName) { Read-Host "Project name" } else { $ProjectName }
+    $PythonVer = if (-not $PythonVer) { Read-Host "Python version" } else { $PythonVer }
+    $Organization = if (-not $Organization) { Read-Host "Organization" } else { $Organization }
+    if (-not $DevMode -eq "Y" -or -not $DevMode -eq "N" -or [string]::IsNullOrWhiteSpace($DevMode)) {
+        $DevMode = ReadYesOrNo -_prompt_text "Dev mode"
     }
-    if (-not $_reset -eq "Y" -or -not $_reset -eq "N" -or [string]::IsNullOrWhiteSpace($_reset)) {
-        $_reset = ReadYesOrNo -_prompt_text "Reset scripts"
+    if (-not $ResetScripts -eq "Y" -or -not $ResetScripts -eq "N" -or [string]::IsNullOrWhiteSpace($ResetScripts)) {
+        $ResetScripts = ReadYesOrNo -_prompt_text "Reset scripts"
     }
 
     # Configure the environment settings for local development environment
-    $env:PROJECT_NAME = $_project_name
-    $env:VENV_ORGANIZATION_NAME = $_organization
+    $env:PROJECT_NAME = $ProjectName
+    $env:VENV_ORGANIZATION_NAME = $Organization
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
         & "$env:VENV_SECRETS_DIR\dev_env_var.ps1"
     }
 
     # Determine project directory based on organization
-    $_organization_dir = Join-Path $_project_base_dir $env:VENV_ORGANIZATION_NAME
+    $_organization_dir = Join-Path $env:PROJECTS_BASE_DIR $env:VENV_ORGANIZATION_NAME
     # Create organization directory if it does not exist
     if (-not (Test-Path $_organization_dir)) {
         mkdir $_organization_dir | Out-Null
     }
-    $_project_dir = Join-Path $_organization_dir $_project_name
+    $_project_dir = Join-Path $_organization_dir $ProjectName
 
     # Output configuration details
-    Write-Host "Project name:       $_project_name"
-    Write-Host "Python version:     $_python_version"
-    Write-Host "Organization Name:  $_organization"
-    Write-Host "Dev Mode:           $_dev_mode"
-    Write-Host "Reset project:      $_reset"
-    Write-Host "VENVIT_DIR:         $_venvit_dir"
-    Write-Host "PROJECTS_BASE_DIR:  $_project_base_dir"
+    Write-Host "Project name:       $ProjectName"
+    Write-Host "Python version:     $PythonVer"
+    Write-Host "Organization Name:  $Organization"
+    Write-Host "Dev Mode:           $DevMode"
+    Write-Host "Reset project:      $ResetScripts"
+    Write-Host "VENVIT_DIR:         $env:VENVIT_DIR"
+    Write-Host "PROJECTS_BASE_DIR:  $env:PROJECTS_BASE_DIR"
     Write-Host "Organization dir:   $_organization_dir"
     Write-Host "PROJECT_DIR:        $_project_dir"
-    Write-Host "VENV_BASE_DIR:      $_venv_base_dir"
-    Write-Host "VENV_PYTHON_BASE:   $_python_base_dir"
+    Write-Host "VENV_BASE_DIR:      $env:VENV_BASE_DIR"
+    Write-Host "VENV_PYTHON_BASE:   $env:VENV_PYTHON_BASE_DIR"
     Write-Host "VENV_ENVIRONMENT:   $env:VENV_ENVIRONMENT"
     Write-Host "VENV_CONFIG_DIR:    $env:VENV_CONFIG_DIR"
     Write-Host "VENV_SECRETS_DIR:   $env:VENV_SECRETS_DIR"
@@ -128,10 +146,6 @@ function CreateVirtualEnvironment {
     Write-Host $separator -ForegroundColor Cyan
 
     if ($_continue -eq "Y") {
-        Set-Location -Path $_organization_dir.Substring(0, 2)
-        Write-Host "$_python_base_dir\Python$_python_version\python -m venv --clear $_venv_base_dir\$_project_name_env"
-
-
         if ($env:VIRTUAL_ENV) {
             "Virtual environment is active at: $env:VIRTUAL_ENV, deactivating"
             deactivate
@@ -140,9 +154,13 @@ function CreateVirtualEnvironment {
             "No virtual environment is active."
         }
 
-        # & deactivate  2>$null
-        & $_python_base_dir\Python$_python_version\python -m venv --clear $_venv_base_dir\$_project_name"_env"
-        & $_venv_base_dir"\"$_project_name"_env\Scripts\activate.ps1"
+        $cmd = "$env:VENV_PYTHON_BASE_DIR\Python$PythonVer\python -m venv --clear $env:VENV_BASE_DIR\$ProjectName" + "_env"
+        Write-Host "$cmd"
+
+        # & $env:VENV_PYTHON_BASE_DIR\Python$PythonVer\python -m venv --clear $env:VENV_BASE_DIR\$ProjectName"_env"
+        $cmd
+        Set-Location -Path $_project_dir
+        & $env:VENV_BASE_DIR"\"$ProjectName"_env\Scripts\activate.ps1"
         python.exe -m pip install --upgrade pip
 
         # CreateProjectStructure
@@ -158,7 +176,7 @@ function CreateVirtualEnvironment {
             Add-Content -Path $_project_install_path -Value "pre-commit install"
             Add-Content -Path $_project_install_path -Value "pre-commit autoupdate"
             Write-Information ""
-            if ($_dev_mode -eq "Y") {
+            if ($DevMode -eq "Y") {
                 Add-Content -Path $_project_install_path -Value 'if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) {pip install --no-cache-dir -e .[dev]}'
             }
             else {
@@ -168,11 +186,11 @@ function CreateVirtualEnvironment {
         if (-not (Test-Path "$_project_dir\.pre-commit-config.yaml")) { CreatePreCommitConfigYaml }
 
         $_support_scripts = @(
-            "venv_${_project_name}_install.ps1",
-            "venv_${_project_name}_setup_mandatory.ps1"
+            "venv_${ProjectName}_install.ps1",
+            "venv_${ProjectName}_setup_mandatory.ps1"
         )
         $_archive_dir = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath "Archive"
-        if ($_reset -eq "Y") {
+        if ($ResetScripts -eq "Y") {
             foreach ($_file_name in $_support_scripts) {
                 $_script_path = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath $_file_name
                 MoveFileToArchiveIfExists -_script_path $_script_path -_archive_dir $_archive_dir
@@ -196,15 +214,15 @@ function CreateVirtualEnvironment {
             # Create the script and write the lines
             $s = 'Write-Host "Running ' + $_support_scripts[1] + '..."' + " -ForegroundColor Yellow"
             Set-Content -Path $_script_mandatory_path -Value $s
-            Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_PY_VER = '$_python_version'"
-            Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_ORGANIZATION = '$_organization'"
-            Add-Content -Path $_script_mandatory_path -Value "`$env:PYTHONPATH = '$_project_dir;$_project_dir\src;$_project_dir\src\$_project_name;$_project_dir\tests'"
+            Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_PY_VER = '$PythonVer'"
+            Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_ORGANIZATION = '$Organization'"
+            Add-Content -Path $_script_mandatory_path -Value "`$env:PYTHONPATH = '$_project_dir;$_project_dir\src;$_project_dir\src\$ProjectName;$_project_dir\tests'"
             Add-Content -Path $_script_mandatory_path -Value "`$env:PROJECT_DIR = '$_project_dir'"
-            Add-Content -Path $_script_mandatory_path -Value "`$env:PROJECT_NAME = '$_project_name'"
+            Add-Content -Path $_script_mandatory_path -Value "`$env:PROJECT_NAME = '$ProjectName'"
         }
 
         # Check if the custom setup script does not exist
-        $_custom_file_name = "venv_${_project_name}_setup_custom.ps1"
+        $_custom_file_name = "venv_${ProjectName}_setup_custom.ps1"
         $_script_custom_path = Join-Path $env:VENV_CONFIG_DIR -ChildPath ${_custom_file_name}
         if (-not (Test-Path $_script_custom_path)) {
             $s = 'Write-Host "Running ' + $_custom_file_name + '..."' + " -ForegroundColor Yellow"
@@ -366,15 +384,18 @@ function ShowEnvVarHelp {
 }
 
 # Script execution starts here
-if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {
-    Write-Host ''
-    Write-Host ''
-    $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $separator = "-" * 80
-    $project_name = $args[0]
-    Write-Host "=[ START $dateTime ]=======================================[ vn.ps1 ]=" -ForegroundColor Blue
-    Write-Host "Create new $project_name virtual environment" -ForegroundColor Blue
-    CreateVirtualEnvironment -_project_name $args[0] -_python_version $args[1] -_organization $args[2] -_dev_mode $args[3] -_reset $args[4]
-    DisplayEnvironmentVariables
-    Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
+Write-Host ''
+Write-Host ''
+$dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
+$separator = "-" * 80
+# $project_name = $args[0]
+Write-Host "Create new $ProjectName virtual environment" -ForegroundColor Blue
+if ($ProjectName -eq 0 -or $ProjectName -eq "-h" -or $ProjectName -eq "--help") {
+    Show-Help
 }
+else {
+    CreateVirtualEnvironment -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
+    DisplayEnvironmentVariables
+}
+Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan

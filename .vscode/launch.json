@@ -23,6 +23,29 @@
       "type": "PowerShell",
       "request": "launch",
       "script": ".\\src\\Update-Manifest.ps1"
+    },
+    {
+      "name": "vn t1 312 HdT -RS -MU",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\vn.ps1",
+      "args": [
+        "Test01",
+        "312",
+        "HdT",
+        "-ResetScripts",
+        "Y",
+        "-DevMode",
+        "Y",
+        "-MultiUser",
+        "y"
+      ]
+    },
+    {
+      "name": "vn no-args",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\vn.ps1"
     }
   ]
 }
