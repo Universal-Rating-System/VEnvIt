@@ -20,8 +20,7 @@ function Invoke-Install {
     # Unblock-File "$env:VENV_SECRETS_DIR\dev_env_var.ps1"
     Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }
     Get-Item "$env:VENV_SECRETS_DIR\dev_env_var.ps1" | ForEach-Object { Unblock-File $_.FullName }
-
-    # -- end copy for readme.md------------------------------------------------------------
+    # -- End copy for readme.md------------------------------------------------------------
 }
 
 function Show-Help {
