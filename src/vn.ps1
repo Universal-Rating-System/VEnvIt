@@ -1,5 +1,5 @@
 param (
-    [Parameter(Mandatory = $true, Position = 0)]
+    [Parameter(Mandatory = $false, Position = 0)]
     [string]$ProjectName,
 
     [Parameter(Mandatory = $false, Position = 1)]
@@ -19,8 +19,16 @@ param (
 
     [Parameter(Mandatory = $false)]
     [ValidateSet("y", "n", "Y", "N")]
-    [String]$MultiUser = "Y"
+    [String]$MultiUser = "Y",
+
+    [Parameter(Mandatory = $false)]
+    [Switch]$Help,
+
+    # Used to indicate that the code is called by Pester to avoid unwanted code execution during Pester testing.
+    [Parameter(Mandatory = $false)]
+    [Switch]$Pester
 )
+
 function CreateDirIfNotExist {
     param (
         [string]$_dir
@@ -71,7 +79,90 @@ function CreateProjectStructure {
     }
 }
 
-function CreateVirtualEnvironment {
+function Show-EnvironmentVariables {
+    Write-Host ""
+    Write-Host "System Environment Variables" -ForegroundColor Green
+    Write-Host "VENV_ENVIRONMENT:      $env:VENV_ENVIRONMENT"
+    Write-Host "PROJECTS_BASE_DIR:     $env:PROJECTS_BASE_DIR"
+    Write-Host "PROJECT_DIR:           $env:PROJECT_DIR"
+    Write-Host "VENVIT_DIR:            $env:VENVIT_DIR"
+    Write-Host "VENV_SECRETS_DIR:      $env:VENV_SECRETS_DIR"
+    Write-Host "VENV_CONFIG_DIR:       $env:VENV_CONFIG_DIR"
+    Write-Host "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
+    Write-Host "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
+    Write-Host ""
+    Write-Host "Project Environment Variables" -ForegroundColor Green
+    Write-Host "INSTALLER_PWD:        $env:INSTALLER_PWD"
+    Write-Host "INSTALLER_USERID:     $env:INSTALLER_USERID"
+    Write-Host "MYSQL_DATABASE:       $env:MYSQL_DATABASE"
+    Write-Host "MYSQL_HOST:           $env:MYSQL_HOST"
+    Write-Host "MYSQL_ROOT_PASSWORD:  $env:MYSQL_ROOT_PASSWORD"
+    Write-Host "MYSQL_TCP_PORT:       $env:MYSQL_TCP_PORT"
+    Write-Host ""
+    Write-Host "Git Information" -ForegroundColor Green
+    git branch --all
+}
+
+# TODO
+# I stopped here because the effort became to big.  The following has to happen:
+# 1. See [Improve organizational support](https://github.com/BrightEdgeeServices/venvit/issues/7)
+# 2. Implement this change [Automate GitHub setup for new repository](https://github.com/BrightEdgeeServices/venvit/issues/6)
+function InitGit {
+    GITHUB_USER="your-username"
+    REPO_NAME="your-repo-name"
+    TOKEN="your-github-token"
+
+    # Check if the repository exists
+    REPO_CHECK=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $TOKEN" https://api.github.com/repos/$GITHUB_USER/$REPO_NAME)
+
+    if ( $REPO_CHECK -eq 404 ) {
+        then
+        Write-Output "Repository does not exist. Creating a new repository..."
+
+        # Create the repository
+        Invoke-WebRequest -H "Authorization: token $TOKEN" https://api.github.com/user/repos -d "{\"name\":\"$REPO_NAME\", \"private\":false}"
+
+        # Add the remote and push
+        git remote add origin https://github.com/$GITHUB_USER/$REPO_NAME.git
+        git push -u origin main
+    }
+    else {
+        Write-Output "Repository already exists."
+        git push -u origin main
+    }
+}
+
+function Invoke-Vn {
+    param (
+        [string]$ProjectName,
+        [string]$PythonVer,
+        [string]$Organization,
+        [string]$DevMode,
+        [string]$ResetScripts
+    )
+    New-VirtualEnvironment -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
+    Show-EnvironmentVariables
+}
+function MoveFileToArchiveIfExists {
+    param (
+        [string]$_script_path,
+        [string]$_archive_dir
+    )
+
+    # Check if the file exists
+    if (Test-Path $_script_path) {
+        # Ensure the archive directory exists
+        if (-not (Test-Path $_archive_dir)) {
+            New-Item -Path $_archive_dir -ItemType Directory
+        }
+
+        # Move the file to the archive directory
+        Move-Item -Path $_script_path -Destination $_archive_dir -Force
+        Write-Host "Moved $($_script_path) to $($_archive_dir)."
+    }
+}
+
+function New-VirtualEnvironment {
     param (
         [string]$ProjectName,
         [string]$PythonVer,
@@ -248,78 +339,6 @@ function CreateVirtualEnvironment {
     }
 }
 
-function DisplayEnvironmentVariables {
-    Write-Host ""
-    Write-Host "System Environment Variables" -ForegroundColor Green
-    Write-Host "VENV_ENVIRONMENT:      $env:VENV_ENVIRONMENT"
-    Write-Host "PROJECTS_BASE_DIR:     $env:PROJECTS_BASE_DIR"
-    Write-Host "PROJECT_DIR:           $env:PROJECT_DIR"
-    Write-Host "VENVIT_DIR:            $env:VENVIT_DIR"
-    Write-Host "VENV_SECRETS_DIR:      $env:VENV_SECRETS_DIR"
-    Write-Host "VENV_CONFIG_DIR:       $env:VENV_CONFIG_DIR"
-    Write-Host "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
-    Write-Host "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
-    Write-Host ""
-    Write-Host "Project Environment Variables" -ForegroundColor Green
-    Write-Host "INSTALLER_PWD:        $env:INSTALLER_PWD"
-    Write-Host "INSTALLER_USERID:     $env:INSTALLER_USERID"
-    Write-Host "MYSQL_DATABASE:       $env:MYSQL_DATABASE"
-    Write-Host "MYSQL_HOST:           $env:MYSQL_HOST"
-    Write-Host "MYSQL_ROOT_PASSWORD:  $env:MYSQL_ROOT_PASSWORD"
-    Write-Host "MYSQL_TCP_PORT:       $env:MYSQL_TCP_PORT"
-    Write-Host ""
-    Write-Host "Git Information" -ForegroundColor Green
-    git branch --all
-}
-
-# TODO
-# I stopped here because the effort became to big.  The following has to happen:
-# 1. See [Improve organizational support](https://github.com/BrightEdgeeServices/venvit/issues/7)
-# 2. Implement this change [Automate GitHub setup for new repository](https://github.com/BrightEdgeeServices/venvit/issues/6)
-function InitGit {
-    GITHUB_USER="your-username"
-    REPO_NAME="your-repo-name"
-    TOKEN="your-github-token"
-
-    # Check if the repository exists
-    REPO_CHECK=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $TOKEN" https://api.github.com/repos/$GITHUB_USER/$REPO_NAME)
-
-    if ( $REPO_CHECK -eq 404 ) {
-        then
-        Write-Output "Repository does not exist. Creating a new repository..."
-
-        # Create the repository
-        Invoke-WebRequest -H "Authorization: token $TOKEN" https://api.github.com/user/repos -d "{\"name\":\"$REPO_NAME\", \"private\":false}"
-
-        # Add the remote and push
-        git remote add origin https://github.com/$GITHUB_USER/$REPO_NAME.git
-        git push -u origin main
-    }
-    else {
-        Write-Output "Repository already exists."
-        git push -u origin main
-    }
-}
-
-function MoveFileToArchiveIfExists {
-    param (
-        [string]$_script_path,
-        [string]$_archive_dir
-    )
-
-    # Check if the file exists
-    if (Test-Path $_script_path) {
-        # Ensure the archive directory exists
-        if (-not (Test-Path $_archive_dir)) {
-            New-Item -Path $_archive_dir -ItemType Directory
-        }
-
-        # Move the file to the archive directory
-        Move-Item -Path $_script_path -Destination $_archive_dir -Force
-        Write-Host "Moved $($_script_path) to $($_archive_dir)."
-    }
-}
-
 function ReadYesOrNo {
     param (
         [Parameter(Mandatory = $true)]
@@ -335,7 +354,7 @@ function ReadYesOrNo {
     return $inputValue
 }
 
-function ShowHelp {
+function Show-Help {
     $separator = "-" * 80
     Write-Host $separator -ForegroundColor Cyan
 
@@ -384,18 +403,21 @@ function ShowEnvVarHelp {
 }
 
 # Script execution starts here
-Write-Host ''
-Write-Host ''
-$dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
-$separator = "-" * 80
-# $project_name = $args[0]
-Write-Host "Create new $ProjectName virtual environment" -ForegroundColor Blue
-if ($ProjectName -eq 0 -or $ProjectName -eq "-h" -or $ProjectName -eq "--help") {
-    Show-Help
+# Pester parameter is to ensure that the script does not execute when called from
+# pester BeforeAll.  Any better ideas would be welcome.
+if (-not $Pester) {
+    Write-Host ''
+    Write-Host ''
+    $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
+    $separator = "-" * 80
+    # $project_name = $args[0]
+    Write-Host "Create new $ProjectName virtual environment" -ForegroundColor Blue
+    if ($ProjectName -eq "" -or $Help) {
+        Show-Help
+    }
+    else {
+        Invoke-Vn -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
+    }
+    Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
 }
-else {
-    CreateVirtualEnvironment -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
-    DisplayEnvironmentVariables
-}
-Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan

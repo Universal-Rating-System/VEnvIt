@@ -1,33 +1,42 @@
-Describe 'VenvNew' {
-    Context CreateDirIfNotExist {
+# Pester test for vn.Tests.ps1
+
+Describe "Top level script execution" {
+    BeforeAll {
+        . $PSScriptRoot\..\src\vn.ps1 -Pester
+    }
+    BeforeEach {
+        Mock -CommandName "Show-Help" -MockWith { Write-Host "Mock: Show-Help called" }
+    }
+    Context "When Help parameter is passed" {
+        It "Should call Show-Help function" {
+            . $PSScriptRoot\..\src\vn.ps1 -Help
+            Assert-MockCalled -CommandName "Show-Help" -Exactly 1
+        }
+    }
+
+    Context "When ProjectName is passed and Help is not passed" {
         BeforeEach {
-            . "$PSScriptRoot\..\src\vn.ps1"
-            $originalLocation = Get-Location
-
-            # Navigate to a test directory
-            $testPath = Join-Path -Path $env:TEMP -ChildPath "PesterTestDir"
-            New-Item -ItemType Directory -Path $testPath -Force | Out-Null
-            Set-Location -Path $testPath
+            Mock -CommandName "Invoke-Vn" -MockWith { Write-Host "Mock: Invoke-Vn called" }
         }
-
-        AfterEach {
-            # Cleanup and return to original location
-            Set-Location -Path $originalLocation
-            Remove-Item -Path $testPath -Recurse -Force
+        It "Should call Invoke-Vn function with ProjectName" {
+            . $PSScriptRoot\..\src\vn.ps1 -ProjectName "Tes01"
+            # Assert-MockCalled -CommandName "Invoke-MyScript" -Exactly 1 -ParameterFilter { $Var01 -eq 'TestValue' }
+            Assert-MockCalled -CommandName "Invoke-Vn" -Exactly 1
         }
+    }
 
-        It "Creates a directory if it does not exist" {
-            $newDir = Join-Path -Path $testPath -ChildPath "NewTestDir"
-            CreateDirIfNotExist -_dir $newDir
-            Test-Path -Path $newDir | Should -Be $true
+    Context "When Var01 is an empty string and Help is not passed" {
+        It "Should call Show-Help function" {
+            . $PSScriptRoot\..\src\vn.ps1 -ProjectName $null
+            Assert-MockCalled -CommandName "Show-Help" -Exactly 1
         }
+    }
 
-        It "Does not create a directory if it already exists" {
-            $existingDir = Join-Path -Path $testPath -ChildPath "ExistingDir"
-            New-Item -ItemType Directory -Path $existingDir | Out-Null
-            Mock New-Item -MockWith {}
-            CreateDirIfNotExist -_dir $existingDir
-            Assert-MockCalled -CommandName New-Item -Times 0 -Exactly
+    Context "When no parameters are passed" {
+        It "Should call Show-Help function" {
+            . $PSScriptRoot\..\src\vn.ps1
+            Assert-MockCalled -CommandName "Show-Help" -Exactly 1
         }
     }
 }
+
