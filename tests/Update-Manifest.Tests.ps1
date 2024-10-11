@@ -1,5 +1,5 @@
 ﻿BeforeAll {
-    . "$PSScriptRoot\..\src\Update-Manifest.ps1"
+    Import-Module "$PSScriptRoot\..\src\Update-Manifest.psm1"
 }
 
 Describe "Update-Manifest script tests" {
@@ -73,7 +73,7 @@ authors = [
     Describe "Invoke-UpdateManifest function" {
         It "Should create manifest.psd1 if pyproject.toml exists and is valid" {
             # Call the function with the path to the temporary directory
-            Invoke-UpdateManifest -config_base_dir $tempDir.FullName
+            Invoke-UpdateManifest -ConfigBaseDir $tempDir.FullName
 
             # Verify that the manifest.psd1 was created
             $manifestPath = Join-Path -Path $tempDir.FullName -ChildPath "manifest.psd1"

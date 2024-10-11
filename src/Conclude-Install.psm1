@@ -1,21 +1,25 @@
-param (
-    [Parameter(Mandatory = $false, Position = 0)]
-    [string]$Release,
+Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 
-    [Parameter(Mandatory = $false, Position = 1)]
-    [string]$SourceScriptDir,
+# param (
+#     [Parameter(Mandatory = $false, Position = 0)]
+#     [string]$Release,
 
-    [Parameter(Mandatory = $false)]
-    [Switch]$Help,
+#     # Temporary directory of the new (upgrade scripts)
+#     [Parameter(Mandatory = $false, Position = 1)]
+#     [string]$UpgradeScriptDir,
 
-    # Used to indicate that the code is called by Pester to avoid unwanted code execution during Pester testing.
-    [Parameter(Mandatory = $false)]
-    [Switch]$Pester
-)
+#     # Invoke the help.  This parameter will render above positional parameters inconsequential.
+#     [Parameter(Mandatory = $false)]
+#     [Switch]$Help,
+
+#     # Used to indicate that the code is called by Pester to avoid unwanted code execution during Pester testing.
+#     [Parameter(Mandatory = $false)]
+#     [Switch]$Pester
+# )
 $separator = "-" * 80
 
-# Function to get or prompt for an environment variable
-function Get-Or-PromptEnvVar {
+# # Function to get or prompt for an environment variable
+function Get-OrPromptEnvVar {
     param (
         [string]$varName,
         [string]$promptText
@@ -36,14 +40,14 @@ function Get-Or-PromptEnvVar {
 function Invoke-ConcludeInstall {
     param (
         [string]$Release,
-        [string]$SourceScriptDir,
-        [switch]$Pester
+        [string]$UpgradeScriptDir
     )
 
-
+    # Invoke-ConcludeUpgradePrep $UpgradeScriptDir
+    Update-Package $UpgradeScriptDir
 
     $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$Release/Installation-Files.zip"
-    $zipFilePath = Join-Path -Path $SourceScriptDir -ChildPath "Installation-Files.zip"
+    $zipFilePath = Join-Path -Path $UpgradeScriptDir -ChildPath "Installation-Files.zip"
 
     # Check for administrative privileges
     if (-not (Test-Admin)) {
@@ -69,13 +73,13 @@ function Invoke-ConcludeInstall {
 
     # Acquire user input for environment variables if they are not already set
     Write-Host "Provide the values for the following environment variables:" -ForegroundColor Yellow
-    Get-Or-PromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "VENV_ENVIRONMENT"
-    $env:PROJECTS_BASE_DIR = Get-Or-PromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "PROJECTS_BASE_DIR"
-    $env:VENVIT_DIR = Get-Or-PromptEnvVar -varName "VENVIT_DIR" -promptText "VENVIT_DIR"
-    $env:VENV_SECRETS_DIR = Get-Or-PromptEnvVar -varName "VENV_SECRETS_DIR" -promptText "VENV_SECRETS_DIR"
-    $env:VENV_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_BASE_DIR" -promptText "VENV_BASE_DIR"
-    $env:VENV_PYTHON_BASE_DIR = Get-Or-PromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "VENV_PYTHON_BASE_DIR"
-    $env:VENV_CONFIG_DIR = Get-Or-PromptEnvVar -varName "VENV_CONFIG_DIR" -promptText "VENV_CONFIG_DIR"
+    Get-OrPromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "VENV_ENVIRONMENT"
+    $env:PROJECTS_BASE_DIR = Get-OrPromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "PROJECTS_BASE_DIR"
+    $env:VENVIT_DIR = Get-OrPromptEnvVar -varName "VENVIT_DIR" -promptText "VENVIT_DIR"
+    $env:VENV_SECRETS_DIR = Get-OrPromptEnvVar -varName "VENV_SECRETS_DIR" -promptText "VENV_SECRETS_DIR"
+    $env:VENV_BASE_DIR = Get-OrPromptEnvVar -varName "VENV_BASE_DIR" -promptText "VENV_BASE_DIR"
+    $env:VENV_PYTHON_BASE_DIR = Get-OrPromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "VENV_PYTHON_BASE_DIR"
+    $env:VENV_CONFIG_DIR = Get-OrPromptEnvVar -varName "VENV_CONFIG_DIR" -promptText "VENV_CONFIG_DIR"
 
     # Ensure the directories exist
     $_system_dirs = @(
@@ -142,30 +146,38 @@ function Invoke-ConcludeInstall {
     Remove-Item -Path $scriptPath -Force
     Write-Host "conclude_install.ps1 has been deleted." -ForegroundColor Green
 
-    Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
-    Write-Host ''
-    Write-Host ''
 }
 
-function Show-Help {
-    $separator = "-" * 80
-    Write-Host $separator -ForegroundColor Cyan
+# function Invoke-ConcludeUpgradePrep {
+#     param (
+#         [string]$UpgradeScriptDir
+#     )
+#     Import-Module $PSScriptRoot\Conclude-UpgradePrep.psm1
+#     $ManifestFileName = "Manifest.psd1"
+#     $CurrentManifestDir = Join-Path -Path $env:VENVIT_DIR -ChildPath $ManifestFileName
+#     $UpgradeManifestDir = Join-Path -Path $UpgradeScriptDir -ChildPath $ManifestFileName
+#     & Update-Package $env:VENVIT_DIR $UpgradeScriptDir
+# }
 
-    # Usage
-    @"
-    Usage:
-    ------
-    Conclude-Install.ps1 Release SourceScriptDir
-    Conclude-Install.ps1 -h
+# function Show-Help {
+#     $separator = "-" * 80
+#     Write-Host $separator -ForegroundColor Cyan
 
-    Parameters:
-      Release          The release being installed.
-      SourceScriptDir  Location (temporary directory) of the installation files.
-      -h               This help.
-"@ | Write-Host
+#     # Usage
+#     @"
+#     Usage:
+#     ------
+#     Conclude-Install.ps1 Release UpgradeScriptDir
+#     Conclude-Install.ps1 -h
 
-    Write-Host $separator -ForegroundColor Cyan
-}
+#     Parameters:
+#       Release          The release being installed.
+#       UpgradeScriptDir  Location (temporary directory) of the installation files.
+#       -h               This help.
+# "@ | Write-Host
+
+#     Write-Host $separator -ForegroundColor Cyan
+# }
 
 function Test-Admin {
     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -189,19 +201,21 @@ function Remove-EnvVarIfExists {
 # Script execution starts here
 # Pester parameter is to ensure that the script does not execute when called from
 # pester BeforeAll.  Any better ideas would be welcome.
-if (-not $Pester) {
-    Write-Host ''
-    Write-Host ''
-    $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
-    $separator = "-" * 80
-    # $project_name = $args[0]
-    Write-Host "Create new $ProjectName virtual environment" -ForegroundColor Blue
-    if ($Release -eq "" -or $Help) {
-        Show-Help
-    }
-    else {
-        Invoke-ConcludeInstall -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
-    }
-    Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
-}
+# if (-not $Pester) {
+#     Write-Host ''
+#     Write-Host ''
+#     $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+#     Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
+#     $separator = "-" * 80
+#     # $project_name = $args[0]
+#     Write-Host "Create new $ProjectName virtual environment" -ForegroundColor Blue
+#     if ($Release -eq "" -or $Help) {
+#         Show-Help
+#     }
+#     else {
+#         Invoke-ConcludeInstall -Release $Release -UpgradeScriptDir $UpgradeScriptDir
+#     }
+#     Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
+# }
+
+Export-ModuleMember -Function 'Invoke-ConcludeInstall'

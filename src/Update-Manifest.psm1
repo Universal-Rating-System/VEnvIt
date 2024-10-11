@@ -1,4 +1,16 @@
-﻿# Function to convert the pyproject.toml file and extract version, author(s), and description
+﻿# param (
+#     # Base directory of configs
+#     [Parameter(Mandatory = $false, Position = 0)]
+#     [string]$ConfigBaseDir,
+
+#     # Invoke the help.  This parameter will render above positional parameters inconsequential.
+#     [Parameter(Mandatory = $false)]
+#     [Switch]$Help,
+
+#     # Used to indicate that the code is called by Pester to avoid unwanted code execution during Pester testing.
+#     [Parameter(Mandatory = $false)]
+#     [Switch]$Pester
+# )
 function Convert-PyprojectToml {
     param (
         [string]$filePath
@@ -49,12 +61,12 @@ function Convert-PyprojectToml {
 
 function Invoke-UpdateManifest {
     param (
-        [string]$config_base_dir  # Root directory parameter
+        [string]$ConfigBaseDir  # Root directory parameter
     )
 
     # Construct the paths for pyproject.toml and manifest.psd1 based on the provided directory
-    $pyprojectPath = Join-Path -Path $config_base_dir -ChildPath "pyproject.toml"
-    $manifestPath = Join-Path -Path $config_base_dir -ChildPath "Manifest.psd1"
+    $pyprojectPath = Join-Path -Path $ConfigBaseDir -ChildPath "pyproject.toml"
+    $manifestPath = Join-Path -Path $ConfigBaseDir -ChildPath "Manifest.psd1"
 
     # Check if pyproject.toml exists
     if (Test-Path -Path $pyprojectPath) {
@@ -78,7 +90,7 @@ function Invoke-UpdateManifest {
 
 function New-ManifestPsd1 {
     param (
-        [string]$filePath,
+        [string]$FilePath,
         [hashtable]$data
     )
 
@@ -90,42 +102,47 @@ function New-ManifestPsd1 {
 }
 "@
 
-    Set-Content -Path $filePath -Value $content
+    Set-Content -Path $FilePath -Value $content
 }
 
-# Main function that accepts a directory parameter and constructs the paths
-function Show-Help {
-    $separator = "-" * 80
-    Write-Host $separator -ForegroundColor Cyan
+# function Show-Help {
+#     $separator = "-" * 80
+#     Write-Host $separator -ForegroundColor Cyan
 
-    # Introduction
-    @"
-Update the manifest for the project from the pyproject.toml files.
-"@ | Write-Host
-    Write-Host $separator -ForegroundColor Cyan
-    @"
-    Usage:
-    ------
-    Update-Manifest.ps1 config_base_dir
-    Update-Manifest.ps1 -h | --help
+#     # Introduction
+#     @"
+# Update the manifest for the project from the pyproject.toml files.
+# "@ | Write-Host
+#     Write-Host $separator -ForegroundColor Cyan
+#     @"
+#     Usage:
+#     ------
+#     Update-Manifest.ps1 ConfigBaseDir
+#     Update-Manifest.ps1 -h | --help
 
-    where:
-      config_base_dir:  Location of the pyproject.toml configuration file.
-"@ | Write-Host
-}
+#     where:
+#       ConfigBaseDir:  Location of the pyproject.toml configuration file.
+# "@ | Write-Host
+# }
 
-Write-Host ''
-Write-Host ''
-$dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-Write-Host "=[ START $dateTime ]=========================[ Update-Manifest.ps1 ]=" -ForegroundColor Blue
-Write-Host "Update manifest" -ForegroundColor Blue
-# The script should not run if it is invoked by Pester
-if ($args.Count -eq 0 -or $args[0] -eq "-h" -or $args[0] -eq "--help") {
-    Show-Help
-}
-else {
-        Invoke-UpdateManifest -config_base_dir $args[0]
-}
-Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
-Write-Host ''
-Write-Host ''
+# Script execution starts here
+# Pester parameter is to ensure that the script does not execute when called from
+# pester BeforeAll.  Any better ideas would be welcome.
+# if (-not $Pester) {
+#     Write-Host ''
+#     Write-Host ''
+#     $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+#     Write-Host "=[ START $dateTime ]=========================[ Update-Manifest.ps1 ]=" -ForegroundColor Blue
+#     Write-Host "Update manifest" -ForegroundColor Blue
+#     # The script should not run if it is invoked by Pester
+#     # if ($args.Count -eq 0 -or $args[0] -eq "-h" -or $args[0] -eq "--help") {
+#     if ($ConfigBaseDir -eq "" -or $Help) {
+#         Show-Help
+#     }
+#     else {
+#             Invoke-UpdateManifest -ConfigBaseDir $args[0]
+#     }
+#     Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
+#     Write-Host ''
+#     Write-Host ''
+# }

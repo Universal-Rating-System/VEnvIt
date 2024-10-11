@@ -1,28 +1,19 @@
 {
   "configurations": [
     {
-      "name": "Update-Manifest .",
+      "name": "Install",
       "type": "PowerShell",
       "request": "launch",
-      "script": ".\\src\\Update-Manifest.ps1",
-      "args": [
-        "."
-      ]
+      "script": ".\\src\\Install.ps1"
     },
     {
-      "name": "Update-Manifest -h",
+      "name": "Install -Help",
       "type": "PowerShell",
       "request": "launch",
-      "script": ".\\src\\Update-Manifest.ps1",
+      "script": ".\\src\\Install.ps1",
       "args": [
-        "-h"
+        "-Help"
       ]
-    },
-    {
-      "name": "Update-Manifest noParam",
-      "type": "PowerShell",
-      "request": "launch",
-      "script": ".\\src\\Update-Manifest.ps1"
     },
     {
       "name": "vn t1 312 HdT -RS -MU",
@@ -46,6 +37,30 @@
       "type": "PowerShell",
       "request": "launch",
       "script": ".\\src\\vn.ps1"
+    },
+    {
+      "name": "Update-Manifest .",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Update-Manifest.ps1",
+      "args": [
+        "."
+      ]
+    },
+    {
+      "name": "Update-Manifest -h",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Update-Manifest.ps1",
+      "args": [
+        "-h"
+      ]
+    },
+    {
+      "name": "Update-Manifest noParam",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Update-Manifest.ps1"
     }
   ]
 }
