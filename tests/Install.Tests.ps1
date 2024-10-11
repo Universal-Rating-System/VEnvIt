@@ -40,7 +40,7 @@ Describe "Install.ps1 script tests" {
 
     It "Invoke-Install Function Tests" {
         Mock Invoke-WebRequest {
-                return @"
+            return @"
                 [{"tag_name": "$MockTag"}]
 "@
         } -ParameterFilter { $Uri -eq "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" }
