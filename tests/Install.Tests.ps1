@@ -27,7 +27,7 @@ Describe "Install.ps1 script tests" {
     BeforeAll {
         . $PSScriptRoot\..\src\Install.ps1 -Pester
         Import-Module "$PSScriptRoot\..\src\Utils.psm1"
-        # Import-Module "$PSScriptRoot\..\src\Conclude-Install.psm1"
+        Import-Module "$PSScriptRoot\..\src\Conclude-Install.psm1"
         $MockTag = "1.0.0"
         $TempBaseDir = New-CustomTempDir -Prefix "venvit"
         $OrigVenvIiDir = $env:VENVIT_DIR
