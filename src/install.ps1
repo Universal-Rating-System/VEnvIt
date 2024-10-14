@@ -14,7 +14,7 @@ function Invoke-Install {
     $Tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" | ConvertFrom-Json)[0].tag_name
     $UpgradeScriptPath = Join-Path -Path $UpgradeScriptDir.FullName -ChildPath "Conclude-Install.psm1"
     Invoke-WebRequest "https://github.com/BrightEdgeeServices/venvit/releases/download/$Tag/Conclude-Install.psm1" -OutFile $UpgradeScriptPath
-    Import-Module $UpgradeScriptPath
+    Import-Module -Name $UpgradeScriptPath
     Invoke-ConcludeInstall -Release $Tag -UpgradeScriptDir $UpgradeScriptDir
     Remove-Item -Path $UpgradeScriptDir -Recurse -Force
     Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }

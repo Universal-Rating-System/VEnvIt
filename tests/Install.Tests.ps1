@@ -56,7 +56,7 @@ Describe "Install.ps1 script tests" {
         } -ParameterFilter { $Uri -eq "https://github.com/BrightEdgeeServices/venvit/releases/download/$MockTag/Conclude-Install.psm1" }
         Mock Import-Module {
             Import-Module "$PSScriptRoot\..\src\Conclude-Install.psm1"
-        } -ParameterFilter { $Path.StartsWith($env:TEMP)}
+        } -ParameterFilter { $Name.StartsWith($env:TEMP)}
         # Mock -ModuleName Conclude-Install -CommandName Invoke-ConcludeInstall {
         Mock Invoke-ConcludeInstall {
             "exit" | Out-File -FilePath "$env:VENVIT_DIR\vn.ps1" -Force
