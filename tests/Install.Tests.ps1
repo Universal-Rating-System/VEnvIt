@@ -46,6 +46,7 @@ Describe "Install.ps1 script tests" {
     }
 
     It "Invoke-Install Function Tests" {
+        Mock Set-ExecutionPolicy {}
         Mock Invoke-WebRequest {
             return @"
                 [{"tag_name": "$MockTag"}]

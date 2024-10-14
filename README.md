@@ -174,6 +174,21 @@ where:
 
    ```
 
+1. Open a new **PowerShell with Administrator rights**.  Do not use an existing one.  Paste the following script in the **PowerShell with Administrator rights**.  The script below can also be found in the `download.ps1` script.
+
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+   $Tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" | ConvertFrom-Json)[0].tag_name
+   $UpgradeScriptPath = Join-Path -Path $UpgradeScriptDir.FullName -ChildPath "Conclude-Install.psm1"
+   Invoke-WebRequest "https://github.com/BrightEdgeeServices/venvit/releases/download/$Tag/Conclude-Install.psm1" -OutFile $UpgradeScriptPath
+   Import-Module -Name $UpgradeScriptPath
+   Invoke-ConcludeInstall -Release $Tag -UpgradeScriptDir $UpgradeScriptDir
+   Remove-Item -Path $UpgradeScriptDir -Recurse -Force
+   Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }
+   Get-Item "$env:VENV_SECRETS_DIR\dev_env_var.ps1" | ForEach-Object { Unblock-File $_.FullName }
+
+   ```
+
 1. Configure the dev_env_var.ps1 script in the VENV_SECRETS_DIR.
 
    - Set the ports for the various Docker containers.
