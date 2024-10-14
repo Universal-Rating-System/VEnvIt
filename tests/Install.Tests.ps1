@@ -26,8 +26,15 @@
 Describe "Install.ps1 script tests" {
     BeforeAll {
         . $PSScriptRoot\..\src\Install.ps1 -Pester
+        $moduleName = "Conclude-Install"
+        # Remove the module if it's already loaded
+        if (Get-Module -Name $moduleName) {
+            Remove-Module -Name $moduleName
+        }
+
         Import-Module "$PSScriptRoot\..\src\Utils.psm1"
-        # Import-Module "$PSScriptRoot\..\src\Conclude-Install.psm1"
+        Import-Module "$PSScriptRoot\..\src\Conclude-Install.psm1"
+
         $MockTag = "1.0.0"
         $TempBaseDir = New-CustomTempDir -Prefix "venvit"
         $OrigVenvIiDir = $env:VENVIT_DIR
@@ -47,6 +54,10 @@ Describe "Install.ps1 script tests" {
         Mock Invoke-WebRequest {
             Copy-Item -Path $PSScriptRoot\..\src\Conclude-Install.psm1 -Destination $OutFile -Verbose
         } -ParameterFilter { $Uri -eq "https://github.com/BrightEdgeeServices/venvit/releases/download/$MockTag/Conclude-Install.psm1" }
+        Mock Import-Module {
+            Import-Module "$PSScriptRoot\..\src\Conclude-Install.psm1"
+        } -ParameterFilter { $Path.StartsWith($env:TEMP)}
+        # Mock -ModuleName Conclude-Install -CommandName Invoke-ConcludeInstall {
         Mock Invoke-ConcludeInstall {
             "exit" | Out-File -FilePath "$env:VENVIT_DIR\vn.ps1" -Force
             "exit" | Out-File -FilePath "$env:VENVIT_DIR\vi.ps1" -Force
