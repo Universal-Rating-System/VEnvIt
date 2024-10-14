@@ -14,6 +14,7 @@ labels:
 
 ## New Release Checks
 
+- [ ] Implemented upgrde procedure.
 - [ ] Remove warnings, errors and spelling reported by IDE.
 - [ ] Update / remove ToDo's
 - [ ] Commented code is not useful anymore are removed.
