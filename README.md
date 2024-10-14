@@ -60,11 +60,12 @@ The installation will set the following system environment variables.  Please se
 | System Environment Variable | Description                                                                                                                                                                                                                                                                                                                                               |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | PROJECTS_BASE_DIR           | The parent/base directory for all projects (e.g., `D:\GoogleDrive\Projects`). The idea is to separate the projects of various identities, such as personal projects and projects of an organization e.g. `\projects\company` and `\projects\myprojects`                                                                                                   |
-| VENV_SECRETS_DIR            | Directory for storing secrets (e.g., `~.\Secrets`). The contents of this directory are private, should not be shared, and should never be pushed to the repository.                                                                                                                                                                                       |
-| VENVIT_DIR                  | Installation directory where these script reside e.g. `\venv`                                                                                                                                                                                                                                                                                             |
 | VENV_BASE_DIR               | The directory where the Python virtual environments are stored differs from the conventional practice of keeping virtual environment installation files within the project directory. Instead, all virtual environments are stored together in a separate directory (e.g., `c:\venv`). This directory should preferably not be a cloud storage directory. |
+| VENV_CONFIG_DIR             | Directory for storing configuration files (e.g., `~.\VenvitConfigs`) for the various virtual environments.                                                                                                                                                                                                                                                |
 | VENV_ENVIRONMENT            | Sets the variable to identify this environment. Possible values include: `loc_dev`, `github_dev`, `prod` or whatever you or the organization decide on. This value will be set differently in various environments to indicate the execution environment.                                                                                                 |
 | VENV_PYTHON_BASE_DIR        | Directory for Python installations (e.g., `C:\Python`). Different versions of Python will be accessed during the creation of the virtual environments. For example, if `VENV_PYTHON_BASE_DIR` is set to `C:\Python`, then Python 3.5 will be installed in `C:\Python\Python35` and Python 3.12 in `C:\Python\Python312`.                                  |
+| VENV_SECRETS_DIR            | Directory for storing secrets (e.g., `~.\Secrets`). The contents of this directory are private, should not be shared, and should never be pushed to the pository.                                                                                                                                                                                         |
+| VENVIT_DIR                  | Installation directory where these script reside e.g. `\venv`                                                                                                                                                                                                                                                                                             |
 
 ## Usage
 
@@ -161,20 +162,15 @@ where:
 1. Open a new **PowerShell with Administrator rights**.  Do not use an existing one.  Paste the following script in the **PowerShell with Administrator rights**.  The script below can also be found in the `download.ps1` script.
 
    ```powershell
-   $tempDir = New-Item -ItemType Directory -Path (Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath ([System.IO.Path]::GetRandomFileName()))
-   $tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" | ConvertFrom-Json)[0].tag_name
-   $installScriptPath = Join-Path -Path $tempDir.FullName -ChildPath "conclude_install.ps1"
-   Invoke-WebRequest -Uri "https://github.com/BrightEdgeeServices/venvit/releases/download/$tag/conclude_install.ps1" -OutFile $installScriptPath
-   & $installScriptPath -release $tag -installScriptDir $tempDir
-   # The next line is used for testing purposes.  It will executhe installation.ps1 in
-   # the development directory and not the downloaded copy.  Once Pester is installed,
-   # it should be redundant.
-   # & "D:\Dropbox\Projects\BEE\venvit\src\install.ps1" -release $tag -installScriptDir "D:\Dropbox\Projects\BEE\venvit\"
-   Remove-Item -Path $tempDir.FullName -Recurse -Force
-   Unblock-File "$env:VENVIT_DIR\vn.ps1"
-   Unblock-File "$env:VENVIT_DIR\vi.ps1"
-   Unblock-File "$env:VENVIT_DIR\vr.ps1"
-   Unblock-File "$env:VENV_SECRETS_DIR\dev_env_var.ps1"
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+   $Tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" | ConvertFrom-Json)[0].tag_name
+   $UpgradeScriptPath = Join-Path -Path $UpgradeScriptDir.FullName -ChildPath "Conclude-Install.psm1"
+   Invoke-WebRequest "https://github.com/BrightEdgeeServices/venvit/releases/download/$Tag/Conclude-Install.psm1" -OutFile $UpgradeScriptPath
+   Import-Module -Name $UpgradeScriptPath
+   Invoke-ConcludeInstall -Release $Tag -UpgradeScriptDir $UpgradeScriptDir
+   Remove-Item -Path $UpgradeScriptDir -Recurse -Force
+   Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }
+   Get-Item "$env:VENV_SECRETS_DIR\dev_env_var.ps1" | ForEach-Object { Unblock-File $_.FullName }
 
    ```
 

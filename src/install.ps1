@@ -10,6 +10,7 @@ param (
 function Invoke-Install {
     # The intention is to keep the following script as short as possible
     # --[ Start copy for readme.md ]------------------------------------------------
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
     $UpgradeScriptDir = New-Item -ItemType Directory -Path (Join-Path -Path $env:TEMP -ChildPath ("venvit_" + [Guid]::NewGuid().ToString()))
     $Tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" | ConvertFrom-Json)[0].tag_name
     $UpgradeScriptPath = Join-Path -Path $UpgradeScriptDir.FullName -ChildPath "Conclude-Install.psm1"

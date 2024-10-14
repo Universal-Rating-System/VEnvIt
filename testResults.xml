@@ -1,89 +1,95 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="10" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2024-10-14" time="14:42:44">
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="10" errors="0" failures="1" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2024-10-14" time="15:16:00">
   <environment clr-version="4.0.30319.42000" user-domain="EDDIE" cwd="D:\Dropbox\Projects\BEE\venvit" platform="Microsoft Windows 10 Pro|C:\WINDOWS|\Device\Harddisk2\Partition3" machine-name="EDDIE" nunit-version="2.5.8.0" os-version="10.0.19045" user="hendr" />
   <culture-info current-culture="en-ZA" current-uiculture="en-US" />
-  <test-suite type="TestFixture" name="Pester" executed="True" result="Success" success="True" time="0.648" asserts="0" description="Pester">
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Failure" success="False" time="0.6754" asserts="0" description="Pester">
     <results>
-      <test-suite type="TestFixture" name="D:\Dropbox\Projects\BEE\venvit\tests\Conclude-UpgradePrep.Tests.ps1" executed="True" result="Success" success="True" time="0.1064" asserts="0" description="D:\Dropbox\Projects\BEE\venvit\tests\Conclude-UpgradePrep.Tests.ps1">
+      <test-suite type="TestFixture" name="D:\Dropbox\Projects\BEE\venvit\tests\Conclude-UpgradePrep.Tests.ps1" executed="True" result="Success" success="True" time="0.1108" asserts="0" description="D:\Dropbox\Projects\BEE\venvit\tests\Conclude-UpgradePrep.Tests.ps1">
         <results>
-          <test-suite type="TestFixture" name="Function testing" executed="True" result="Success" success="True" time="0.0501" asserts="0" description="Function testing">
+          <test-suite type="TestFixture" name="Function testing" executed="True" result="Success" success="True" time="0.0545" asserts="0" description="Function testing">
             <results>
-              <test-suite type="TestFixture" name="Function testing.Update-Package" executed="True" result="Success" success="True" time="0.0456" asserts="0" description="Function testing.Update-Package">
+              <test-suite type="TestFixture" name="Function testing.Update-Package" executed="True" result="Success" success="True" time="0.0484" asserts="0" description="Function testing.Update-Package">
                 <results>
-                  <test-case description="Should apply 6.0.0 and 7.0.0" name="Function testing.Update-Package.Should apply 6.0.0 and 7.0.0" time="0.0405" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Should apply 6.0.0 and 7.0.0" name="Function testing.Update-Package.Should apply 6.0.0 and 7.0.0" time="0.0434" asserts="0" success="True" result="Success" executed="True" />
                 </results>
               </test-suite>
             </results>
           </test-suite>
         </results>
       </test-suite>
-      <test-suite type="TestFixture" name="D:\Dropbox\Projects\BEE\venvit\tests\Install.Tests.ps1" executed="True" result="Success" success="True" time="0.1308" asserts="0" description="D:\Dropbox\Projects\BEE\venvit\tests\Install.Tests.ps1">
+      <test-suite type="TestFixture" name="D:\Dropbox\Projects\BEE\venvit\tests\Install.Tests.ps1" executed="True" result="Failure" success="False" time="0.1289" asserts="0" description="D:\Dropbox\Projects\BEE\venvit\tests\Install.Tests.ps1">
         <results>
-          <test-suite type="TestFixture" name="Install.ps1 script tests" executed="True" result="Success" success="True" time="0.0823" asserts="0" description="Install.ps1 script tests">
+          <test-suite type="TestFixture" name="Install.ps1 script tests" executed="True" result="Failure" success="False" time="0.0684" asserts="0" description="Install.ps1 script tests">
             <results>
-              <test-case description="Invoke-Install Function Tests" name="Install.ps1 script tests.Invoke-Install Function Tests" time="0.0664" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Invoke-Install Function Tests" name="Install.ps1 script tests.Invoke-Install Function Tests" time="0.0491" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>UnauthorizedAccessException: Access to the registry key 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell' is denied.</message>
+                  <stack-trace>at Invoke-Install, D:\Dropbox\Projects\BEE\venvit\src\Install.ps1:13
+at &lt;ScriptBlock&gt;, D:\Dropbox\Projects\BEE\venvit\tests\Install.Tests.ps1:68</stack-trace>
+                </failure>
+              </test-case>
             </results>
           </test-suite>
         </results>
       </test-suite>
-      <test-suite type="TestFixture" name="D:\Dropbox\Projects\BEE\venvit\tests\Update-Manifest.Tests.ps1" executed="True" result="Success" success="True" time="0.1368" asserts="0" description="D:\Dropbox\Projects\BEE\venvit\tests\Update-Manifest.Tests.ps1">
+      <test-suite type="TestFixture" name="D:\Dropbox\Projects\BEE\venvit\tests\Update-Manifest.Tests.ps1" executed="True" result="Success" success="True" time="0.1501" asserts="0" description="D:\Dropbox\Projects\BEE\venvit\tests\Update-Manifest.Tests.ps1">
         <results>
-          <test-suite type="TestFixture" name="Update-Manifest script tests" executed="True" result="Success" success="True" time="0.0867" asserts="0" description="Update-Manifest script tests">
+          <test-suite type="TestFixture" name="Update-Manifest script tests" executed="True" result="Success" success="True" time="0.0906" asserts="0" description="Update-Manifest script tests">
             <results>
-              <test-suite type="TestFixture" name="Update-Manifest script tests.Convert-PyprojectToml function" executed="True" result="Success" success="True" time="0.0299" asserts="0" description="Update-Manifest script tests.Convert-PyprojectToml function">
+              <test-suite type="TestFixture" name="Update-Manifest script tests.Convert-PyprojectToml function" executed="True" result="Success" success="True" time="0.028" asserts="0" description="Update-Manifest script tests.Convert-PyprojectToml function">
                 <results>
-                  <test-case description="Should parse pyproject.toml and extract version, authors, and description" name="Update-Manifest script tests.Convert-PyprojectToml function.Should parse pyproject.toml and extract version, authors, and description" time="0.0247" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Should parse pyproject.toml and extract version, authors, and description" name="Update-Manifest script tests.Convert-PyprojectToml function.Should parse pyproject.toml and extract version, authors, and description" time="0.0227" asserts="0" success="True" result="Success" executed="True" />
                 </results>
               </test-suite>
-              <test-suite type="TestFixture" name="Update-Manifest script tests.New-ManifestPsd1 function" executed="True" result="Success" success="True" time="0.0527" asserts="0" description="Update-Manifest script tests.New-ManifestPsd1 function">
+              <test-suite type="TestFixture" name="Update-Manifest script tests.New-ManifestPsd1 function" executed="True" result="Success" success="True" time="0.0528" asserts="0" description="Update-Manifest script tests.New-ManifestPsd1 function">
                 <results>
-                  <test-case description="Should create manifest.psd1 with correct data" name="Update-Manifest script tests.New-ManifestPsd1 function.Should create manifest.psd1 with correct data" time="0.0177" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Should create manifest.psd1 with correct data" name="Update-Manifest script tests.New-ManifestPsd1 function.Should create manifest.psd1 with correct data" time="0.0195" asserts="0" success="True" result="Success" executed="True" />
                 </results>
               </test-suite>
-              <test-suite type="TestFixture" name="Update-Manifest script tests.Invoke-UpdateManifest function" executed="True" result="Success" success="True" time="0.0818" asserts="0" description="Update-Manifest script tests.Invoke-UpdateManifest function">
+              <test-suite type="TestFixture" name="Update-Manifest script tests.Invoke-UpdateManifest function" executed="True" result="Success" success="True" time="0.0836" asserts="0" description="Update-Manifest script tests.Invoke-UpdateManifest function">
                 <results>
-                  <test-case description="Should create manifest.psd1 if pyproject.toml exists and is valid" name="Update-Manifest script tests.Invoke-UpdateManifest function.Should create manifest.psd1 if pyproject.toml exists and is valid" time="0.0243" asserts="0" success="True" result="Success" executed="True" />
-                </results>
-              </test-suite>
-            </results>
-          </test-suite>
-        </results>
-      </test-suite>
-      <test-suite type="TestFixture" name="D:\Dropbox\Projects\BEE\venvit\tests\Utils.Tests.ps1" executed="True" result="Success" success="True" time="0.0747" asserts="0" description="D:\Dropbox\Projects\BEE\venvit\tests\Utils.Tests.ps1">
-        <results>
-          <test-suite type="TestFixture" name="Test Utils" executed="True" result="Success" success="True" time="0.0242" asserts="0" description="Test Utils">
-            <results>
-              <test-suite type="TestFixture" name="Test Utils.New-CustomTempDir Test" executed="True" result="Success" success="True" time="0.0163" asserts="0" description="Test Utils.New-CustomTempDir Test">
-                <results>
-                  <test-case description="Temporary dir with prefix" name="Test Utils.New-CustomTempDir Test.Temporary dir with prefix" time="0.0113" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Should create manifest.psd1 if pyproject.toml exists and is valid" name="Update-Manifest script tests.Invoke-UpdateManifest function.Should create manifest.psd1 if pyproject.toml exists and is valid" time="0.023" asserts="0" success="True" result="Success" executed="True" />
                 </results>
               </test-suite>
             </results>
           </test-suite>
         </results>
       </test-suite>
-      <test-suite type="TestFixture" name="D:\Dropbox\Projects\BEE\venvit\tests\vn.Tests.ps1" executed="True" result="Success" success="True" time="0.1916" asserts="0" description="D:\Dropbox\Projects\BEE\venvit\tests\vn.Tests.ps1">
+      <test-suite type="TestFixture" name="D:\Dropbox\Projects\BEE\venvit\tests\Utils.Tests.ps1" executed="True" result="Success" success="True" time="0.0797" asserts="0" description="D:\Dropbox\Projects\BEE\venvit\tests\Utils.Tests.ps1">
         <results>
-          <test-suite type="TestFixture" name="Top level script execution" executed="True" result="Success" success="True" time="0.1408" asserts="0" description="Top level script execution">
+          <test-suite type="TestFixture" name="Test Utils" executed="True" result="Success" success="True" time="0.0265" asserts="0" description="Test Utils">
             <results>
-              <test-suite type="TestFixture" name="Top level script execution.When Help parameter is passed" executed="True" result="Success" success="True" time="0.0356" asserts="0" description="Top level script execution.When Help parameter is passed">
+              <test-suite type="TestFixture" name="Test Utils.New-CustomTempDir Test" executed="True" result="Success" success="True" time="0.0218" asserts="0" description="Test Utils.New-CustomTempDir Test">
                 <results>
-                  <test-case description="Should call Show-Help function" name="Top level script execution.When Help parameter is passed.Should call Show-Help function" time="0.0307" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Temporary dir with prefix" name="Test Utils.New-CustomTempDir Test.Temporary dir with prefix" time="0.0171" asserts="0" success="True" result="Success" executed="True" />
                 </results>
               </test-suite>
-              <test-suite type="TestFixture" name="Top level script execution.When ProjectName is passed and Help is not passed" executed="True" result="Success" success="True" time="0.0672" asserts="0" description="Top level script execution.When ProjectName is passed and Help is not passed">
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="D:\Dropbox\Projects\BEE\venvit\tests\vn.Tests.ps1" executed="True" result="Success" success="True" time="0.1977" asserts="0" description="D:\Dropbox\Projects\BEE\venvit\tests\vn.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Top level script execution" executed="True" result="Success" success="True" time="0.1416" asserts="0" description="Top level script execution">
+            <results>
+              <test-suite type="TestFixture" name="Top level script execution.When Help parameter is passed" executed="True" result="Success" success="True" time="0.0317" asserts="0" description="Top level script execution.When Help parameter is passed">
                 <results>
-                  <test-case description="Should call Invoke-Vn function with ProjectName" name="Top level script execution.When ProjectName is passed and Help is not passed.Should call Invoke-Vn function with ProjectName" time="0.0267" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Should call Show-Help function" name="Top level script execution.When Help parameter is passed.Should call Show-Help function" time="0.0271" asserts="0" success="True" result="Success" executed="True" />
                 </results>
               </test-suite>
-              <test-suite type="TestFixture" name="Top level script execution.When Var01 is an empty string and Help is not passed" executed="True" result="Success" success="True" time="0.0986" asserts="0" description="Top level script execution.When Var01 is an empty string and Help is not passed">
+              <test-suite type="TestFixture" name="Top level script execution.When ProjectName is passed and Help is not passed" executed="True" result="Success" success="True" time="0.0683" asserts="0" description="Top level script execution.When ProjectName is passed and Help is not passed">
                 <results>
-                  <test-case description="Should call Show-Help function" name="Top level script execution.When Var01 is an empty string and Help is not passed.Should call Show-Help function" time="0.0268" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Should call Invoke-Vn function with ProjectName" name="Top level script execution.When ProjectName is passed and Help is not passed.Should call Invoke-Vn function with ProjectName" time="0.0319" asserts="0" success="True" result="Success" executed="True" />
                 </results>
               </test-suite>
-              <test-suite type="TestFixture" name="Top level script execution.When no parameters are passed" executed="True" result="Success" success="True" time="0.1276" asserts="0" description="Top level script execution.When no parameters are passed">
+              <test-suite type="TestFixture" name="Top level script execution.When Var01 is an empty string and Help is not passed" executed="True" result="Success" success="True" time="0.1014" asserts="0" description="Top level script execution.When Var01 is an empty string and Help is not passed">
                 <results>
-                  <test-case description="Should call Show-Help function" name="Top level script execution.When no parameters are passed.Should call Show-Help function" time="0.0244" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Should call Show-Help function" name="Top level script execution.When Var01 is an empty string and Help is not passed.Should call Show-Help function" time="0.0283" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="Top level script execution.When no parameters are passed" executed="True" result="Success" success="True" time="0.1326" asserts="0" description="Top level script execution.When no parameters are passed">
+                <results>
+                  <test-case description="Should call Show-Help function" name="Top level script execution.When no parameters are passed.Should call Show-Help function" time="0.0267" asserts="0" success="True" result="Success" executed="True" />
                 </results>
               </test-suite>
             </results>
