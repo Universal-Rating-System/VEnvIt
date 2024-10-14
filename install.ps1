@@ -7,4 +7,4 @@ if (Test-Path -Path "$env:PROJECT_DIR\pyproject.toml") {
 }
 pre-commit install
 pre-commit autoupdate
-
+if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) {pip install --no-cache-dir -e .[dev]}
