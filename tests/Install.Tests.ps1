@@ -61,15 +61,15 @@ Describe "Install.ps1 script tests" {
     }
 
     AfterAll {
-        if (Test-Path -Path $env:VENVIT_DIR) {
-            Remove-Item -Path $env:VENVIT_DIR -Force -Recurse
-        }
-        if (Test-Path -Path $env:VENV_SECRETS_DIR) {
-            Remove-Item -Path $env:VENV_SECRETS_DIR -Force -Recurse
-        }
-        if (Test-Path -Path $TempBaseDir) {
-            Remove-Item -Path $TempBaseDir -Force -Recurse
-        }
+        # if (Test-Path -Path $env:VENVIT_DIR) {
+        #     Remove-Item -Path $env:VENVIT_DIR -Force -Recurse
+        # }
+        # if (Test-Path -Path $env:VENV_SECRETS_DIR) {
+        #     Remove-Item -Path $env:VENV_SECRETS_DIR -Force -Recurse
+        # }
+        # if (Test-Path -Path $TempBaseDir) {
+        #     Remove-Item -Path $TempBaseDir -Force -Recurse
+        # }
         $env:VENVIT_DIR = $OrigVenvItDir
         $env:VENV_SECRETS_DIR = $OrigVenvSecretsDir
     }

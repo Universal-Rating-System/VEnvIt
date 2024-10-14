@@ -16,7 +16,7 @@ function Invoke-Install {
     Invoke-WebRequest "https://github.com/BrightEdgeeServices/venvit/releases/download/$Tag/Conclude-Install.psm1" -OutFile $UpgradeScriptPath
     Import-Module $UpgradeScriptPath
     Invoke-ConcludeInstall -Release $Tag -UpgradeScriptDir $UpgradeScriptDir
-    Remove-Item -Path $UpgradeScriptDir.FullName -Recurse -Force
+    Remove-Item -Path $UpgradeScriptDir -Recurse -Force
     Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }
     Get-Item "$env:VENV_SECRETS_DIR\dev_env_var.ps1" | ForEach-Object { Unblock-File $_.FullName }
     # --[ End copy for readme.md ]----------------------------------------------------
