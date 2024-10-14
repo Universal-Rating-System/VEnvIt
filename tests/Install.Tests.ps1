@@ -1,29 +1,4 @@
-﻿
-# Describe "Top level script execution" {
-#     BeforeAll {
-#         . $PSScriptRoot\..\src\Install.ps1 -Pester
-#     }
-
-#     BeforeEach {
-#         Mock -CommandName "Show-Help" -MockWith { Write-Host "Mock: Show-Help called" }
-#     }
-
-#     Context "When Help parameter is passed" {
-#         It "Should call Show-Help function" {
-#             . $PSScriptRoot\..\src\Conclude-Install.ps1 -Help
-#             Assert-MockCalled -CommandName "Show-Help" -Exactly 1
-#         }
-#     }
-
-#     Context "When no parameters are passed" {
-#         It "Should call Show-Help function" {
-#             Import-Module "$PSScriptRoot\..\src\Conclude-Install.psm1"
-#             Assert-MockCalled -CommandName "Show-Help" -Exactly 1
-#         }
-#     }
-# }
-
-Describe "Install.ps1 script tests" {
+﻿Describe "Install.ps1 script tests" {
     BeforeAll {
         . $PSScriptRoot\..\src\Install.ps1 -Pester
         $moduleName = "Conclude-Install"
@@ -73,15 +48,6 @@ Describe "Install.ps1 script tests" {
     }
 
     AfterAll {
-        # if (Test-Path -Path $env:VENVIT_DIR) {
-        #     Remove-Item -Path $env:VENVIT_DIR -Force -Recurse
-        # }
-        # if (Test-Path -Path $env:VENV_SECRETS_DIR) {
-        #     Remove-Item -Path $env:VENV_SECRETS_DIR -Force -Recurse
-        # }
-        # if (Test-Path -Path $TempBaseDir) {
-        #     Remove-Item -Path $TempBaseDir -Force -Recurse
-        # }
         $env:VENVIT_DIR = $OrigVenvItDir
         $env:VENV_SECRETS_DIR = $OrigVenvSecretsDir
     }

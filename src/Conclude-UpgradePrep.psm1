@@ -3,12 +3,6 @@ function Get-ManifestFileName {
     return "Manifest.psd1"
 }
 
-# function Get-VersionChanges {
-#     return @{
-#         '6.0.0' = 'Upgrade_6_0_0'
-#         '7.0.0' = 'Upgrade_7_0_0'
-#     }
-# }
 $VersionChanges = @{
         '6.0.0' = 'Invoke-Upgrade_6_0_0'
         '7.0.0' = 'Invoke-Upgrade_7_0_0'
@@ -49,25 +43,4 @@ function Update-Package {
     }
 }
 
-# Script execution starts here
-# This block is ONLY executed if the script is run directly, not dot-sourced i.e. by Pester
-# if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {
-#     param (
-#         [string]$CurrentManifestPath,
-#         [string]$UpgradeManifestPath
-#     )
-#     Write-Host ''
-#     Write-Host ''
-#     $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-#     Write-Host "=[ START $dateTime ]============================================[ Upgrade.ps1 ]=" -ForegroundColor Blue
-#     Write-Host "Update manifest" -ForegroundColor Blue
-
-#     if (-not $CurrentManifestPath -or -not $UpgradeManifestPath) {
-#         throw "Both -CurrentManifestPath and -UpgradeManifestPath parameters are required."
-#     }
-#     Update-Package -CurrentDir $CurrentManifestPath -LatestDir $UpgradeManifestPath
-#     Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
-#     Write-Host ''
-#     Write-Host ''
-# }
 Export-ModuleMember -Function Get-ManifestFileName, Update-Package, Invoke-Upgrade_6_0_0, Invoke-Upgrade_7_0_0

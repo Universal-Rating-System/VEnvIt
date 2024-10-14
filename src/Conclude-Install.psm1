@@ -1,24 +1,8 @@
 Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 
-# param (
-#     [Parameter(Mandatory = $false, Position = 0)]
-#     [string]$Release,
-
-#     # Temporary directory of the new (upgrade scripts)
-#     [Parameter(Mandatory = $false, Position = 1)]
-#     [string]$UpgradeScriptDir,
-
-#     # Invoke the help.  This parameter will render above positional parameters inconsequential.
-#     [Parameter(Mandatory = $false)]
-#     [Switch]$Help,
-
-#     # Used to indicate that the code is called by Pester to avoid unwanted code execution during Pester testing.
-#     [Parameter(Mandatory = $false)]
-#     [Switch]$Pester
-# )
 $separator = "-" * 80
 
-# # Function to get or prompt for an environment variable
+# Function to get or prompt for an environment variable
 function Get-OrPromptEnvVar {
     param (
         [string]$varName,
@@ -159,26 +143,6 @@ function Invoke-ConcludeInstall {
 #     & Update-Package $env:VENVIT_DIR $UpgradeScriptDir
 # }
 
-# function Show-Help {
-#     $separator = "-" * 80
-#     Write-Host $separator -ForegroundColor Cyan
-
-#     # Usage
-#     @"
-#     Usage:
-#     ------
-#     Conclude-Install.ps1 Release UpgradeScriptDir
-#     Conclude-Install.ps1 -h
-
-#     Parameters:
-#       Release          The release being installed.
-#       UpgradeScriptDir  Location (temporary directory) of the installation files.
-#       -h               This help.
-# "@ | Write-Host
-
-#     Write-Host $separator -ForegroundColor Cyan
-# }
-
 function Test-Admin {
     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
     $adminRole = [Security.Principal.WindowsBuiltInRole]::Administrator
@@ -197,25 +161,5 @@ function Remove-EnvVarIfExists {
         Write-Host "$varName has been removed."
     }
 }
-
-# Script execution starts here
-# Pester parameter is to ensure that the script does not execute when called from
-# pester BeforeAll.  Any better ideas would be welcome.
-# if (-not $Pester) {
-#     Write-Host ''
-#     Write-Host ''
-#     $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-#     Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
-#     $separator = "-" * 80
-#     # $project_name = $args[0]
-#     Write-Host "Create new $ProjectName virtual environment" -ForegroundColor Blue
-#     if ($Release -eq "" -or $Help) {
-#         Show-Help
-#     }
-#     else {
-#         Invoke-ConcludeInstall -Release $Release -UpgradeScriptDir $UpgradeScriptDir
-#     }
-#     Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
-# }
 
 Export-ModuleMember -Function 'Invoke-ConcludeInstall'
