@@ -28,7 +28,7 @@ function Invoke-ConcludeInstall {
     )
 
     # Invoke-ConcludeUpgradePrep $UpgradeScriptDir
-    Update-Package $UpgradeScriptDir
+    Update-PackagePrep $UpgradeScriptDir
 
     $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$Release/Installation-Files.zip"
     $zipFilePath = Join-Path -Path $UpgradeScriptDir -ChildPath "Installation-Files.zip"
@@ -140,17 +140,9 @@ function Invoke-ConcludeInstall {
 #     $ManifestFileName = "Manifest.psd1"
 #     $CurrentManifestDir = Join-Path -Path $env:VENVIT_DIR -ChildPath $ManifestFileName
 #     $UpgradeManifestDir = Join-Path -Path $UpgradeScriptDir -ChildPath $ManifestFileName
-#     & Update-Package $env:VENVIT_DIR $UpgradeScriptDir
+#     & Update-PackagePrep $env:VENVIT_DIR $UpgradeScriptDir
 # }
 
-function Test-Admin {
-    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $adminRole = [Security.Principal.WindowsBuiltInRole]::Administrator
-    $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
-    return $principal.IsInRole($adminRole)
-}
-
-# Function to remove an environment variable if it exists
 function Remove-EnvVarIfExists {
     param (
         [string]$varName
@@ -162,4 +154,12 @@ function Remove-EnvVarIfExists {
     }
 }
 
+function Test-Admin {
+    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $adminRole = [Security.Principal.WindowsBuiltInRole]::Administrator
+    $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
+    return $principal.IsInRole($adminRole)
+}
+
+# Function to remove an environment variable if it exists
 Export-ModuleMember -Function 'Invoke-ConcludeInstall'

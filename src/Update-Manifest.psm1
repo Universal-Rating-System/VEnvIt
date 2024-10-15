@@ -91,3 +91,5 @@ function New-ManifestPsd1 {
 
     Set-Content -Path $FilePath -Value $content
 }
+
+Export-ModuleMember -Function Convert-PyprojectToml, Invoke-UpdateManifest, New-ManifestPsd1

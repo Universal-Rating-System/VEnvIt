@@ -8,4 +8,4 @@
     return $TempDir
 }
 
-Export-ModuleMember -Function 'New-CustomTempDir'
+Export-ModuleMember -Function New-CustomTempDir

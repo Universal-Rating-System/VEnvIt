@@ -9,4 +9,11 @@ Describe "Function testing" {
         # Test to be implemented
     }
 
+    Context "Remove-EnvVarIfExists" {
+        # Test to be implemented
+    }
+
+    Context "Test-Admin" {
+        # Test to be implemented
+    }
 }

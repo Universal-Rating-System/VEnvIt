@@ -1,4 +1,4 @@
-﻿Describe "Test Utils" {
+﻿Describe "Function Tests" {
     BeforeAll {
         # "$PSScriptRoot\..\src\Utils.psm1"
         Import-Module "$PSScriptRoot\..\src\Utils.psm1"
