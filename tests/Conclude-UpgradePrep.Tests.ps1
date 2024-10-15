@@ -62,41 +62,23 @@ Describe "Function testing" {
 
     }
 
-    Context "Invoke-Upgrade_0_0_0" {
+    Context "Invoke-PrepForUpgrade_6_0_0" {
         # Test to be implemented
     }
 
-    Context "Invoke-Upgrade_6_0_0" {
-        # Test to be implemented
-    }
-
-    Context "Invoke-Upgrade_7_0_0" {
+    Context "Invoke-PrepForUpgrade_7_0_0" {
         # Test to be implemented
     }
 
     Context "Update-PackagePrep" {
         BeforeAll {
+            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+            if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
             Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
-            # Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
             Import-Module $PSScriptRoot\..\src\Utils.psm1
 
-            # $ManifestData500 = @{
-            #     Version     = "5.0.0"
-            #     Authors        = "Ann Other <ann@other.com>"
-            #     Description   = "Description of 5.0.0"
-            # }
-            # $ManifestData600 = @{
-            #     Version     = "6.0.0"
-            #     Authors        = "Ann Other <ann@other.com>"
-            #     Description   = "Description of 6.0.0"
-            # }
-            # $ManifestData700 = @{
-            #     Version = "7.0.0"
-            #     Authors        = "Ann Other <ann@other.com>"
-            #     Description   = "Description of 7.0.0"
-            # }
             $OrigVENVIT_DIR = $env:VENVIT_DIR
-
         }
         BeforeEach {
             $TempDir = New-CustomTempDir -Prefix "venvit"
@@ -108,9 +90,9 @@ Describe "Function testing" {
         It 'Should apply 6.0.0 and 7.0.0' {
             Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 
-            Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-Upgrade_6_0_0 { return $true }
-            Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-Upgrade_7_0_0 { return $true }
-            # Mock -CommandName Invoke-Upgrade_7_0_0
+            Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 { return $true }
+            Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_7_0_0 { return $true }
+            # Mock -CommandName Invoke-PrepForUpgrade_7_0_0
             $CurrentManifestPath = Join-Path -Path $env:VENVIT_DIR -ChildPath (Get-ManifestFileName)
             New-ManifestPsd1 -FilePath $CurrentManifestPath -Data $ManifestData500
             $UpgradeManifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
@@ -118,8 +100,8 @@ Describe "Function testing" {
             Update-PackagePrep -UpgradeScriptDir $UpgradeScriptDir
 
             # Assert that the correct upgrade functions were called in order
-            Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-Upgrade_6_0_0 -Times 1 -Exactly
-            Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-Upgrade_7_0_0 -Times 1 -Exactly
+            Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 -Times 1 -Exactly
+            Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_7_0_0 -Times 1 -Exactly
         }
         AfterEach {
             Remove-Item -Path $TempDir -Recurse -Force

@@ -29,6 +29,22 @@ param (
     [Switch]$Pester
 )
 
+function Confirm-EnvironmentVariables {
+    # Check for required environment variables and display help if they're missing
+    $Result = $true
+    if (
+        -not $env:VENV_ENVIRONMENT -or
+        -not $env:VENVIT_DIR -or
+        -not $env:VENV_SECRETS_DIR -or
+        -not $env:VENV_CONFIG_DIR -or
+        -not $env:PROJECTS_BASE_DIR -or
+        -not $env:VENV_BASE_DIR -or
+        -not $env:VENV_PYTHON_BASE_DIR) {
+        $Result = $false
+    }
+    return $Result
+}
+
 function CreateDirIfNotExist {
     param (
         [string]$_dir
@@ -140,8 +156,12 @@ function Invoke-Vn {
         [string]$DevMode,
         [string]$ResetScripts
     )
-    New-VirtualEnvironment -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
-    Show-EnvironmentVariables
+    if (Confirm-EnvironmentVariables) {
+        New-VirtualEnvironment -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
+        Show-EnvironmentVariables
+    } else {
+        Show-Help
+    }
 }
 function MoveFileToArchiveIfExists {
     param (
@@ -172,23 +192,10 @@ function New-VirtualEnvironment {
     )
 
     # Show help if no project name is provided
-    if (-not $ProjectName -or $ProjectName -eq "-h") {
-        ShowHelp
-        return
-    }
-
-    # Check for required environment variables and display help if they're missing
-    if (
-        -not $env:VENV_ENVIRONMENT -or
-        -not $env:VENVIT_DIR -or
-        -not $env:VENV_SECRETS_DIR -or
-        -not $env:VENV_CONFIG_DIR -or
-        -not $env:PROJECTS_BASE_DIR -or
-        -not $env:VENV_BASE_DIR -or
-        -not $env:VENV_PYTHON_BASE_DIR) {
-        ShowEnvVarHelp
-        return
-    }
+    # if (-not $ProjectName -or $ProjectName -eq "-h") {
+    #     ShowHelp
+    #     return
+    # }
 
     # Set local variables from environment variables
     # $ProjectName = if (-not $ProjectName) { Read-Host "Project name" } else { $ProjectName }
