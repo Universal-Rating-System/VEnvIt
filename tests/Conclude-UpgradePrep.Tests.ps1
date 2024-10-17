@@ -69,7 +69,9 @@ Describe "Function testing" {
     Context "Invoke-PrepForUpgrade_6_0_0" {
         BeforeAll {
             # This test must be run with administrator rights.
-            Test-Admin
+            if (-not (Test-Admin)) {
+                Throw "Tests must be run as an Administrator. Aborting..."
+            }
             $OrigRTE_ENVIRONMENT = $env:RTE_ENVIRONMENT
             $OrigSCRIPTS_DIR = $env:SCRIPTS_DIR
             $OrigSECRETS_DIR = $env:SECRETS_DIR
