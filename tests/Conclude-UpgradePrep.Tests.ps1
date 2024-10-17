@@ -1,8 +1,12 @@
 ﻿# Upgrade.Tests.ps1
 
-
 Describe "Function testing" {
     BeforeAll {
+        if (Get-Module -Name "Conclude-Install") { Remove-Module -Name "Conclude-Install" }
+        if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+        Import-Module $PSScriptRoot\..\src\Conclude-Install.psm1
+        Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+
         $ManifestData500 = @{
             Version     = "5.0.0"
             Authors     = "Ann Other <ann@other.com>"
@@ -63,6 +67,45 @@ Describe "Function testing" {
     }
 
     Context "Invoke-PrepForUpgrade_6_0_0" {
+        BeforeAll {
+            $OrigRTE_ENVIRONMENT = $env:RTE_ENVIRONMENT
+            $OrigSCRIPTS_DIR = $env:SCRIPTS_DIR
+            $OrigSECRETS_DIR = $env:SECRETS_DIR
+            [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", "rte_environment", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", "scripts_dir", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", "secrets_dir", [System.EnvironmentVariableTarget]::Machine)
+        }
+        It "Should prepare for 6.0.0" {
+            # This test must be run with administrator rights.
+            Test-Admin
+            Invoke-PrepForUpgrade_6_0_0
+            $rte_environment = [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
+            $scripts_dir = [System.Environment]::GetEnvironmentVariable("SCRIPTS_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $secrets_dir = [System.Environment]::GetEnvironmentVariable("SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $rte_environment | Should -Be $null
+            $scripts_dir | Should -Be $null
+            $secrets_dir | Should -Be $null
+        }
+
+        AfterAll {
+            if ($OrigRTE_ENVIRONMENT) {
+                [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $OrigRTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
+            } else {
+                Remove-EnvVarIfExists -VarName "RTE_ENVIRONMENT"
+            }
+            if ($SCRIPTS_DIR) {
+                [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $OrigSCRIPTS_DIR, [System.EnvironmentVariableTarget]::Machine)
+            }
+            else {
+                Remove-EnvVarIfExists -VarName "SCRIPTS_DIR"
+            }
+            if ($OrigRTE_ENVIRONMENT) {
+                [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $OrigSECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
+            }
+            else {
+                Remove-EnvVarIfExists -VarName "SECRETS_DIR"
+            }
+        }
         # Test to be implemented
     }
 
@@ -72,7 +115,6 @@ Describe "Function testing" {
 
     Context "Update-PackagePrep" {
         BeforeAll {
-            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
             if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
             if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
             Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1

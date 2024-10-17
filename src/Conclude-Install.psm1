@@ -21,11 +21,23 @@ function Get-OrPromptEnvVar {
     }
 }
 
+function Invoke-CleanUp {
+    # TODO
+    # This function must clean up the installation in case it is not with administrator rights.
+}
+
 function Invoke-ConcludeInstall {
     param (
         [string]$Release,
         [string]$UpgradeScriptDir
     )
+
+    # Check for administrative privileges
+    if (-not (Test-Admin)) {
+        Write-Host "This script needs to be run as an administrator. Please run it in an elevated PowerShell session." -ForegroundColor Red
+        Invoke-CleanUp
+        exit
+    }
 
     # Invoke-ConcludeUpgradePrep $UpgradeScriptDir
     Update-PackagePrep $UpgradeScriptDir
@@ -33,21 +45,7 @@ function Invoke-ConcludeInstall {
     $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$Release/Installation-Files.zip"
     $zipFilePath = Join-Path -Path $UpgradeScriptDir -ChildPath "Installation-Files.zip"
 
-    # Check for administrative privileges
-    if (-not (Test-Admin)) {
-        Write-Host "This script needs to be run as an administrator. Please run it in an elevated PowerShell session." -ForegroundColor Red
-        exit
-    }
-
     # Remove historical (Batch) environment variables if they exist
-    $_old_env_vars = @(
-        @("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT),
-        @("SCRIPTS_DIR", "$env:SCRIPTS_DIR")
-        @("SECRETS_DIR", "$env:SECRETS_DIR")
-    )
-    foreach ($var in $_old_env_vars) {
-        Remove-EnvVarIfExists -varName $var[0]
-    }
 
     # Download the zip file
     Write-Host "Downloading installation files from $url..."
@@ -143,23 +141,21 @@ function Invoke-ConcludeInstall {
 #     & Update-PackagePrep $env:VENVIT_DIR $UpgradeScriptDir
 # }
 
-function Remove-EnvVarIfExists {
-    param (
-        [string]$varName
-    )
-    $existingValue = [System.Environment]::GetEnvironmentVariable($varName, [System.EnvironmentVariableTarget]::Machine)
-    if ($existingValue) {
-        [System.Environment]::SetEnvironmentVariable($varName, $null, [System.EnvironmentVariableTarget]::Machine)
-        Write-Host "$varName has been removed."
-    }
+function Test-Admin {
+
+    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $Principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
+    $adminRole = [Security.Principal.WindowsBuiltInRole]::Administrator
+    return Invoke-IsInRole -Principal $Principal -Role $adminRole
 }
 
-function Test-Admin {
-    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $adminRole = [Security.Principal.WindowsBuiltInRole]::Administrator
-    $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
-    return $principal.IsInRole($adminRole)
+function Invoke-IsInRole {
+    param (
+        [Security.Principal.WindowsPrincipal]$Principal,
+        [Security.Principal.WindowsBuiltInRole]$Role
+    )
+    return $Principal.IsInRole($Role)
 }
 
 # Function to remove an environment variable if it exists
-Export-ModuleMember -Function 'Invoke-ConcludeInstall'
+Export-ModuleMember -Function Invoke-ConcludeInstall, Invoke-IsInRole, Remove-EnvVarIfExists, Test-Admin

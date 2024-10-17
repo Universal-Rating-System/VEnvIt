@@ -84,6 +84,33 @@ Describe "Function testing" {
             $env:VENV_PYTHON_BASE_DIR = $OrigVENV_PYTHON_BASE_DIR
         }
 }
+
+    Context "Get-InstallationValues" {
+        It "All parameters set" {
+            $InstallValues = Get-InstallationValues -ProjectName "MyProject" -PythonVer "311" -Organization "MyOrg" -DevMode "Y" -ResetScripts "Y"
+            $InstallValues.PythonVer | Should -Be "311"
+            $InstallValues.Organization | Should -Be "MyOrg"
+            $InstallValues.DevMode | Should -Be "Y"
+            $InstallValues.ResetScripts | Should -Be "Y"
+        }
+    }
+    Context "Get-Value" {
+        It "With set values" {
+            $Value = Get-Value -CurrValue "311" -Prompt "Python version" -DefValue "312"
+            $Value | Should -Be "311"
+        }
+        It "Read from console" {
+            Mock Read-Host { "314" } -ParameterFilter { $Prompt -eq "Python version (default: 310)" }
+            $Value = Get-Value -Prompt "Python version" -DefValue "310"
+            $Value | Should -Be "314"
+        }
+        It "Get default value" {
+            Mock Read-Host { "" } -ParameterFilter { $Prompt -eq "Python version (default: 39)" }
+            $Value = Get-Value -Prompt "Python version" -DefValue "39"
+            $Value | Should -Be "39"
+        }
+    }
+
     Context "New-VirtualEnvironment" {
 
     }

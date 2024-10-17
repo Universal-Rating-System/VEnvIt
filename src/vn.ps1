@@ -95,6 +95,39 @@ function CreateProjectStructure {
     }
 }
 
+function Get-InstallationValues {
+    param (
+        [string]$ProjectName,
+        [string]$PythonVer,
+        [string]$Organization,
+        [string]$DevMode,
+        [string]$ResetScripts
+    )
+    $PythonVer = Get-Value -CurrValue $PythonVer -Prompt "Python version" -DefValue "312"
+    $Organization = Get-Value -CurrValue $Organization -Prompt "Organization" -DefValue "MyOrg"
+    if (-not $DevMode -eq "Y" -or -not $DevMode -eq "N" -or [string]::IsNullOrWhiteSpace($DevMode)) {
+        $DevMode = ReadYesOrNo -_prompt_text "Dev mode"
+    }
+    if (-not $ResetScripts -eq "Y" -or -not $ResetScripts -eq "N" -or [string]::IsNullOrWhiteSpace($ResetScripts)) {
+        $ResetScripts = ReadYesOrNo -_prompt_text "Reset scripts"
+    }
+    $InstallationValues = [PSCustomObject]@{ PythonVer = $PythonVer; Organization = $Organization; DevMode = $DevMode; ResetScripts = $ResetScripts }
+    return $InstallationValues
+}
+
+function Get-Value {
+    param (
+        [string]$CurrValue,
+        [string]$Prompt,
+        [string]$DefValue
+    )
+    $Value = if (-not $CurrValue) { Read-Host "$Prompt (default: $DefValue)" } else { $CurrValue }
+    if (-not $Value) {
+        $Value = $DefValue
+    }
+    return $Value
+}
+
 function Show-EnvironmentVariables {
     Write-Host ""
     Write-Host "System Environment Variables" -ForegroundColor Green
@@ -191,26 +224,12 @@ function New-VirtualEnvironment {
         [string]$ResetScripts
     )
 
-    # Show help if no project name is provided
-    # if (-not $ProjectName -or $ProjectName -eq "-h") {
-    #     ShowHelp
-    #     return
-    # }
-
     # Set local variables from environment variables
-    # $ProjectName = if (-not $ProjectName) { Read-Host "Project name" } else { $ProjectName }
-    $PythonVer = if (-not $PythonVer) { Read-Host "Python version" } else { $PythonVer }
-    $Organization = if (-not $Organization) { Read-Host "Organization" } else { $Organization }
-    if (-not $DevMode -eq "Y" -or -not $DevMode -eq "N" -or [string]::IsNullOrWhiteSpace($DevMode)) {
-        $DevMode = ReadYesOrNo -_prompt_text "Dev mode"
-    }
-    if (-not $ResetScripts -eq "Y" -or -not $ResetScripts -eq "N" -or [string]::IsNullOrWhiteSpace($ResetScripts)) {
-        $ResetScripts = ReadYesOrNo -_prompt_text "Reset scripts"
-    }
+    $InstallationValues = Get-InstallationValues -PythonVer $PythonVer -Organization $Organization -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
 
     # Configure the environment settings for local development environment
-    $env:PROJECT_NAME = $ProjectName
-    $env:VENV_ORGANIZATION_NAME = $Organization
+    $env:PROJECT_NAME = $InstallationValues.ProjectName
+    $env:VENV_ORGANIZATION_NAME = $InstallationValues.Organization
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
         & "$env:VENV_SECRETS_DIR\dev_env_var.ps1"
     }

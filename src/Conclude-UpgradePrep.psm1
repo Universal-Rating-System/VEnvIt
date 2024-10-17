@@ -4,6 +4,11 @@ $VersionChanges = @{
     '6.0.0' = 'Invoke-PrepForUpgrade_6_0_0'
     '7.0.0' = 'Invoke-PrepForUpgrade_7_0_0'
 }
+$PreVersion600EnvVars = @(
+    @("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT),
+    @("SCRIPTS_DIR", "$env:SCRIPTS_DIR"),
+    @("SECRETS_DIR", "$env:SECRETS_DIR")
+)
 
 function Get-ManifestFileName {
     return "Manifest.psd1"
@@ -29,12 +34,26 @@ function Invoke-PrepForUpgrade_6_0_0 {
     # Apply necessary changes and cleanup to prepare an implement v6.0.0
     # The current installed version is pre v6.0.0
     Write-Host "Applying upgrade for version 6.0.0"
+    foreach ($var in $PreVersion600EnvVars) {
+        Remove-EnvVarIfExists -VarName $var[0]
+    }
 }
 
 function Invoke-PrepForUpgrade_7_0_0 {
     # Apply necessary changes and cleanup to prepare an implement v7.0.0
     # The current installed version is pre v7.0.0
     Write-Host "Applying upgrade for version 7.0.0"
+}
+
+function Remove-EnvVarIfExists {
+    param (
+        [string]$VarName
+    )
+    $existingValue = [System.Environment]::GetEnvironmentVariable($VarName, [System.EnvironmentVariableTarget]::Machine)
+    if ($existingValue) {
+        [System.Environment]::SetEnvironmentVariable($VarName, $null, [System.EnvironmentVariableTarget]::Machine)
+        Write-Host "$VarName has been removed."
+    }
 }
 
 function Update-PackagePrep {
@@ -54,4 +73,6 @@ function Update-PackagePrep {
     }
 }
 
-Export-ModuleMember -Function Get-ManifestFileName, Get-Version, Update-PackagePrep, Invoke-PrepForUpgrade_6_0_0, Invoke-PrepForUpgrade_7_0_0
+Export-ModuleMember -Function Get-ManifestFileName, Get-Version, Update-PackagePrep, Invoke-PrepForUpgrade_6_0_0
+Export-ModuleMember -Function Invoke-PrepForUpgrade_7_0_0, Remove-EnvVarIfExists
+Export-ModuleMember -Variable PreVersion600EnvVars
