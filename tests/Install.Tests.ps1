@@ -2,14 +2,14 @@
     Context "Invoke-Install Function Tests" {
         BeforeAll {
             . $PSScriptRoot\..\src\Install.ps1 -Pester
-            $moduleName = "Conclude-Install"
+            $moduleName = "Install-Conclude"
             # Remove the module if it's already loaded
             if (Get-Module -Name $moduleName) {
                 Remove-Module -Name $moduleName
             }
 
             Import-Module "$PSScriptRoot\..\src\Utils.psm1"
-            Import-Module "$PSScriptRoot\..\src\Conclude-Install.psm1"
+            Import-Module "$PSScriptRoot\..\src\Install-Conclude.psm1"
 
             $MockTag = "1.0.0"
             $TempBaseDir = New-CustomTempDir -Prefix "venvit"
@@ -29,12 +29,12 @@
 "@
             } -ParameterFilter { $Uri -eq "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" }
             Mock Invoke-WebRequest {
-                Copy-Item -Path $PSScriptRoot\..\src\Conclude-Install.psm1 -Destination $OutFile -Verbose
-            } -ParameterFilter { $Uri -eq "https://github.com/BrightEdgeeServices/venvit/releases/download/$MockTag/Conclude-Install.psm1" }
+                Copy-Item -Path $PSScriptRoot\..\src\Install-Conclude.psm1 -Destination $OutFile -Verbose
+            } -ParameterFilter { $Uri -eq "https://github.com/BrightEdgeeServices/venvit/releases/download/$MockTag/Install-Conclude.psm1" }
             Mock Import-Module {
-                Import-Module "$PSScriptRoot\..\src\Conclude-Install.psm1"
-            } -ParameterFilter { $Name.StartsWith($env:TEMP)}
-            # Mock -ModuleName Conclude-Install -CommandName Invoke-ConcludeInstall {
+                Import-Module "$PSScriptRoot\..\src\Install-Conclude.psm1"
+            } -ParameterFilter { $Name.StartsWith($env:TEMP) }
+            # Mock -ModuleName Install-Conclude -CommandName Invoke-ConcludeInstall {
             Mock Invoke-ConcludeInstall {
                 "exit" | Out-File -FilePath "$env:VENVIT_DIR\vn.ps1" -Force
                 "exit" | Out-File -FilePath "$env:VENVIT_DIR\vi.ps1" -Force
@@ -51,6 +51,7 @@
         AfterAll {
             $env:VENVIT_DIR = $OrigVenvItDir
             $env:VENV_SECRETS_DIR = $OrigVenvSecretsDir
+            Remove-Item -Path $TempDir -Recurse -Force
         }
     }
     Context "Show-Help Function Tests" {

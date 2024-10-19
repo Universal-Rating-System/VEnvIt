@@ -43,6 +43,8 @@ function Invoke-PrepForUpgrade_7_0_0 {
     # Apply necessary changes and cleanup to prepare an implement v7.0.0
     # The current installed version is pre v7.0.0
     Write-Host "Applying upgrade for version 7.0.0"
+    VENV_SECRETS_DIR
+    VENV_CONFIG_DIR
 }
 
 function Remove-EnvVarIfExists {

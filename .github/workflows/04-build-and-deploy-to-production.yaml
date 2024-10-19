@@ -82,7 +82,7 @@ jobs:
           prerelease: false
           files: |
             Installation-Files.zip
-            ./src/Conclude-Install.psm1
+            ./src/Install-Conclude.psm1
             ./Manifest.psd1
 
       # - name: Send release email notification

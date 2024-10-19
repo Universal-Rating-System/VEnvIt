@@ -1,23 +1,34 @@
 Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 
+$envVarSet = @(
+    [PSCustomObject]@{Name = "VENV_ENVIRONMENT"; DefVal = "loc_dev"; IsDir = $false},
+    [PSCustomObject]@{Name = "PROJECTS_BASE_DIR"; DefVal = "~\Projects"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENVIT_DIR"; DefVal = "$env:ProgramFiles\VenvIt"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENVIT_SECRETS_ORG_DIR"; DefVal = "$env:VENVIT_DIR\Secrets"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENVIT_SECRETS_USER_DIR"; DefVal = "~\VenvIt\Secrets"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENV_BASE_DIR"; DefVal = "~\venv"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENV_PYTHON_BASE_DIR"; DefVal = "c:\Python"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENV_CONFIG_ORG_DIR"; DefVal = "$env:VENVIT_DIR\Config"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENV_CONFIG_USER_DIR"; DefVal = "~\VenvIt\Config"; IsDir = $true }
+)
 $separator = "-" * 80
 
 # Function to get or prompt for an environment variable
-function Get-OrPromptEnvVar {
-    param (
-        [string]$varName,
-        [string]$promptText
-    )
-    $existingValue = [System.Environment]::GetEnvironmentVariable($varName, [System.EnvironmentVariableTarget]::Machine)
-    if ($existingValue) {
-        Write-Host $varName": "$existingValue
-        return $existingValue
-    }
-    else {
-        $newValue = Read-Host $promptText
-        [System.Environment]::SetEnvironmentVariable($varName, $newValue, [System.EnvironmentVariableTarget]::Machine)
-        # Write-Host "$varName\: $newValue"
-        return $newValue
+function Set-EnvironmentVariables {
+    foreach ($envVar in $envVarSet) {
+        $existingValue = [System.Environment]::GetEnvironmentVariable($envVar.Name, [System.EnvironmentVariableTarget]::Machine)
+        if ($existingValue) {
+            $promptText = $envVar.Name + " ($existingValue)"
+            $defaultValue = $existingValue
+        } else {
+            $promptText = $envVar.Name + " (" + $envVar.DefVal + ")"
+            $defaultValue = $envVar.DefVal
+        }
+        $newValue = Read-Host -Prompt $promptText
+        if ($newValue -eq "") {
+            $newValue = $defaultValue
+        }
+        [System.Environment]::SetEnvironmentVariable($envVar.Name, $newValue, [System.EnvironmentVariableTarget]::Machine)
     }
 }
 
@@ -45,40 +56,13 @@ function Invoke-ConcludeInstall {
     $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$Release/Installation-Files.zip"
     $zipFilePath = Join-Path -Path $UpgradeScriptDir -ChildPath "Installation-Files.zip"
 
-    # Remove historical (Batch) environment variables if they exist
+    Write-Host $separator -ForegroundColor Cyan
+    Set-EnvironmentVariables
+    New-Directories
 
     # Download the zip file
     Write-Host "Downloading installation files from $url..."
     Invoke-WebRequest -Uri $url -OutFile $zipFilePath
-
-    Write-Host $separator -ForegroundColor Cyan
-
-    # Acquire user input for environment variables if they are not already set
-    Write-Host "Provide the values for the following environment variables:" -ForegroundColor Yellow
-    Get-OrPromptEnvVar -varName "VENV_ENVIRONMENT" -promptText "VENV_ENVIRONMENT"
-    $env:PROJECTS_BASE_DIR = Get-OrPromptEnvVar -varName "PROJECTS_BASE_DIR" -promptText "PROJECTS_BASE_DIR"
-    $env:VENVIT_DIR = Get-OrPromptEnvVar -varName "VENVIT_DIR" -promptText "VENVIT_DIR"
-    $env:VENV_SECRETS_DIR = Get-OrPromptEnvVar -varName "VENV_SECRETS_DIR" -promptText "VENV_SECRETS_DIR"
-    $env:VENV_BASE_DIR = Get-OrPromptEnvVar -varName "VENV_BASE_DIR" -promptText "VENV_BASE_DIR"
-    $env:VENV_PYTHON_BASE_DIR = Get-OrPromptEnvVar -varName "VENV_PYTHON_BASE_DIR" -promptText "VENV_PYTHON_BASE_DIR"
-    $env:VENV_CONFIG_DIR = Get-OrPromptEnvVar -varName "VENV_CONFIG_DIR" -promptText "VENV_CONFIG_DIR"
-
-    # Ensure the directories exist
-    $_system_dirs = @(
-        @("PROJECTS_BASE_DIR", $env:PROJECTS_BASE_DIR),
-        @("VENVIT_DIR", $env:VENVIT_DIR),
-        @("VENV_SECRETS_DIR", $env:VENV_SECRETS_DIR),
-        @("PROJECTS_BASE_DIR", $env:PROJECTS_BASE_DIR),
-        @("VENV_BASE_DIR", $env:VENV_BASE_DIR),
-        @("VENV_PYTHON_BASE_DIR", $env:VENV_PYTHON_BASE_DIR),
-        @("VENV_CONFIG_DIR", "$env:VENV_CONFIG_DIR")
-    )
-    foreach ($var in $_system_dirs) {
-        if (-not (Test-Path -Path $var[1])) {
-            New-Item -ItemType Directory -Path $var[1] | Out-Null
-        }
-    }
-
     # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
     Write-Host "Unzipping Installation-Files.zip to $env:VENVIT_DIR..."
     Expand-Archive -Path $zipFilePath -DestinationPath $env:VENVIT_DIR -Force
@@ -130,16 +114,25 @@ function Invoke-ConcludeInstall {
 
 }
 
-# function Invoke-ConcludeUpgradePrep {
-#     param (
-#         [string]$UpgradeScriptDir
-#     )
-#     Import-Module $PSScriptRoot\Conclude-UpgradePrep.psm1
-#     $ManifestFileName = "Manifest.psd1"
-#     $CurrentManifestDir = Join-Path -Path $env:VENVIT_DIR -ChildPath $ManifestFileName
-#     $UpgradeManifestDir = Join-Path -Path $UpgradeScriptDir -ChildPath $ManifestFileName
-#     & Update-PackagePrep $env:VENVIT_DIR $UpgradeScriptDir
-# }
+function Invoke-IsInRole {
+    param (
+        [Security.Principal.WindowsPrincipal]$Principal,
+        [Security.Principal.WindowsBuiltInRole]$Role
+    )
+    return $Principal.IsInRole($Role)
+}
+
+function New-Directories {
+    # Ensure the directories exist
+    foreach ($envVar in $envVarSet) {
+        if ( $envVar.IsDir ) {
+            $dirName = [System.Environment]::GetEnvironmentVariable($envVar.Name, [System.EnvironmentVariableTarget]::Machine)
+            if (-not (Test-Path -Path $dirName)) {
+                New-Item -ItemType Directory -Path $dirName | Out-Null
+            }
+        }
+    }
+}
 
 function Test-Admin {
 
@@ -149,13 +142,6 @@ function Test-Admin {
     return Invoke-IsInRole -Principal $Principal -Role $adminRole
 }
 
-function Invoke-IsInRole {
-    param (
-        [Security.Principal.WindowsPrincipal]$Principal,
-        [Security.Principal.WindowsBuiltInRole]$Role
-    )
-    return $Principal.IsInRole($Role)
-}
-
-# Function to remove an environment variable if it exists
-Export-ModuleMember -Function Invoke-ConcludeInstall, Invoke-IsInRole, Remove-EnvVarIfExists, Test-Admin
+Export-ModuleMember -Function Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories, Remove-EnvVarIfExists
+Export-ModuleMember -Function Set-EnvironmentVariables, Test-Admin
+Export-ModuleMember -Variable envVarSet
