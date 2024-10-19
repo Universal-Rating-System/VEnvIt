@@ -2,11 +2,7 @@
     Context "Invoke-Install Function Tests" {
         BeforeAll {
             . $PSScriptRoot\..\src\Install.ps1 -Pester
-            $moduleName = "Install-Conclude"
-            # Remove the module if it's already loaded
-            if (Get-Module -Name $moduleName) {
-                Remove-Module -Name $moduleName
-            }
+            if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
 
             Import-Module "$PSScriptRoot\..\src\Utils.psm1"
             Import-Module "$PSScriptRoot\..\src\Install-Conclude.psm1"
@@ -51,7 +47,7 @@
         AfterAll {
             $env:VENVIT_DIR = $OrigVenvItDir
             $env:VENV_SECRETS_DIR = $OrigVenvSecretsDir
-            Remove-Item -Path $TempDir -Recurse -Force
+            Remove-Item -Path $TempBaseDir -Recurse -Force
         }
     }
     Context "Show-Help Function Tests" {
