@@ -82,7 +82,18 @@ Describe "Function testing" {
     }
 
     Context "Set-EnvironmentVariables tests" {
-        It "All environment variables have values" {
+        BeforeEach {
+            [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", "venv_environment", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", "projects_base_dir", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", "venvit_dir", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENVIT_SECRETS_ORG_DIR", "venvit_secrets_org_dir", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENVIT_SECRETS_USER_DIR", "venvit_secrets_user_dir", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", "venv_base_dir", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", "venv_python_base_dir", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_ORG_DIR", "venv_config_org_dir", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", "venv_config_user_dir", [System.EnvironmentVariableTarget]::Machine)
+        }
+            It "All environment variables have values" {
             Mock -ModuleName Install-Conclude Read-Host { return "venv_environment" } -ParameterFilter { $Prompt -eq "VENV_ENVIRONMENT (venv_environment)" }
             Mock -ModuleName Install-Conclude Read-Host { return "projects_base_dir" } -ParameterFilter { $Prompt -eq "PROJECTS_BASE_DIR (projects_base_dir)" }
             Mock -ModuleName Install-Conclude Read-Host { return "venvit_dir" } -ParameterFilter { $Prompt -eq "VENVIT_DIR (venvit_dir)" }
