@@ -10,21 +10,17 @@ param (
 function Invoke-Install {
     # The intention is to keep the following script as short as possible
     # --[ Start copy for readme.md ]------------------------------------------------
-    Write-Host "*** Checkpoint 1 ***"
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
-    Write-Host "*** Checkpoint 2 ***"
     $UpgradeScriptDir = New-Item -ItemType Directory -Path (Join-Path -Path $env:TEMP -ChildPath ("venvit_" + [Guid]::NewGuid().ToString()))
-    Write-Host "*** Checkpoint 3 ***"
     $Tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" | ConvertFrom-Json)[0].tag_name
-    Write-Host "*** Checkpoint 4 ***"
     $UpgradeScriptPath = Join-Path -Path $UpgradeScriptDir.FullName -ChildPath "Install-Conclude.psm1"
-    Write-Host "*** Checkpoint 5 ***"
+    Write-Host "*** Checkpoint 1 ***"
     Invoke-WebRequest "https://github.com/BrightEdgeeServices/venvit/releases/download/$Tag/Install-Conclude.psm1" -OutFile $UpgradeScriptPath
-    Write-Host "*** Checkpoint 6 ***"
+    Write-Host "*** Checkpoint 3 ***"
     Import-Module -Name $UpgradeScriptPath
-    Write-Host "*** Checkpoint 7 ***"
+    Write-Host "*** Checkpoint 4 ***"
     Invoke-ConcludeInstall -Release $Tag -UpgradeScriptDir $UpgradeScriptDir
-    Write-Host "*** Checkpoint 8 ***"
+    Write-Host "*** Checkpoint 5 ***"
     Remove-Item -Path $UpgradeScriptDir -Recurse -Force
     Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }
     Get-Item "$env:VENV_SECRETS_DIR\dev_env_var.ps1" | ForEach-Object { Unblock-File $_.FullName }

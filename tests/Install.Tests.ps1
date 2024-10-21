@@ -25,6 +25,10 @@
 "@
             } -ParameterFilter { $Uri -eq "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" }
             Mock Invoke-WebRequest {
+                Write-Host "*** Checkpoint 2 ***"
+                Write-Host $PSScriptRoot
+                Write-Host $OutFile
+                & Get-ChildItem $PSScriptRoot
                 Copy-Item -Path $PSScriptRoot\..\src\Install-Conclude.psm1 -Destination $OutFile -Verbose
             } -ParameterFilter { $Uri -eq "https://github.com/BrightEdgeeServices/venvit/releases/download/$MockTag/Install-Conclude.psm1" }
             Mock Import-Module {
