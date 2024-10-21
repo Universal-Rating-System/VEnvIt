@@ -17,7 +17,7 @@
             New-Item -ItemType Directory -Path $env:VENV_SECRETS_DIR -Force -ErrorAction SilentlyContinue
         }
 
-        It "Shoulsd Invoke-ConcludeInstall" {
+        It "Should Invoke-ConcludeInstall" {
             Mock Set-ExecutionPolicy {}
             Mock Invoke-WebRequest {
                 return @"
@@ -28,7 +28,7 @@
                 Copy-Item -Path $PSScriptRoot\..\src\Install-Conclude.psm1 -Destination $OutFile -Verbose
             } -ParameterFilter { $Uri -eq "https://github.com/BrightEdgeeServices/venvit/releases/download/$MockTag/Install-Conclude.psm1" }
             Mock Import-Module {
-                Import-Module "$PSScriptRoot\..\src\Install-Conclude.psm1"
+                Import-Module "$PSScriptRoot\..\src\Install-Conclude.psm1" -Verbose
             } -ParameterFilter { $Name.StartsWith($env:TEMP) }
             # Mock -ModuleName Install-Conclude -CommandName Invoke-ConcludeInstall {
             Mock Invoke-ConcludeInstall {
