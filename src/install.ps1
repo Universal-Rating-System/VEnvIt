@@ -14,19 +14,9 @@ function Invoke-Install {
     $UpgradeScriptDir = New-Item -ItemType Directory -Path (Join-Path -Path $env:TEMP -ChildPath ("venvit_" + [Guid]::NewGuid().ToString()))
     $Tag = (Invoke-WebRequest "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" | ConvertFrom-Json)[0].tag_name
     $UpgradeScriptPath = Join-Path -Path $UpgradeScriptDir.FullName -ChildPath "Install-Conclude.psm1"
-    Write-Host "*** Checkpoint 1 ***"
     Invoke-WebRequest "https://github.com/BrightEdgeeServices/venvit/releases/download/$Tag/Install-Conclude.psm1" -OutFile $UpgradeScriptPath
-    Write-Host "*** Checkpoint 3 ***"
-    Write-Host $UpgradeScriptPath
-    Write-Host $UpgradeScriptDir
-    Write-Host $env:TEMP
-    Write-Host "*** Checkpoint 4 ***"
-    & Get-ChildItem $UpgradeScriptDir -recurse | Write-Host
-    Write-Host "*** Checkpoint 5 ***"
     Import-Module -Name $UpgradeScriptPath
-    Write-Host "*** Checkpoint 7 ***"
     Invoke-ConcludeInstall -Release $Tag -UpgradeScriptDir $UpgradeScriptDir
-    Write-Host "*** Checkpoint 8 ***"
     Remove-Item -Path $UpgradeScriptDir -Recurse -Force
     Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }
     Get-Item "$env:VENV_SECRETS_DIR\dev_env_var.ps1" | ForEach-Object { Unblock-File $_.FullName }
