@@ -30,6 +30,7 @@
             } -ParameterFilter { $Uri -eq "https://github.com/BrightEdgeeServices/venvit/releases/download/$MockTag/Install-Conclude.psm1" }
             Mock Import-Module {
                 Write-Host "*** Checkpoint 6 ***"
+                & Get-ChildItem $env:TEMP -recurse | Write-Host
                 Import-Module "$PSScriptRoot\..\src\Install-Conclude.psm1" -Verbose
             } -ParameterFilter { $Name.StartsWith($env:TEMP) }
             # Mock -ModuleName Install-Conclude -CommandName Invoke-ConcludeInstall {

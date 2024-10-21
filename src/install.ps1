@@ -18,6 +18,8 @@ function Invoke-Install {
     Invoke-WebRequest "https://github.com/BrightEdgeeServices/venvit/releases/download/$Tag/Install-Conclude.psm1" -OutFile $UpgradeScriptPath
     Write-Host "*** Checkpoint 3 ***"
     Write-Host $UpgradeScriptPath
+    Write-Host $UpgradeScriptDir
+    Write-Host $env:TEMP
     Write-Host "*** Checkpoint 4 ***"
     & Get-ChildItem $UpgradeScriptDir -recurse | Write-Host
     Write-Host "*** Checkpoint 5 ***"
