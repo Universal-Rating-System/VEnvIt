@@ -18,11 +18,13 @@ function Invoke-Install {
     Invoke-WebRequest "https://github.com/BrightEdgeeServices/venvit/releases/download/$Tag/Install-Conclude.psm1" -OutFile $UpgradeScriptPath
     Write-Host "*** Checkpoint 3 ***"
     Write-Host $UpgradeScriptPath
+    Write-Host "*** Checkpoint 4 ***"
     & Get-ChildItem $UpgradeScriptDir -recurse | Write-Host
-    Import-Module -Name $UpgradeScriptPath
     Write-Host "*** Checkpoint 5 ***"
+    Import-Module -Name $UpgradeScriptPath
+    Write-Host "*** Checkpoint 7 ***"
     Invoke-ConcludeInstall -Release $Tag -UpgradeScriptDir $UpgradeScriptDir
-    Write-Host "*** Checkpoint 6 ***"
+    Write-Host "*** Checkpoint 8 ***"
     Remove-Item -Path $UpgradeScriptDir -Recurse -Force
     Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }
     Get-Item "$env:VENV_SECRETS_DIR\dev_env_var.ps1" | ForEach-Object { Unblock-File $_.FullName }
