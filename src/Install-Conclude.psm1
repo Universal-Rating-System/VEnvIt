@@ -14,24 +14,6 @@ $envVarSet = @(
 $separator = "-" * 80
 
 # Function to get or prompt for an environment variable
-function Set-EnvironmentVariables {
-    foreach ($envVar in $envVarSet) {
-        $existingValue = [System.Environment]::GetEnvironmentVariable($envVar.Name, [System.EnvironmentVariableTarget]::Machine)
-        if ($existingValue) {
-            $promptText = $envVar.Name + " ($existingValue)"
-            $defaultValue = $existingValue
-        } else {
-            $promptText = $envVar.Name + " (" + $envVar.DefVal + ")"
-            $defaultValue = $envVar.DefVal
-        }
-        $newValue = Read-Host -Prompt $promptText
-        if ($newValue -eq "") {
-            $newValue = $defaultValue
-        }
-        [System.Environment]::SetEnvironmentVariable($envVar.Name, $newValue, [System.EnvironmentVariableTarget]::Machine)
-    }
-}
-
 function Invoke-CleanUp {
     # TODO
     # This function must clean up the installation in case it is not with administrator rights.
@@ -52,38 +34,11 @@ function Invoke-ConcludeInstall {
 
     # Invoke-ConcludeUpgradePrep $UpgradeScriptDir
     Update-PackagePrep $UpgradeScriptDir
-
-    $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$Release/Installation-Files.zip"
-    $zipFilePath = Join-Path -Path $UpgradeScriptDir -ChildPath "Installation-Files.zip"
-
     Write-Host $separator -ForegroundColor Cyan
     Set-EnvironmentVariables
     New-Directories
-
-    # Download the zip file
-    Write-Host "Downloading installation files from $url..."
-    Invoke-WebRequest -Uri $url -OutFile $zipFilePath
-    # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
-    Write-Host "Unzipping Installation-Files.zip to $env:VENVIT_DIR..."
-    Expand-Archive -Path $zipFilePath -DestinationPath $env:VENVIT_DIR -Force
-
-    # Move the dev_env_var.ps1 file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
-    $sourceFilePath = Join-Path -Path $env:VENVIT_DIR -ChildPath "dev_env_var.ps1"
-    $destinationFilePath = Join-Path -Path $env:VENV_SECRETS_DIR -ChildPath "dev_env_var.ps1"
-
-    if (Test-Path -Path $sourceFilePath) {
-        if (-not (Test-Path -Path $destinationFilePath)) {
-            Write-Host "Moving dev_env_var.ps1 to $env:VENV_SECRETS_DIR..."
-            Move-Item -Path $sourceFilePath -Destination $destinationFilePath -Force
-        }
-        else {
-            Write-Host "dev_env_var.ps1 already exists in $env:VENV_SECRETS_DIR. It will not be overwritten."
-        }
-    }
-    else {
-        Write-Host "dev_env_var.ps1 not found in $env:VENVIT_DIR."
-    }
-
+    Publish-LatestVersion -Release $Release -UpgradeScriptDir $UpgradeScriptDir
+    Publish-Secrets
     Write-Host $separator -ForegroundColor Cyan
 
     # Remove the zip file after extraction
@@ -134,6 +89,69 @@ function New-Directories {
     }
 }
 
+function Publish-LatestVersion {
+    param (
+        [string]$Release,
+        [string]$UpgradeScriptDir
+    )
+    $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$Release/Installation-Files.zip"
+    $zipFilePath = Join-Path -Path $UpgradeScriptDir -ChildPath "Installation-Files.zip"
+
+    # Download the zip file
+    Write-Host "Downloading installation files from $url..."
+    Invoke-WebRequest -Uri $url -OutFile $zipFilePath
+    # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
+    Write-Host "Unzipping Installation-Files.zip to $env:VENVIT_DIR..."
+    Expand-Archive -Path $zipFilePath -DestinationPath $env:VENVIT_DIR -Force
+}
+
+function Publish-Secrets {
+    # Move the dev_env_var.ps1 file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
+    $sourceFilePath = Join-Path -Path $env:VENVIT_DIR -ChildPath "dev_env_var.ps1"
+    $destinationOrgFilePath = Join-Path -Path $env:VENVIT_SECRETS_ORG_DIR -ChildPath "dev_env_var.ps1"
+    $destinationUserFilePath = Join-Path -Path $env:VENVIT_SECRETS_USER_DIR -ChildPath "dev_env_var.ps1"
+
+    if (Test-Path -Path $sourceFilePath) {
+        if (-not (Test-Path -Path $destinationOrgFilePath)) {
+            Write-Host "Moving dev_env_var.ps1 to $env:VENVIT_SECRETS_ORG_DIR..."
+            Copy-Item -Path $sourceFilePath -Destination $destinationOrgFilePath -Force
+        }
+        else {
+            Write-Host "dev_env_var.ps1 already exists in $env:VENVIT_SECRETS_ORG_DIR. It will not be overwritten."
+        }
+        if (-not (Test-Path -Path $destinationUserFilePath)) {
+            Write-Host "Moving dev_env_var.ps1 to $env:VENVIT_SECRETS_USER_DIR..."
+            Move-Item -Path $sourceFilePath -Destination $destinationUserFilePath -Force
+        }
+        else {
+            Write-Host "dev_env_var.ps1 already exists in $env:VENVIT_SECRETS_USER_DIR. It will not be overwritten."
+        }
+    }
+    else {
+        Write-Host "dev_env_var.ps1 not found in $env:VENVIT_DIR."
+    }
+
+}
+
+function Set-EnvironmentVariables {
+    foreach ($envVar in $envVarSet) {
+        $existingValue = [System.Environment]::GetEnvironmentVariable($envVar.Name, [System.EnvironmentVariableTarget]::Machine)
+        if ($existingValue) {
+            $promptText = $envVar.Name + " ($existingValue)"
+            $defaultValue = $existingValue
+        }
+        else {
+            $promptText = $envVar.Name + " (" + $envVar.DefVal + ")"
+            $defaultValue = $envVar.DefVal
+        }
+        $newValue = Read-Host -Prompt $promptText
+        if ($newValue -eq "") {
+            $newValue = $defaultValue
+        }
+        [System.Environment]::SetEnvironmentVariable($envVar.Name, $newValue, [System.EnvironmentVariableTarget]::Machine)
+    }
+}
+
 function Test-Admin {
 
     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -142,6 +160,6 @@ function Test-Admin {
     return Invoke-IsInRole -Principal $Principal -Role $adminRole
 }
 
-Export-ModuleMember -Function Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories, Remove-EnvVarIfExists
-Export-ModuleMember -Function Set-EnvironmentVariables, Test-Admin
+Export-ModuleMember -Function Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories, Publish-LatestVersion
+Export-ModuleMember -Function Publish-Secrets, Remove-EnvVarIfExists, Set-EnvironmentVariables, Test-Admin
 Export-ModuleMember -Variable envVarSet
