@@ -98,7 +98,7 @@ Describe "Function testing" {
 
 
             Mock -ModuleName Install-Conclude Invoke-WebRequest {
-                Copy-Item -Path $webMockDir\Installation-Files.zip -Destination $OutFile -Verbose
+                Copy-Item -Path $webMockDir\Installation-Files.zip -Destination $OutFile
             }
 
             Publish-LatestVersion -Release $latestVersion -UpgradeScriptDir $upgadeScriptDir
@@ -133,7 +133,7 @@ Describe "Function testing" {
             New-Item -ItemType Directory -Path $env:VENVIT_SECRETS_ORG_DIR | Out-Null
             New-Item -ItemType Directory -Path $env:VENVIT_SECRETS_USER_DIR | Out-Null
 
-            Copy-Item -Path $PSScriptRoot\..\src\dev_env_var.ps1 -Destination $env:VENVIT_DIR -Verbose
+            Copy-Item -Path $PSScriptRoot\..\src\dev_env_var.ps1 -Destination $env:VENVIT_DIR
         }
 
         It "Should copy all secrets files" {
@@ -193,6 +193,30 @@ Describe "Function testing" {
 
         }
         # Bit of a useless test due to "IsInRole" not being able to be mocked.
+    }
+
+    Context "Set-Path" {
+        BeforeEach {
+            $orgigPATH = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
+        }
+
+        It "VenvIt not in path" {
+            [System.Environment]::SetEnvironmentVariable("Path", "C:\;D:\", [System.EnvironmentVariableTarget]::Machine)
+            Set-Path
+            $newPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
+            $newPath | Should -Be "C:\;D:\;$env:VENVIT_DIR"
+        }
+
+        It "VenvIt already in path" {
+            [System.Environment]::SetEnvironmentVariable("Path", "C:\;D:\;$env:VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine)
+            Set-Path
+            $newPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
+            $newPath | Should -Be "C:\;D:\;$env:VENVIT_DIR"
+        }
+
+        AfterEach {
+            [System.Environment]::SetEnvironmentVariable("Path", $orgigPATH, [System.EnvironmentVariableTarget]::Machine)
+        }
     }
 
     Context "Test-Admin Function" {

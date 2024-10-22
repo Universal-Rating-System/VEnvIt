@@ -13,7 +13,21 @@ $envVarSet = @(
 )
 $separator = "-" * 80
 
-# Function to get or prompt for an environment variable
+function Clear-InstallationFiles {
+    # Remove the zip file after extraction
+    Remove-Item -Path $zipFilePath -Force
+    Write-Host "Installation-Files.zip has been deleted." -ForegroundColor Green
+
+
+    # Confirmation message
+    Write-Host "Installation and configuration are complete." -ForegroundColor Green
+
+    # Remove the install.ps1 script
+    $scriptPath = $MyInvocation.MyCommand.Path
+    Write-Host "Removing the conclude_install.ps1 script..." -ForegroundColor Green
+    Remove-Item -Path $scriptPath -Force
+    Write-Host "conclude_install.ps1 has been deleted." -ForegroundColor Green
+}
 function Invoke-CleanUp {
     # TODO
     # This function must clean up the installation in case it is not with administrator rights.
@@ -36,37 +50,13 @@ function Invoke-ConcludeInstall {
     Update-PackagePrep $UpgradeScriptDir
     Write-Host $separator -ForegroundColor Cyan
     Set-EnvironmentVariables
+    Set-Path
+    Write-Host "Environment variables have been set successfully." -ForegroundColor Green
     New-Directories
     Publish-LatestVersion -Release $Release -UpgradeScriptDir $UpgradeScriptDir
     Publish-Secrets
     Write-Host $separator -ForegroundColor Cyan
-
-    # Remove the zip file after extraction
-    Remove-Item -Path $zipFilePath -Force
-    Write-Host "Installation-Files.zip has been deleted." -ForegroundColor Green
-
-    # Add VENVIT_DIR to the System Path variable
-    $path = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
-    if ($path -notlike "*$env:VENVIT_DIR*") {
-        $newPath = "$path;$env:VENVIT_DIR"
-        [System.Environment]::SetEnvironmentVariable("Path", $newPath, [System.EnvironmentVariableTarget]::Machine)
-        Write-Host "VENVIT_DIR has been added to the System Path." -ForegroundColor Green
-    }
-    else {
-        Write-Host "VENVIT_DIR is already in the System Path." -ForegroundColor Green
-    }
-
-    Write-Host "Environment variables have been set successfully." -ForegroundColor Green
-
-    # Confirmation message
-    Write-Host "Installation and configuration are complete." -ForegroundColor Green
-
-    # Remove the install.ps1 script
-    $scriptPath = $MyInvocation.MyCommand.Path
-    Write-Host "Removing the conclude_install.ps1 script..." -ForegroundColor Green
-    Remove-Item -Path $scriptPath -Force
-    Write-Host "conclude_install.ps1 has been deleted." -ForegroundColor Green
-
+    Clear-InstallationFiles
 }
 
 function Invoke-IsInRole {
@@ -152,6 +142,19 @@ function Set-EnvironmentVariables {
     }
 }
 
+function Set-Path {
+    # Add VENVIT_DIR to the System Path variable
+    $path = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
+    if ($path -notlike "*$env:VENVIT_DIR*") {
+        $newPath = "$path;$env:VENVIT_DIR"
+        [System.Environment]::SetEnvironmentVariable("Path", $newPath, [System.EnvironmentVariableTarget]::Machine)
+        Write-Host "VENVIT_DIR has been added to the System Path." -ForegroundColor Green
+    }
+    else {
+        Write-Host "VENVIT_DIR is already in the System Path." -ForegroundColor Green
+    }
+}
+
 function Test-Admin {
 
     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -161,5 +164,5 @@ function Test-Admin {
 }
 
 Export-ModuleMember -Function Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories, Publish-LatestVersion
-Export-ModuleMember -Function Publish-Secrets, Remove-EnvVarIfExists, Set-EnvironmentVariables, Test-Admin
+Export-ModuleMember -Function Publish-Secrets, Remove-EnvVarIfExists, Set-EnvironmentVariables, Set-Path, Test-Admin
 Export-ModuleMember -Variable envVarSet
