@@ -14,23 +14,11 @@ $envVarSet = @(
 $separator = "-" * 80
 
 function Clear-InstallationFiles {
-    # Remove the zip file after extraction
-    Remove-Item -Path $zipFilePath -Force
-    Write-Host "Installation-Files.zip has been deleted." -ForegroundColor Green
-
-
-    # Confirmation message
-    Write-Host "Installation and configuration are complete." -ForegroundColor Green
-
-    # Remove the install.ps1 script
-    $scriptPath = $MyInvocation.MyCommand.Path
-    Write-Host "Removing the conclude_install.ps1 script..." -ForegroundColor Green
-    Remove-Item -Path $scriptPath -Force
-    Write-Host "conclude_install.ps1 has been deleted." -ForegroundColor Green
-}
-function Invoke-CleanUp {
-    # TODO
-    # This function must clean up the installation in case it is not with administrator rights.
+    param (
+        [string]$upgradeScriptDir
+    )
+    Remove-Item -Path $upgradeScriptDir -Force -Recurse
+    Write-Host "Installation files has been deleted." -ForegroundColor Green
 }
 
 function Invoke-ConcludeInstall {
@@ -56,7 +44,8 @@ function Invoke-ConcludeInstall {
     Publish-LatestVersion -Release $Release -UpgradeScriptDir $UpgradeScriptDir
     Publish-Secrets
     Write-Host $separator -ForegroundColor Cyan
-    Clear-InstallationFiles
+    Clear-InstallationFiles -UpgradeScriptDir $UpgradeScriptDir
+    Write-Host "Installation and configuration are complete." -ForegroundColor Green
 }
 
 function Invoke-IsInRole {
@@ -163,6 +152,7 @@ function Test-Admin {
     return Invoke-IsInRole -Principal $Principal -Role $adminRole
 }
 
-Export-ModuleMember -Function Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories, Publish-LatestVersion
-Export-ModuleMember -Function Publish-Secrets, Remove-EnvVarIfExists, Set-EnvironmentVariables, Set-Path, Test-Admin
+Export-ModuleMember -Function Clear-InstallationFiles, Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories
+Export-ModuleMember -Function Publish-LatestVersion, Publish-Secrets, Remove-EnvVarIfExists, Set-EnvironmentVariables
+Export-ModuleMember -Function Set-Path, Test-Admin
 Export-ModuleMember -Variable envVarSet

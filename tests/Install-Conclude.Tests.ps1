@@ -23,17 +23,25 @@ Describe "Function testing" {
         $OrigVENV_CONFIG_USER_DIR = $env:VENV_CONFIG_USER_DIR
     }
 
+    Context "Clear-InstallationFiles" {
+        BeforeEach {
+            $tempDir = New-CustomTempDir -Prefix "VenvIt"
+            $upgradeScriptDir = "$tempDir\UpgradeScript"
+
+            New-Item -ItemType Directory -Path $upgradeScriptDir | Out-Null
+        }
+
+        It "Unsure instqallation files removed" {
+            Clear-InstallationFiles -upgradeScriptDir $upgradeScriptDir
+            (Test-Path -Path $upgradeScriptDir) | Should -Be $false
+        }
+
+        AfterEach {
+            Remove-Item -Path $TempDir -Recurse -Force
+        }
+     }
+
     Context "Invoke-ConcludeInstall" {
-        # TODO
-        # Test to be implemented
-    }
-
-    Context "Invoke-CleanUp" {
-        # TODO
-        # Test to be implemented
-    }
-
-    Context "Remove-EnvVarIfExists" {
         # TODO
         # Test to be implemented
     }
@@ -146,6 +154,11 @@ Describe "Function testing" {
         AfterEach {
             Remove-Item -Path $TempDir -Recurse -Force
         }
+    }
+
+    Context "Remove-EnvVarIfExists" {
+        # TODO
+        # Test to be implemented
     }
 
     Context "Set-EnvironmentVariables tests" {
