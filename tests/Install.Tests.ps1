@@ -25,11 +25,11 @@
 "@
             } -ParameterFilter { $Uri -eq "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" }
             Mock Invoke-WebRequest {
-                Copy-Item -Path $PSScriptRoot\..\src\Install-Conclude.psm1 -Destination $OutFile -Verbose
+                Copy-Item -Path $PSScriptRoot\..\src\Install-Conclude.psm1 -Destination $OutFile
             } -ParameterFilter { $Uri -eq "https://github.com/BrightEdgeeServices/venvit/releases/download/$MockTag/Install-Conclude.psm1" }
             Mock Import-Module {
                 $NormalizedModulePath = (Get-Item -Path $PSScriptRoot\..\src\Install-Conclude.psm1).FullName
-                Import-Module $NormalizedModulePath -Verbose
+                Import-Module $NormalizedModulePath
             } -ParameterFilter {
                 # Normalize both $Name and $env:TEMP to ensure they are compared in the same format
                 $NormalizedTempPath = (Get-Item -Path $env:TEMP).FullName

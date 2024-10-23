@@ -24,6 +24,7 @@ Describe "Function testing" {
         }
     }
     Context "Get-ManifestFileName" {
+        # TODO
         # Test to be implemented
     }
 
@@ -109,10 +110,10 @@ Describe "Function testing" {
                 Remove-EnvVarIfExists -VarName "SECRETS_DIR"
             }
         }
-        # Test to be implemented
     }
 
     Context "Invoke-PrepForUpgrade_7_0_0" {
+        # TODO
         # Test to be implemented
     }
 

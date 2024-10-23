@@ -43,28 +43,32 @@ Describe "Top level script execution" {
 Describe "Function testing" {
     BeforeAll {
         . $PSScriptRoot\..\src\vn.ps1 -Pester
+        if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+        Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+        $OrigPROJECT_NAME = $env:PROJECT_NAME
+        $OrigPROJECTS_BASE_DIR = $env:PROJECTS_BASE_DIR
+        $OrigVENV_BASE_DIR = $env:VENV_BASE_DIR
+        $OrigVENV_CONFIG_USER_DIR = $env:VENV_CONFIG_USER_DIR
+        $OrigVENV_CONFIG_ORG_DIR = $env:VENV_CONFIG_ORG_DIR
+        $OrigVENV_ENVIRONMENT = $env:VENV_ENVIRONMENT
+        $OrigVENV_ORGANIZATION_NAME = $env:VENV_ORGANIZATION_NAME
+        $OrigVENV_PYTHON_BASE_DIR = $env:VENV_PYTHON_BASE_DIR
+        $OrigVENV_SECRETS_ORG_DIR = $env:VENV_SECRETS_ORG_DIR
+        $OrigVENV_SECRETS_USER_DIR = $env:VENV_SECRETS_USER_DIR
+        $OrigVENVIT_DIR = $env:VENVIT_DIR
+
+        $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
     }
+
     Context "Confirm-EnvironmentVariables" {
         BeforeEach {
-            $OrigVENV_ENVIRONMENT = $env:VENV_ENVIRONMENT
             $env:VENV_ENVIRONMENT = "venv_environment"
-
-            $OrigVENVIT_DIR = $env:VENVIT_DIR
             $env:VENVIT_DIR = "venvit_dir"
-
-            $OrigVENV_SECRETS_DIR = $env:VENV_SECRETS_DIR
             $env:VENV_SECRETS_DIR = "venv_secrets_dir"
-
-            $OrigVENV_CONFIG_DIR = $env:VENV_CONFIG_DIR
             $env:VENV_CONFIG_DIR = "venv_config_dir"
-
-            $OrigPROJECTS_BASE_DIR = $env:PROJECTS_BASE_DIR
             $env:PROJECTS_BASE_DIR = "projects_base_dir"
-
-            $OrigVENV_BASE_DIR = $env:VENV_BASE_DIR
             $env:VENV_BASE_DIR = "venv_base_dir"
-
-            $OrigVENV_PYTHON_BASE_DIR = $env:VENV_PYTHON_BASE_DIR
             $env:VENV_PYTHON_BASE_DIR = "venv_python_base_dir"
         }
         It "Should be true" {
@@ -75,15 +79,8 @@ Describe "Function testing" {
             Confirm-EnvironmentVariables | Should -Be $false
         }
         AfterEach {
-            $env:VENV_ENVIRONMENT = $OrigVENV_ENVIRONMENT
-            $env:VENVIT_DIR = $OrigVENVIT_DIR
-            $env:VENV_SECRETS_DIR = $OrigVENV_SECRETS_DIR
-            $env:VENV_CONFIG_DIR = $OrigVENV_CONFIG_DIR
-            $env:PROJECTS_BASE_DIR = $OrigPROJECTS_BASE_DIR
-            $env:VENV_BASE_DIR = $OrigVENV_BASE_DIR
-            $env:VENV_PYTHON_BASE_DIR = $OrigVENV_PYTHON_BASE_DIR
         }
-}
+    }
 
     Context "Get-InstallationValues" {
         It "All parameters set" {
@@ -94,6 +91,7 @@ Describe "Function testing" {
             $InstallValues.ResetScripts | Should -Be "Y"
         }
     }
+
     Context "Get-Value" {
         It "With set values" {
             $Value = Get-Value -CurrValue "311" -Prompt "Python version" -DefValue "312"
@@ -111,8 +109,111 @@ Describe "Function testing" {
         }
     }
 
-    Context "New-VirtualEnvironment" {
+    Context "Invoke-VirtualEnvironment" {
+        BeforeEach {
+            $tempDir = New-CustomTempDir -Prefix "VenvIt"
+            $env:PROJECT_NAME = $mockInstalVal.ProjectName
+            $env:PROJECTS_BASE_DIR = "$tempDir\PROJECTS_BASE_DIR"
+            $env:VENV_BASE_DIR = "$tempDir\VENV_BASE_DIR"
+            $env:VENV_ORGANIZATION_NAME = $mockInstalVal.Organization
 
+            $organizationDir = (Join-Path -Path $env:PROJECTS_BASE_DIR -ChildPath $env:VENV_ORGANIZATION_NAME)
+            $mockInstalVal | Add-Member -MemberType NoteProperty -Name "OrganizationDir" -Value $organizationDir
+            $mockInstalVal | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value (Join-Path -Path $mockInstalVal.OrganizationDir -ChildPath $env:PROJECT_NAME)
+
+            # $env:VENV_ORGANIZATION_NAME = $mockInstalVal.Organization
+            New-Item -ItemType Directory -Path $env:PROJECTS_BASE_DIR | Out-Null
+            New-Item -ItemType Directory -Path $mockInstalVal.ProjectDir | Out-Null
+            New-Item -ItemType Directory -Path $env:VENV_BASE_DIR | Out-Null
+        }
+
+        It "Should install Python virtual environment" {
+            Invoke-VirtualEnvironment -InstallationValues $mockInstalVal
+            $PythonExePath = "$env:VENV_BASE_DIR\$env:PROJECT_NAME" + "_env\Scripts\python.exe"
+            (Test-Path $PythonExePath) | Should -Be $true
+        }
+
+        AfterEach {
+            Remove-Item -Path $tempDir -Recurse -Force
+        }
+    }
+
+    Context "New-ProjectInstallScript" {
+        BeforeEach {
+            Mock CreatePreCommitConfigYaml {}
+            $tempDir = New-CustomTempDir -Prefix "VenvIt"
+            $env:PROJECT_NAME = $mockInstalVal.ProjectName
+            $env:PROJECTS_BASE_DIR = "$tempDir\PROJECTS_BASE_DIR"
+            # $env:VENV_BASE_DIR = "$tempDir\VENV_BASE_DIR"
+            $env:VENV_ORGANIZATION_NAME = $mockInstalVal.Organization
+
+            $organizationDir = (Join-Path -Path $env:PROJECTS_BASE_DIR -ChildPath $env:VENV_ORGANIZATION_NAME)
+            $mockInstalVal | Add-Member -MemberType NoteProperty -Name "OrganizationDir" -Value $organizationDir
+            $mockInstalVal | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value (Join-Path -Path $mockInstalVal.OrganizationDir -ChildPath $env:PROJECT_NAME)
+
+            # $env:VENV_ORGANIZATION_NAME = $mockInstalVal.Organization
+            New-Item -ItemType Directory -Path $env:PROJECTS_BASE_DIR | Out-Null
+            New-Item -ItemType Directory -Path $mockInstalVal.ProjectDir | Out-Null
+            # New-Item -ItemType Directory -Path $env:VENV_BASE_DIR | Out-Null
+        }
+        It "Should create project install.ps1" {
+            New-ProjectInstallScript -InstallationValues $mockInstalVal
+            $InstallPath = (Join-Path -Path $mockInstalVal.ProjectDir -ChildPath "install.ps1")
+            (Test-Path $InstallPath) | Should -Be $true
+        }
+
+        AfterEach {
+            Remove-Item -Path $tempDir -Recurse -Force
+        }
+    }
+
+    Context "New-VirtualEnvironment" {
+        # TODO
+        # Test to be implemented
+    }
+
+    Context "Set-Environment" {
+        BeforeEach {
+            $tempDir = New-CustomTempDir -Prefix "VenvIt"
+            $env:PROJECTS_BASE_DIR = "$tempDir\PROJECTS_BASE_DIR"
+            $env:VENV_SECRETS_ORG_DIR = "$tempDir\VENV_SECRETS_ORG_DIR"
+            $env:VENV_SECRETS_USER_DIR = "$tempDir\VENV_SECRETS_USER_DIR"
+            $secretsContents = @"
+            Write-Host 'This file contains secrets'
+"@
+            New-Item -ItemType Directory -Path $env:VENV_SECRETS_ORG_DIR | Out-Null
+            New-Item -ItemType Directory -Path $env:VENV_SECRETS_USER_DIR | Out-Null
+            Set-Content -Path (Join-Path -Path $env:VENV_SECRETS_ORG_DIR -ChildPath "dev_env_var.ps1") -Value $secretsContents
+            Set-Content -Path (Join-Path -Path $env:VENV_SECRETS_USER_DIR -ChildPath "dev_env_var.ps1") -Value $secretsContents
+        }
+
+        It "Should confirm environment settings" {
+            $installationValues = Set-Environment -InstallationValues $mockInstalVal
+            $installationValues.ProjectDir | Should -Be "$tempDir\PROJECTS_BASE_DIR\MyOrg\MyProject"
+            $installationValues.OrganizationDir | Should -Be "$tempDir\PROJECTS_BASE_DIR\MyOrg"
+        }
+        AfterEach {
+            Remove-Item -Path $tempDir -Recurse -Force
+        }
+    }
+
+    Context "Show-EnvironmentVariables" {
+        # TODO
+        # Test to be implemented
+    }
+
+    AfterAll {
+        $env:PROJECT_NAME = $OrigPROJECT_NAME
+        $env:PROJECTS_BASE_DIR = $OrigPROJECTS_BASE_DIR
+        $env:VENV_BASE_DIR = $OrigVENV_BASE_DIR
+        $env:VENV_CONFIG_ORG_DIR = $OrigVENV_CONFIG_ORG_DIR
+        $env:VENV_CONFIG_USER_DIR = $OrigVENV_CONFIG_USER_DIR
+        $env:VENV_ENVIRONMENT = $OrigVENV_ENVIRONMENT
+        $env:VENV_ORGANIZATION_NAME = $OrigVENV_ORGANIZATION_NAME
+        $env:VENV_PYTHON_BASE_DIR = $OrigVENV_PYTHON_BASE_DIR
+        $env:VENV_SECRETS_ORG_DIR = $OrigVENV_SECRETS_ORG_DIR
+        $env:VENV_SECRETS_USER_DIR = $OrigVENV_SECRETS_USER_DIR
+        $env:VENVIT_DIR = $OrigVENVIT_DIR
     }
 }
 

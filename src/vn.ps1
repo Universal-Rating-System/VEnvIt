@@ -17,9 +17,9 @@ param (
     [ValidateSet("y", "n", "Y", "N")]
     [String]$DevMode = "Y",
 
-    [Parameter(Mandatory = $false)]
-    [ValidateSet("y", "n", "Y", "N")]
-    [String]$MultiUser = "Y",
+    # [Parameter(Mandatory = $false)]
+    # [ValidateSet("y", "n", "Y", "N")]
+    # [String]$MultiUser = "Y",
 
     [Parameter(Mandatory = $false)]
     [Switch]$Help,
@@ -29,14 +29,18 @@ param (
     [Switch]$Pester
 )
 
+$separator = "-" * 80
+
 function Confirm-EnvironmentVariables {
     # Check for required environment variables and display help if they're missing
     $Result = $true
     if (
         -not $env:VENV_ENVIRONMENT -or
         -not $env:VENVIT_DIR -or
-        -not $env:VENV_SECRETS_DIR -or
-        -not $env:VENV_CONFIG_DIR -or
+        -not $env:VENV_SECRETS_ORG_DIR -or
+        -not $env:VENV_SECRETS_USER_DIR -or
+        -not $env:VENV_CONFIG_ORG_DIR -or
+        -not $env:VENV_CONFIG_USER_DIR -or
         -not $env:PROJECTS_BASE_DIR -or
         -not $env:VENV_BASE_DIR -or
         -not $env:VENV_PYTHON_BASE_DIR) {
@@ -103,15 +107,16 @@ function Get-InstallationValues {
         [string]$DevMode,
         [string]$ResetScripts
     )
+    # Set local variables from environment variables
     $PythonVer = Get-Value -CurrValue $PythonVer -Prompt "Python version" -DefValue "312"
     $Organization = Get-Value -CurrValue $Organization -Prompt "Organization" -DefValue "MyOrg"
     if (-not $DevMode -eq "Y" -or -not $DevMode -eq "N" -or [string]::IsNullOrWhiteSpace($DevMode)) {
-        $DevMode = ReadYesOrNo -_prompt_text "Dev mode"
+        $DevMode = ReadYesOrNo -promptText "Dev mode"
     }
     if (-not $ResetScripts -eq "Y" -or -not $ResetScripts -eq "N" -or [string]::IsNullOrWhiteSpace($ResetScripts)) {
-        $ResetScripts = ReadYesOrNo -_prompt_text "Reset scripts"
+        $ResetScripts = ReadYesOrNo -promptText "Reset scripts"
     }
-    $InstallationValues = [PSCustomObject]@{ PythonVer = $PythonVer; Organization = $Organization; DevMode = $DevMode; ResetScripts = $ResetScripts }
+    $InstallationValues = [PSCustomObject]@{ ProjectName = $ProjectName; PythonVer = $PythonVer; Organization = $Organization; DevMode = $DevMode; ResetScripts = $ResetScripts }
     return $InstallationValues
 }
 
@@ -126,30 +131,6 @@ function Get-Value {
         $Value = $DefValue
     }
     return $Value
-}
-
-function Show-EnvironmentVariables {
-    Write-Host ""
-    Write-Host "System Environment Variables" -ForegroundColor Green
-    Write-Host "VENV_ENVIRONMENT:      $env:VENV_ENVIRONMENT"
-    Write-Host "PROJECTS_BASE_DIR:     $env:PROJECTS_BASE_DIR"
-    Write-Host "PROJECT_DIR:           $env:PROJECT_DIR"
-    Write-Host "VENVIT_DIR:            $env:VENVIT_DIR"
-    Write-Host "VENV_SECRETS_DIR:      $env:VENV_SECRETS_DIR"
-    Write-Host "VENV_CONFIG_DIR:       $env:VENV_CONFIG_DIR"
-    Write-Host "VENV_BASE_DIR:         $env:VENV_BASE_DIR"
-    Write-Host "VENV_PYTHON_BASE_DIR:  $env:VENV_PYTHON_BASE_DIR"
-    Write-Host ""
-    Write-Host "Project Environment Variables" -ForegroundColor Green
-    Write-Host "INSTALLER_PWD:        $env:INSTALLER_PWD"
-    Write-Host "INSTALLER_USERID:     $env:INSTALLER_USERID"
-    Write-Host "MYSQL_DATABASE:       $env:MYSQL_DATABASE"
-    Write-Host "MYSQL_HOST:           $env:MYSQL_HOST"
-    Write-Host "MYSQL_ROOT_PASSWORD:  $env:MYSQL_ROOT_PASSWORD"
-    Write-Host "MYSQL_TCP_PORT:       $env:MYSQL_TCP_PORT"
-    Write-Host ""
-    Write-Host "Git Information" -ForegroundColor Green
-    git branch --all
 }
 
 # TODO
@@ -181,18 +162,38 @@ function InitGit {
     }
 }
 
+function Invoke-VirtualEnvironment {
+    param (
+        [PSCustomObject]$InstallationValues
+    )
+    if ($env:VIRTUAL_ENV) {
+        "Deactivating Virtual environment $env:VIRTUAL_ENV."
+        deactivate
+    }
+
+    $cmd = "$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python -m venv --clear $env:VENV_BASE_DIR\$env:PROJECT_NAME" + "_env"
+    Write-Host "$cmd"
+
+    # & $env:VENV_PYTHON_BASE_DIR\Python$PythonVer\python -m venv --clear $env:VENV_BASE_DIR\$ProjectName"_env"
+    $cmd
+    Set-Location -Path $InstallationValues.ProjectDir
+    & $env:VENV_BASE_DIR"\"$env:PROJECT_NAME"_env\Scripts\activate.ps1"
+    python.exe -m pip install --upgrade pip
+}
+
 function Invoke-Vn {
     param (
         [string]$ProjectName,
         [string]$PythonVer,
         [string]$Organization,
-        [string]$DevMode,
-        [string]$ResetScripts
+        [string]$ResetScripts,
+        [string]$DevMode
     )
     if (Confirm-EnvironmentVariables) {
-        New-VirtualEnvironment -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
+        New-VirtualEnvironment -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -ResetScripts $ResetScripts -DevMode $DevMode
         Show-EnvironmentVariables
-    } else {
+    }
+    else {
         Show-Help
     }
 }
@@ -215,92 +216,61 @@ function MoveFileToArchiveIfExists {
     }
 }
 
+function New-ProjectInstallScript {
+    param (
+        [PSCustomObject]$InstallationValues
+    )
+
+    $ProjectInstallScriptPath = Join-Path -Path $InstallationValues.ProjectDir -ChildPath "install.ps1"
+    if (-not (Test-Path -Path $ProjectInstallScriptPath)) {
+        $content = @'
+Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
+Write-Host "Running $env:PROJECT_DIR\install.ps1..." -ForegroundColor Yellow
+Write-Host "Install Pre-Commit and related tools" -ForegroundColor Yellow
+pip install --upgrade --force --no-cache-dir black
+pip install --upgrade --force --no-cache-dir flake8
+pip install --upgrade --force --no-cache-dir pre-commit
+pip install --upgrade --force --no-cache-dir mdformat
+pip install --upgrade --force --no-cache-dir coverage codecov
+pre-commit install
+pre-commit autoupdate
+Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
+Write-Host "Install $envPROJECT_NAME" -ForegroundColor Yellow
+
+'@
+        if ($InstallationValues.DevMode -eq "Y") {
+            $content += 'if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) {pip install --no-cache-dir -e .[dev]}'
+        }
+        else {
+            $content += 'if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) {pip install --no-cache-dir -e .}'
+        }
+    }
+    Set-Content -Path $ProjectInstallScriptPath -Value $content
+    if (-not (Test-Path (Join-Path -Path $InstallationValues.ProjectDir -ChildPath "\.pre-commit-config.yaml")))
+        { CreatePreCommitConfigYaml }
+}
+
 function New-VirtualEnvironment {
     param (
         [string]$ProjectName,
         [string]$PythonVer,
         [string]$Organization,
-        [string]$DevMode,
-        [string]$ResetScripts
+        [string]$ResetScripts,
+        [string]$DevMode
     )
 
-    # Set local variables from environment variables
-    $InstallationValues = Get-InstallationValues -PythonVer $PythonVer -Organization $Organization -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
-
-    # Configure the environment settings for local development environment
-    $env:PROJECT_NAME = $InstallationValues.ProjectName
-    $env:VENV_ORGANIZATION_NAME = $InstallationValues.Organization
-    if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
-        & "$env:VENV_SECRETS_DIR\dev_env_var.ps1"
-    }
-
-    # Determine project directory based on organization
-    $_organization_dir = Join-Path $env:PROJECTS_BASE_DIR $env:VENV_ORGANIZATION_NAME
-    # Create organization directory if it does not exist
-    if (-not (Test-Path $_organization_dir)) {
-        mkdir $_organization_dir | Out-Null
-    }
-    $_project_dir = Join-Path $_organization_dir $ProjectName
-
-    # Output configuration details
-    Write-Host "Project name:       $ProjectName"
-    Write-Host "Python version:     $PythonVer"
-    Write-Host "Organization Name:  $Organization"
-    Write-Host "Dev Mode:           $DevMode"
-    Write-Host "Reset project:      $ResetScripts"
-    Write-Host "VENVIT_DIR:         $env:VENVIT_DIR"
-    Write-Host "PROJECTS_BASE_DIR:  $env:PROJECTS_BASE_DIR"
-    Write-Host "Organization dir:   $_organization_dir"
-    Write-Host "PROJECT_DIR:        $_project_dir"
-    Write-Host "VENV_BASE_DIR:      $env:VENV_BASE_DIR"
-    Write-Host "VENV_PYTHON_BASE:   $env:VENV_PYTHON_BASE_DIR"
-    Write-Host "VENV_ENVIRONMENT:   $env:VENV_ENVIRONMENT"
-    Write-Host "VENV_CONFIG_DIR:    $env:VENV_CONFIG_DIR"
-    Write-Host "VENV_SECRETS_DIR:   $env:VENV_SECRETS_DIR"
-
-    $_continue = ReadYesOrNo -_prompt_text "Continue"
+    $installationValues = Get-installationValues -PythonVer $PythonVer -Organization $Organization -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
+    Set-Environment -InstallationValues $installationValues
+    Show-EnvironmentVariables
+    $_continue = ReadYesOrNo -promptText "Continue"
 
     Write-Host $separator -ForegroundColor Cyan
 
     if ($_continue -eq "Y") {
-        if ($env:VIRTUAL_ENV) {
-            "Virtual environment is active at: $env:VIRTUAL_ENV, deactivating"
-            deactivate
-        }
-        else {
-            "No virtual environment is active."
-        }
-
-        $cmd = "$env:VENV_PYTHON_BASE_DIR\Python$PythonVer\python -m venv --clear $env:VENV_BASE_DIR\$ProjectName" + "_env"
-        Write-Host "$cmd"
-
-        # & $env:VENV_PYTHON_BASE_DIR\Python$PythonVer\python -m venv --clear $env:VENV_BASE_DIR\$ProjectName"_env"
-        $cmd
-        Set-Location -Path $_project_dir
-        & $env:VENV_BASE_DIR"\"$ProjectName"_env\Scripts\activate.ps1"
-        python.exe -m pip install --upgrade pip
+        Invoke-VirtualEnvironment -InstallationValues $installationValues
 
         # CreateProjectStructure
 
-        $_project_install_path = Join-Path -Path $_project_dir -ChildPath "install.ps1"
-        if (-not (Test-Path -Path $_project_install_path)) {
-            New-Item -ItemType File -Path $_project_install_path -Force | Out-Null
-            $s = 'Write-Host "Running ' + $_project_install_path + '..."' + " -ForegroundColor Yellow"
-            Add-Content -Path $_project_install_path -Value $s
-            Add-Content -Path $_project_install_path -Value "pip install --upgrade --force --no-cache-dir black"
-            Add-Content -Path $_project_install_path -Value "pip install --upgrade --force --no-cache-dir flake8"
-            Add-Content -Path $_project_install_path -Value "pip install --upgrade --force --no-cache-dir pre-commit"
-            Add-Content -Path $_project_install_path -Value "pre-commit install"
-            Add-Content -Path $_project_install_path -Value "pre-commit autoupdate"
-            Write-Information ""
-            if ($DevMode -eq "Y") {
-                Add-Content -Path $_project_install_path -Value 'if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) {pip install --no-cache-dir -e .[dev]}'
-            }
-            else {
-                Add-Content -Path $_project_install_path -Value 'if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) {pip install --no-cache-dir -e .}'
-            }
-        }
-        if (-not (Test-Path "$_project_dir\.pre-commit-config.yaml")) { CreatePreCommitConfigYaml }
 
         $_support_scripts = @(
             "venv_${ProjectName}_install.ps1",
@@ -380,6 +350,61 @@ function ReadYesOrNo {
     return $inputValue
 }
 
+function Set-Environment {
+    param (
+        [PSCustomObject]$InstallationValues
+    )
+    # Configure the environment settings for local development environment
+    $env:PROJECT_NAME = $InstallationValues.ProjectName
+    $env:VENV_ORGANIZATION_NAME = $InstallationValues.Organization
+    if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
+        & "$env:VENV_SECRETS_ORG_DIR\dev_env_var.ps1"
+        & "$env:VENV_SECRETS_USER_DIR\dev_env_var.ps1"
+    }
+
+    # Determine project directory based on organization
+    # $organization_dir = Join-Path $env:PROJECTS_BASE_DIR $env:VENV_ORGANIZATION_NAME
+    # Create organization directory if it does not exist
+    $organizationDir = (Join-Path -Path $env:PROJECTS_BASE_DIR -ChildPath $env:VENV_ORGANIZATION_NAME)
+    $InstallationValues | Add-Member -MemberType NoteProperty -Name "OrganizationDir" -Value $organizationDir
+    if (-not (Test-Path $InstallationValues.OrganizationDir)) {
+        mkdir $InstallationValues.OrganizationDir | Out-Null
+    }
+    # $_project_dir = Join-Path $_organization_dir $ProjectName
+    $InstallationValues | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value (Join-Path -Path $InstallationValues.OrganizationDir -ChildPath $env:PROJECT_NAME)
+    if (-not (Test-Path $InstallationValues.ProjectDir)) {
+        mkdir $InstallationValues.ProjectDir | Out-Null
+    }
+    return $InstallationValues
+}
+
+function Show-EnvironmentVariables {
+    Write-Host ""
+    Write-Host "System Environment Variables" -ForegroundColor Green
+    Write-Host "VENV_ENVIRONMENT:       $env:VENV_ENVIRONMENT"
+    Write-Host "PROJECTS_BASE_DIR:      $env:PROJECTS_BASE_DIR"
+    Write-Host "PROJECT_DIR:            $env:PROJECT_DIR"
+    Write-Host "VENVIT_DIR:             $env:VENVIT_DIR"
+    Write-Host "VENV_SECRETS_ORG_DIR:   $env:VENV_SECRETS_DIR"
+    Write-Host "VENV_SECRETS_USER_DIR:  $env:VENV_SECRETS_DIR"
+    Write-Host "VENV_CONFIG_DIR:        $env:VENV_CONFIG_DIR"
+    Write-Host "VENV_BASE_DIR:          $env:VENV_BASE_DIR"
+    Write-Host "VENV_PYTHON_BASE_DIR:   $env:VENV_PYTHON_BASE_DIR"
+    Write-Host ""
+    Write-Host "Project Environment Variables" -ForegroundColor Green
+    Write-Host "PROJECT_NAME:           $env:PROJECT_NAME"
+    Write-Host "VENV_ORGANIZATION_NAME: $env:VENV_ORGANIZATION_NAME"
+    Write-Host "INSTALLER_PWD:          $env:INSTALLER_PWD"
+    Write-Host "INSTALLER_USERID:       $env:INSTALLER_USERID"
+    Write-Host "MYSQL_DATABASE:         $env:MYSQL_DATABASE"
+    Write-Host "MYSQL_HOST:             $env:MYSQL_HOST"
+    Write-Host "MYSQL_ROOT_PASSWORD:    $env:MYSQL_ROOT_PASSWORD"
+    Write-Host "MYSQL_TCP_PORT:         $env:MYSQL_TCP_PORT"
+    Write-Host ""
+    Write-Host "Git Information" -ForegroundColor Green
+    git branch --all
+}
+
 function Show-Help {
     $separator = "-" * 80
     Write-Host $separator -ForegroundColor Cyan
@@ -402,31 +427,31 @@ function Show-Help {
     Write-Host $separator -ForegroundColor Cyan
 }
 
-function ShowEnvVarHelp {
-    Write-Host "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
+# function ShowEnvVarHelp {
+#     Write-Host "Make sure the following system environment variables are set. See the help for more detail." -ForegroundColor Cyan
 
-    $_env_vars = @(
-        @("VENV_ENVIRONMENT", $env:VENV_ENVIRONMENT),
-        @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
-        @("VENVIT_DIR", "$env:VENVIT_DIR"),
-        @("VENV_SECRETS_DIR", "$env:VENV_SECRETS_DIR"),
-        @("VENV_CONFIG_DIR, $env:VENV_CONFIG_DIR"),
-        @("VENV_BASE_DIR", "$env:VENV_BASE_DIR"),
-        @("VENV_PYTHON_BASE_DIR", "$env:VENV_PYTHON_BASE_DIR")
-    )
+#     $_env_vars = @(
+#         @("VENV_ENVIRONMENT", $env:VENV_ENVIRONMENT),
+#         @("PROJECTS_BASE_DIR", "$env:PROJECTS_BASE_DIR"),
+#         @("VENVIT_DIR", "$env:VENVIT_DIR"),
+#         @("VENV_SECRETS_DIR", "$env:VENV_SECRETS_DIR"),
+#         @("VENV_CONFIG_DIR, $env:VENV_CONFIG_DIR"),
+#         @("VENV_BASE_DIR", "$env:VENV_BASE_DIR"),
+#         @("VENV_PYTHON_BASE_DIR", "$env:VENV_PYTHON_BASE_DIR")
+#     )
 
-    foreach ($var in $_env_vars) {
-        if ([string]::IsNullOrEmpty($var[1])) {
-            Write-Host $var[0] -ForegroundColor Red -NoNewline
-            Write-Host " - Not Set"
-        }
-        else {
-            Write-Host $var[0] -ForegroundColor Green -NoNewline
-            $s = " - Set to: " + $var[1]
-            Write-Host $s
-        }
-    }
-}
+#     foreach ($var in $_env_vars) {
+#         if ([string]::IsNullOrEmpty($var[1])) {
+#             Write-Host $var[0] -ForegroundColor Red -NoNewline
+#             Write-Host " - Not Set"
+#         }
+#         else {
+#             Write-Host $var[0] -ForegroundColor Green -NoNewline
+#             $s = " - Set to: " + $var[1]
+#             Write-Host $s
+#         }
+#     }
+# }
 
 # Script execution starts here
 # Pester parameter is to ensure that the script does not execute when called from
@@ -436,14 +461,13 @@ if (-not $Pester) {
     Write-Host ''
     $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
-    $separator = "-" * 80
     # $project_name = $args[0]
     Write-Host "Create new $ProjectName virtual environment" -ForegroundColor Blue
     if ($ProjectName -eq "" -or $Help) {
         Show-Help
     }
     else {
-        Invoke-Vn -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
+        Invoke-Vn -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization-ResetScripts $ResetScripts -DevMode $DevMode
     }
     Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
 }
