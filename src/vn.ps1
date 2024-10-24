@@ -31,6 +31,51 @@ param (
 
 $separator = "-" * 80
 
+function Backup-CongigScripts {
+    param (
+        [PSCustomObject]$InstallationValues,
+        [string]$TimeStamp
+    )
+
+    # $configScripts = @(
+    #     "VEnv${ProjectName}Install.ps1",
+    #     "VEnv${ProjectName}CustomSetup.ps1"
+    # )
+    if ($InstallationValues.ResetScripts -eq "Y") {
+        $OrgArchiveDir = Join-Path -Path $env:VENV_CONFIG_ORG_DIR -ChildPath "Archive"
+        $fileName = ("VEnv" + $InstallationValues.ProjectName + "Install.ps1")
+        $scriptPath = Join-Path -Path $env:VENV_CONFIG_ORG_DIR -ChildPath $fileName
+        Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $OrgArchiveDir -TimeStamp $TimeStamp
+
+        # $UserArchiveDir = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "Archive"
+        # $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "$VEnv${InstallationValues.ProjectName}CustomSetup.ps1"
+
+        $UserArchiveDir = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "Archive"
+        $fileName = ("VEnv" + $InstallationValues.ProjectName + "CustomSetup.ps1")
+        $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath $fileName
+        Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $UserArchiveDir -TimeStamp $TimeStamp
+    }
+}
+
+function Backup-ScriptToArchiveIfExists {
+    param (
+        [string]$ScriptPath,
+        [string]$ArchiveDir,
+        [string]$TimeStamp
+    )
+
+    # Check if the file exists
+    if (Test-Path $scriptPath) {
+        # Ensure the archive directory exists
+        if (-not (Test-Path $archiveDir)) {
+            New-Item -Path $archiveDir -ItemType Directory
+        }
+        $archivePath = Join-Path -Path $ArchiveDir -ChildPath ($env:PROJECT_NAME + "_" + $TimeStamp + ".zip")
+        Compress-Archive -Path $ScriptPath -DestinationPath $archivePath
+        Write-Host "Zipped $ScriptPath."
+    }
+}
+
 function Confirm-EnvironmentVariables {
     # Check for required environment variables and display help if they're missing
     $Result = $true
@@ -197,25 +242,6 @@ function Invoke-Vn {
         Show-Help
     }
 }
-function MoveFileToArchiveIfExists {
-    param (
-        [string]$_script_path,
-        [string]$_archive_dir
-    )
-
-    # Check if the file exists
-    if (Test-Path $_script_path) {
-        # Ensure the archive directory exists
-        if (-not (Test-Path $_archive_dir)) {
-            New-Item -Path $_archive_dir -ItemType Directory
-        }
-
-        # Move the file to the archive directory
-        Move-Item -Path $_script_path -Destination $_archive_dir -Force
-        Write-Host "Moved $($_script_path) to $($_archive_dir)."
-    }
-}
-
 function New-ProjectInstallScript {
     param (
         [PSCustomObject]$InstallationValues
@@ -268,21 +294,9 @@ function New-VirtualEnvironment {
 
     if ($_continue -eq "Y") {
         Invoke-VirtualEnvironment -InstallationValues $installationValues
-
-        # CreateProjectStructure
-
-
-        $_support_scripts = @(
-            "venv_${ProjectName}_install.ps1",
-            "venv_${ProjectName}_setup_mandatory.ps1"
-        )
-        $_archive_dir = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath "Archive"
-        if ($ResetScripts -eq "Y") {
-            foreach ($_file_name in $_support_scripts) {
-                $_script_path = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath $_file_name
-                MoveFileToArchiveIfExists -_script_path $_script_path -_archive_dir $_archive_dir
-            }
-        }
+        New-ProjectInstallScript -InstallationValues $installationValues
+        $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+        Backup-CongigScripts -InstallationValues $installationValues -TimeStamp $timeStamp
 
         # Check if the install script does not exist
         $_script_install_path = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath $_support_scripts[0]

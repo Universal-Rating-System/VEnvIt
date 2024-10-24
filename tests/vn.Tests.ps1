@@ -61,6 +61,43 @@ Describe "Function testing" {
         $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
     }
 
+    Context "Backup-ScriptToArchiveIfExists" {
+        # TODO
+        # Test to be implemented
+    }
+    Context "Backup-CongigScripts" {
+        BeforeEach {
+            $tempDir = New-CustomTempDir -Prefix "VenvIt"
+            $env:VENV_CONFIG_ORG_DIR = "$tempDir\VENV_CONFIG_ORG_DIR"
+            $env:VENV_CONFIG_USER_DIR = "$tempDir\VENV_CONFIG_USER_DIR"
+
+            New-Item -ItemType Directory -Path $env:VENV_CONFIG_ORG_DIR | Out-Null
+            New-Item -ItemType Directory -Path $env:VENV_CONFIG_USER_DIR | Out-Null
+
+            $fileName = ("VEnv" + $mockInstalVal.ProjectName + "Install.ps1")
+            $scriptPath = Join-Path -Path $env:VENV_CONFIG_ORG_DIR -ChildPath $fileName
+            New-Item -Path $scriptPath -ItemType File -Force
+
+            $fileName = ("VEnv" + $mockInstalVal.ProjectName + "CustomSetup.ps1")
+            $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath $fileName
+            New-Item -Path $scriptPath -ItemType File -Force
+
+        }
+        It "Should chreate zip archives" {
+            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+            Backup-CongigScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
+
+            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_ORG_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
+            (Test-Path $zipPath) | Should -Be $true
+            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_USER_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
+            (Test-Path $zipPath) | Should -Be $true
+        }
+
+        AfterEach {
+
+        }
+    }
+
     Context "Confirm-EnvironmentVariables" {
         BeforeEach {
             $env:VENV_ENVIRONMENT = "venv_environment"
@@ -121,7 +158,6 @@ Describe "Function testing" {
             $mockInstalVal | Add-Member -MemberType NoteProperty -Name "OrganizationDir" -Value $organizationDir
             $mockInstalVal | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value (Join-Path -Path $mockInstalVal.OrganizationDir -ChildPath $env:PROJECT_NAME)
 
-            # $env:VENV_ORGANIZATION_NAME = $mockInstalVal.Organization
             New-Item -ItemType Directory -Path $env:PROJECTS_BASE_DIR | Out-Null
             New-Item -ItemType Directory -Path $mockInstalVal.ProjectDir | Out-Null
             New-Item -ItemType Directory -Path $env:VENV_BASE_DIR | Out-Null
@@ -140,7 +176,7 @@ Describe "Function testing" {
 
     Context "New-ProjectInstallScript" {
         BeforeEach {
-            Mock CreatePreCommitConfigYaml {}
+            Mock CreatePreCommitConfigYaml { return $true}
             $tempDir = New-CustomTempDir -Prefix "VenvIt"
             $env:PROJECT_NAME = $mockInstalVal.ProjectName
             $env:PROJECTS_BASE_DIR = "$tempDir\PROJECTS_BASE_DIR"
@@ -158,8 +194,9 @@ Describe "Function testing" {
         }
         It "Should create project install.ps1" {
             New-ProjectInstallScript -InstallationValues $mockInstalVal
-            $InstallPath = (Join-Path -Path $mockInstalVal.ProjectDir -ChildPath "install.ps1")
-            (Test-Path $InstallPath) | Should -Be $true
+            $installScriptPath = (Join-Path -Path $mockInstalVal.ProjectDir -ChildPath "install.ps1")
+            (Test-Path $installScriptPath) | Should -Be $true
+            Assert-MockCalled -CommandName CreatePreCommitConfigYaml
         }
 
         AfterEach {
