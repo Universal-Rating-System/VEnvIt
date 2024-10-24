@@ -242,29 +242,75 @@ function Invoke-Vn {
         Show-Help
     }
 }
-function New-ConfigScripts {
+function New-SupportScript {
+    param (
+        [string]$BaseDir,
+        [string]$FileName,
+        [string]$Content,
+        [string]$TimeStamp
+    )
+
+    $archiveDir = Join-Path -Path $BaseDir -ChildPath "Archive"
+    $scriptPath = Join-Path -Path $BaseDir -ChildPath $FileName
+    if (Test-Path -Path $scriptPath) {
+        Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $archiveDir -TimeStamp $TimeStamp
+        Remove-Item -Path $scriptPath -Recurse -Force
+    }
+    Set-Content -Path $scriptPath -Value $content
+}
+
+function New-VEnvCustomSetupScripts {
     param (
         [PSCustomObject]$InstallationValues,
         [string]$TimeStamp
     )
 
     if ($InstallationValues.ResetScripts -eq "Y") {
-        $content = @'
-Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
+        $fileName = ("VEnv" + $InstallationValues.ProjectName + "CustomSetup.ps1")
+        $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
+        $content += 'Write-Host "Running $env:VENV_CONFIG_ORG_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
+        $content += '$env:VENV_PY_VER = "' + $InstallationValues.PythonVer + '"' + "`n"
+        $content += '$env:PYTHONPATH = "' + $InstallationValues.ProjectDir + "\src;" + $InstallationValues.ProjectDir + "\tests" + '"' + "`n"
+        $content += '$env:PROJECT_DIR = "' + $InstallationValues.ProjectDir + '"' + "`n"
+        $content += '$env:PROJECT_NAME = "' + $InstallationValues.ProjectName + '"' + "`n`n"
+        $content += '# Set/override environment variables by changing them here.  Uncomment them and set the correct value or add a variable by replacing "??"'
+        $content += '#$env:INSTALLER_PWD = "??"' + "`n"
+        $content += '#$env:INSTALLER_USERID = "??"' + "`n"
+        $content += '#$env:LINUX_ROOT_PWD = "??"' + "`n"
+        $content += '#$env:MYSQL_DATABASE = "??"' + "`n"
+        $content += '#$env:MYSQL_HOST = "??"' + "`n"
+        $content += '#$env:MYSQL_PWD = "??"' + "`n"
+        $content += '#$env:MYSQL_ROOT_PASSWORD = "??"' + "`n"
+        $content += '#$env:MYSQL_TCP_PORT = ??' + "`n"
+        New-SupportScript -BaseDir $env:VENV_CONFIG_ORG_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp
 
-'@
+        $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
+        $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName... -ForegroundColor Yellow`n"
+        $content += "# Insert customized setup commands specific to the user.`n"
+        $content += "# Values in this file will override values set by the Organization custom setup script.`n"
+        New-SupportScript -BaseDir $env:VENV_CONFIG_USER_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp
+    }
+}
+
+function New-VEnvInstallScripts {
+    param (
+        [PSCustomObject]$InstallationValues,
+        [string]$TimeStamp
+    )
+
+    if ($InstallationValues.ResetScripts -eq "Y") {
+        $fileName = ("VEnv" + $InstallationValues.ProjectName + "Install.ps1")
+        $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
         $content += 'Write-Host "Running $env:VENV_CONFIG_ORG_DIR\' + "$fileName... -ForegroundColor Yellow`n"
         $content += "git init`n"
         $content += '& ' + $InstallationValues.ProjectDir + "\install.ps1`n"
-        New-SupportScript -BaseDir $env:VENV_CONFIG_ORG_DIR -FileNamePostfix "Install" -Content $content
+        New-SupportScript -BaseDir $env:VENV_CONFIG_ORG_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp
 
-        $content = @'
-Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
-
-'@
+        $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
         $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName... -ForegroundColor Yellow`n"
-        $content += "# Insert customized setup commands`n"
-        New-SupportScript -BaseDir $env:VENV_CONFIG_USER_DIR -FileNamePostfix "Install" -Content $content
+        $content += "# Insert customized setup commands specific to the user`n"
+        $content += "# Values in this file will override values set by the Organization installation script.`n"
+        New-SupportScript -BaseDir $env:VENV_CONFIG_USER_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp
     }
 }
 
@@ -299,50 +345,7 @@ Write-Host "Install $envPROJECT_NAME" -ForegroundColor Yellow
     }
     Set-Content -Path $ProjectInstallScriptPath -Value $content
     if (-not (Test-Path (Join-Path -Path $InstallationValues.ProjectDir -ChildPath "\.pre-commit-config.yaml")))
-        { CreatePreCommitConfigYaml }
-}
-
-function New-SecretsScripts {
-    param (
-        [PSCustomObject]$InstallationValues,
-        [string]$TimeStamp
-    )
-
-    if ($InstallationValues.ResetScripts -eq "Y") {
-        $content = @'
-Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
-
-'@
-        $content += 'Write-Host "Running $env:VENV_CONFIG_ORG_DIR\' + "$fileName... -ForegroundColor Yellow`n"
-        $content += "git init`n"
-        $content += '& ' + $InstallationValues.ProjectDir + "\install.ps1`n"
-        New-SupportScript -BaseDir $env:VENV_CONFIG_ORG_DIR -FileNamePostfix "Install" -Content $content
-
-        $content = @'
-Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
-
-'@
-        $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName... -ForegroundColor Yellow`n"
-        $content += "# Insert customized setup commands`n"
-        New-SupportScript -BaseDir $env:VENV_CONFIG_USER_DIR -FileNamePostfix "Install" -Content $content
-    }
-}
-
-function New-SupportScript {
-    param (
-        [string]$BaseDir,
-        [string]$FileNamePostfix,
-        [string]$Content
-    )
-
-    $archiveDir = Join-Path -Path $BaseDir -ChildPath "Archive"
-    $fileName = ("VEnv" + $InstallationValues.ProjectName + "$FileNamePostfix.ps1")
-    $scriptPath = Join-Path -Path $BaseDir -ChildPath $fileName
-    if (Test-Path -Path $scriptPath) {
-        Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $archiveDir -TimeStamp $TimeStamp
-        Remove-Item -Path $scriptPath -Recurse -Force
-    }
-    Set-Content -Path $scriptPath -Value $content
+    { CreatePreCommitConfigYaml }
 }
 
 function New-VirtualEnvironment {
@@ -365,40 +368,9 @@ function New-VirtualEnvironment {
         Invoke-VirtualEnvironment -InstallationValues $installationValues
         New-ProjectInstallScript -InstallationValues $installationValues
         $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-        # Backup-ConfigScripts -InstallationValues $installationValues -TimeStamp $timeStamp
-        New-ConfigScripts -InstallationValues $installationValues -TimeStamp $timeStamp
+        New-VEnvInstallScripts -InstallationValues $installationValues -TimeStamp $timeStamp
 
 
-        # Check if the mandatory setup script does not exist
-        $_script_mandatory_path = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath $_support_scripts[1]
-        if (-not (Test-Path $_script_mandatory_path)) {
-            # Create the script and write the lines
-            $s = 'Write-Host "Running ' + $_support_scripts[1] + '..."' + " -ForegroundColor Yellow"
-            Set-Content -Path $_script_mandatory_path -Value $s
-            Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_PY_VER = '$PythonVer'"
-            Add-Content -Path $_script_mandatory_path -Value "`$env:VENV_ORGANIZATION = '$Organization'"
-            Add-Content -Path $_script_mandatory_path -Value "`$env:PYTHONPATH = '$_project_dir;$_project_dir\src;$_project_dir\src\$ProjectName;$_project_dir\tests'"
-            Add-Content -Path $_script_mandatory_path -Value "`$env:PROJECT_DIR = '$_project_dir'"
-            Add-Content -Path $_script_mandatory_path -Value "`$env:PROJECT_NAME = '$ProjectName'"
-        }
-
-        # Check if the custom setup script does not exist
-        $_custom_file_name = "venv_${ProjectName}_setup_custom.ps1"
-        $_script_custom_path = Join-Path $env:VENV_CONFIG_DIR -ChildPath ${_custom_file_name}
-        if (-not (Test-Path $_script_custom_path)) {
-            $s = 'Write-Host "Running ' + $_custom_file_name + '..."' + " -ForegroundColor Yellow"
-            Set-Content -Path $_script_custom_path -Value $s
-            Add-Content -Path $_script_custom_path -Value ''
-            Add-Content -Path $_script_custom_path -Value '# Override global environment variables by setting the here.  Uncomment them and set the correct value or add a variable by replacing "??"'
-            Add-Content -Path $_script_custom_path -Value '#$env:INSTALLER_PWD = "??"'
-            Add-Content -Path $_script_custom_path -Value '#$env:INSTALLER_USERID = "??"'
-            Add-Content -Path $_script_custom_path -Value '#$env:LINUX_ROOT_PWD = "??"'
-            Add-Content -Path $_script_custom_path -Value '#$env:MYSQL_DATABASE = "??"'
-            Add-Content -Path $_script_custom_path -Value '#$env:MYSQL_HOST = "??"'
-            Add-Content -Path $_script_custom_path -Value '#$env:MYSQL_PWD = "??"'
-            Add-Content -Path $_script_custom_path -Value '#$env:MYSQL_ROOT_PASSWORD = "??"'
-            Add-Content -Path $_script_custom_path -Value '#$env:MYSQL_TCP_PORT = ??'
-        }
         Write-Host $separator -ForegroundColor Cyan
         & $_script_mandatory_path
         Write-Host $separator -ForegroundColor Cyan

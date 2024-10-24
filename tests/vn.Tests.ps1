@@ -144,7 +144,7 @@ Describe "Function testing" {
 
     Context "New-ProjectInstallScript" {
         BeforeEach {
-            Mock CreatePreCommitConfigYaml { return $true}
+            Mock CreatePreCommitConfigYaml { return $true }
             $tempDir = New-CustomTempDir -Prefix "VenvIt"
             $env:PROJECT_NAME = $mockInstalVal.ProjectName
             $env:PROJECTS_BASE_DIR = "$tempDir\PROJECTS_BASE_DIR"
@@ -172,7 +172,56 @@ Describe "Function testing" {
         }
     }
 
-    Context "New-ConfigScripts" {
+    Context "New-SupportScript" {
+        # TODO
+        # Test to be implemented
+    }
+
+    Context "New-VEnvCustomSetupScripts" {
+        BeforeEach {
+            $tempDir = New-CustomTempDir -Prefix "VenvIt"
+            $env:PROJECT_NAME = $mockInstalVal.ProjectName
+            $env:PROJECTS_BASE_DIR = "$tempDir\PROJECTS_BASE_DIR"
+            $env:VENV_CONFIG_ORG_DIR = "$tempDir\VENV_CONFIG_ORG_DIR"
+            $env:VENV_CONFIG_USER_DIR = "$tempDir\VENV_CONFIG_USER_DIR"
+            $env:VENV_ORGANIZATION_NAME = $mockInstalVal.Organization
+
+            $organizationDir = (Join-Path -Path $env:PROJECTS_BASE_DIR -ChildPath $env:VENV_ORGANIZATION_NAME)
+            $mockInstalVal | Add-Member -MemberType NoteProperty -Name "OrganizationDir" -Value $organizationDir
+            $mockInstalVal | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value (Join-Path -Path $mockInstalVal.OrganizationDir -ChildPath $env:PROJECT_NAME)
+
+            New-Item -ItemType Directory -Path $env:VENV_CONFIG_ORG_DIR | Out-Null
+            New-Item -ItemType Directory -Path $env:VENV_CONFIG_USER_DIR | Out-Null
+
+            $fileName = ("VEnv" + $mockInstalVal.ProjectName + "CustomSetup.ps1")
+            $scriptPath = Join-Path -Path $env:VENV_CONFIG_ORG_DIR -ChildPath $fileName
+            New-Item -Path $scriptPath -ItemType File -Force
+
+            $fileName = ("VEnv" + $mockInstalVal.ProjectName + "CustomSetup.ps1")
+            $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath $fileName
+            New-Item -Path $scriptPath -ItemType File -Force
+        }
+
+        It "Should chreate zip archives" {
+            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
+
+            $scriptPath = Join-Path -Path "$env:VENV_CONFIG_ORG_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "CustomSetup.ps1")
+            (Test-Path $scriptPath) | Should -Be $true
+            $scriptPath = Join-Path -Path "$env:VENV_CONFIG_USER_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "CustomSetup.ps1")
+            (Test-Path $scriptPath) | Should -Be $true
+            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_ORG_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
+            (Test-Path $zipPath) | Should -Be $true
+            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_USER_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
+            (Test-Path $zipPath) | Should -Be $true
+        }
+
+        AfterEach {
+            Remove-Item -Path $tempDir -Recurse -Force
+        }
+    }
+
+    Context "New-VEnvInstallScripts" {
         BeforeEach {
             $tempDir = New-CustomTempDir -Prefix "VenvIt"
             $env:PROJECT_NAME = $mockInstalVal.ProjectName
@@ -193,7 +242,7 @@ Describe "Function testing" {
         }
         It "Should chreate zip archives" {
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-ConfigScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
+            New-VEnvInstallScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
 
             $configPath = Join-Path -Path "$env:VENV_CONFIG_ORG_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "Install.ps1")
             (Test-Path $configPath) | Should -Be $true
@@ -208,11 +257,6 @@ Describe "Function testing" {
         AfterEach {
             Remove-Item -Path $tempDir -Recurse -Force
         }
-    }
-
-    Context "New-SupportScript" {
-        # TODO
-        # Test to be implemented
     }
 
     Context "New-VirtualEnvironment" {
