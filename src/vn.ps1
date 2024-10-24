@@ -31,31 +31,31 @@ param (
 
 $separator = "-" * 80
 
-function Backup-CongigScripts {
-    param (
-        [PSCustomObject]$InstallationValues,
-        [string]$TimeStamp
-    )
+# function Backup-ConfigScripts {
+#     param (
+#         [PSCustomObject]$InstallationValues,
+#         [string]$TimeStamp
+#     )
 
-    # $configScripts = @(
-    #     "VEnv${ProjectName}Install.ps1",
-    #     "VEnv${ProjectName}CustomSetup.ps1"
-    # )
-    if ($InstallationValues.ResetScripts -eq "Y") {
-        $OrgArchiveDir = Join-Path -Path $env:VENV_CONFIG_ORG_DIR -ChildPath "Archive"
-        $fileName = ("VEnv" + $InstallationValues.ProjectName + "Install.ps1")
-        $scriptPath = Join-Path -Path $env:VENV_CONFIG_ORG_DIR -ChildPath $fileName
-        Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $OrgArchiveDir -TimeStamp $TimeStamp
+#     # $configScripts = @(
+#     #     "VEnv${ProjectName}Install.ps1",
+#     #     "VEnv${ProjectName}CustomSetup.ps1"
+#     # )
+#     if ($InstallationValues.ResetScripts -eq "Y") {
+#         $OrgArchiveDir = Join-Path -Path $env:VENV_CONFIG_ORG_DIR -ChildPath "Archive"
+#         $fileName = ("VEnv" + $InstallationValues.ProjectName + "Install.ps1")
+#         $scriptPath = Join-Path -Path $env:VENV_CONFIG_ORG_DIR -ChildPath $fileName
+#         Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $OrgArchiveDir -TimeStamp $TimeStamp
 
-        # $UserArchiveDir = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "Archive"
-        # $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "$VEnv${InstallationValues.ProjectName}CustomSetup.ps1"
+#         # $UserArchiveDir = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "Archive"
+#         # $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "$VEnv${InstallationValues.ProjectName}CustomSetup.ps1"
 
-        $UserArchiveDir = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "Archive"
-        $fileName = ("VEnv" + $InstallationValues.ProjectName + "CustomSetup.ps1")
-        $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath $fileName
-        Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $UserArchiveDir -TimeStamp $TimeStamp
-    }
-}
+#         $UserArchiveDir = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "Archive"
+#         $fileName = ("VEnv" + $InstallationValues.ProjectName + "CustomSetup.ps1")
+#         $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath $fileName
+#         Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $UserArchiveDir -TimeStamp $TimeStamp
+#     }
+# }
 
 function Backup-ScriptToArchiveIfExists {
     param (
@@ -242,6 +242,32 @@ function Invoke-Vn {
         Show-Help
     }
 }
+function New-ConfigScripts {
+    param (
+        [PSCustomObject]$InstallationValues,
+        [string]$TimeStamp
+    )
+
+    if ($InstallationValues.ResetScripts -eq "Y") {
+        $content = @'
+Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
+
+'@
+        $content += 'Write-Host "Running $env:VENV_CONFIG_ORG_DIR\' + "$fileName... -ForegroundColor Yellow`n"
+        $content += "git init`n"
+        $content += '& ' + $InstallationValues.ProjectDir + "\install.ps1`n"
+        New-SupportScript -BaseDir $env:VENV_CONFIG_ORG_DIR -FileNamePostfix "Install" -Content $content
+
+        $content = @'
+Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
+
+'@
+        $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName... -ForegroundColor Yellow`n"
+        $content += "# Insert customized setup commands`n"
+        New-SupportScript -BaseDir $env:VENV_CONFIG_USER_DIR -FileNamePostfix "Install" -Content $content
+    }
+}
+
 function New-ProjectInstallScript {
     param (
         [PSCustomObject]$InstallationValues
@@ -276,6 +302,49 @@ Write-Host "Install $envPROJECT_NAME" -ForegroundColor Yellow
         { CreatePreCommitConfigYaml }
 }
 
+function New-SecretsScripts {
+    param (
+        [PSCustomObject]$InstallationValues,
+        [string]$TimeStamp
+    )
+
+    if ($InstallationValues.ResetScripts -eq "Y") {
+        $content = @'
+Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
+
+'@
+        $content += 'Write-Host "Running $env:VENV_CONFIG_ORG_DIR\' + "$fileName... -ForegroundColor Yellow`n"
+        $content += "git init`n"
+        $content += '& ' + $InstallationValues.ProjectDir + "\install.ps1`n"
+        New-SupportScript -BaseDir $env:VENV_CONFIG_ORG_DIR -FileNamePostfix "Install" -Content $content
+
+        $content = @'
+Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
+
+'@
+        $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName... -ForegroundColor Yellow`n"
+        $content += "# Insert customized setup commands`n"
+        New-SupportScript -BaseDir $env:VENV_CONFIG_USER_DIR -FileNamePostfix "Install" -Content $content
+    }
+}
+
+function New-SupportScript {
+    param (
+        [string]$BaseDir,
+        [string]$FileNamePostfix,
+        [string]$Content
+    )
+
+    $archiveDir = Join-Path -Path $BaseDir -ChildPath "Archive"
+    $fileName = ("VEnv" + $InstallationValues.ProjectName + "$FileNamePostfix.ps1")
+    $scriptPath = Join-Path -Path $BaseDir -ChildPath $fileName
+    if (Test-Path -Path $scriptPath) {
+        Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $archiveDir -TimeStamp $TimeStamp
+        Remove-Item -Path $scriptPath -Recurse -Force
+    }
+    Set-Content -Path $scriptPath -Value $content
+}
+
 function New-VirtualEnvironment {
     param (
         [string]$ProjectName,
@@ -296,18 +365,9 @@ function New-VirtualEnvironment {
         Invoke-VirtualEnvironment -InstallationValues $installationValues
         New-ProjectInstallScript -InstallationValues $installationValues
         $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-        Backup-CongigScripts -InstallationValues $installationValues -TimeStamp $timeStamp
+        # Backup-ConfigScripts -InstallationValues $installationValues -TimeStamp $timeStamp
+        New-ConfigScripts -InstallationValues $installationValues -TimeStamp $timeStamp
 
-        # Check if the install script does not exist
-        $_script_install_path = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath $_support_scripts[0]
-        if (-not (Test-Path -Path $_script_install_path)) {
-            # Create the script and write the lines
-            $s = 'Write-Host "Running ' + $_support_scripts[0] + '..."' + " -ForegroundColor Yellow"
-            Set-Content -Path $_script_install_path -Value $s
-            Add-Content -Path $_script_install_path -Value "git init"
-            $s = '& "' + "$_project_dir\install.ps1" + '"'
-            Add-Content -Path $_script_install_path -Value $s
-        }
 
         # Check if the mandatory setup script does not exist
         $_script_mandatory_path = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath $_support_scripts[1]

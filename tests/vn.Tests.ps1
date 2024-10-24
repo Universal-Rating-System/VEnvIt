@@ -65,38 +65,6 @@ Describe "Function testing" {
         # TODO
         # Test to be implemented
     }
-    Context "Backup-CongigScripts" {
-        BeforeEach {
-            $tempDir = New-CustomTempDir -Prefix "VenvIt"
-            $env:VENV_CONFIG_ORG_DIR = "$tempDir\VENV_CONFIG_ORG_DIR"
-            $env:VENV_CONFIG_USER_DIR = "$tempDir\VENV_CONFIG_USER_DIR"
-
-            New-Item -ItemType Directory -Path $env:VENV_CONFIG_ORG_DIR | Out-Null
-            New-Item -ItemType Directory -Path $env:VENV_CONFIG_USER_DIR | Out-Null
-
-            $fileName = ("VEnv" + $mockInstalVal.ProjectName + "Install.ps1")
-            $scriptPath = Join-Path -Path $env:VENV_CONFIG_ORG_DIR -ChildPath $fileName
-            New-Item -Path $scriptPath -ItemType File -Force
-
-            $fileName = ("VEnv" + $mockInstalVal.ProjectName + "CustomSetup.ps1")
-            $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath $fileName
-            New-Item -Path $scriptPath -ItemType File -Force
-
-        }
-        It "Should chreate zip archives" {
-            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            Backup-CongigScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
-
-            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_ORG_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
-            (Test-Path $zipPath) | Should -Be $true
-            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_USER_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
-            (Test-Path $zipPath) | Should -Be $true
-        }
-
-        AfterEach {
-
-        }
-    }
 
     Context "Confirm-EnvironmentVariables" {
         BeforeEach {
@@ -202,6 +170,49 @@ Describe "Function testing" {
         AfterEach {
             Remove-Item -Path $tempDir -Recurse -Force
         }
+    }
+
+    Context "New-ConfigScripts" {
+        BeforeEach {
+            $tempDir = New-CustomTempDir -Prefix "VenvIt"
+            $env:PROJECT_NAME = $mockInstalVal.ProjectName
+            $env:VENV_CONFIG_ORG_DIR = "$tempDir\VENV_CONFIG_ORG_DIR"
+            $env:VENV_CONFIG_USER_DIR = "$tempDir\VENV_CONFIG_USER_DIR"
+
+            New-Item -ItemType Directory -Path $env:VENV_CONFIG_ORG_DIR | Out-Null
+            New-Item -ItemType Directory -Path $env:VENV_CONFIG_USER_DIR | Out-Null
+
+            $fileName = ("VEnv" + $mockInstalVal.ProjectName + "Install.ps1")
+            $scriptPath = Join-Path -Path $env:VENV_CONFIG_ORG_DIR -ChildPath $fileName
+            New-Item -Path $scriptPath -ItemType File -Force
+
+            $fileName = ("VEnv" + $mockInstalVal.ProjectName + "Install.ps1")
+            $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath $fileName
+            New-Item -Path $scriptPath -ItemType File -Force
+
+        }
+        It "Should chreate zip archives" {
+            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+            New-ConfigScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
+
+            $configPath = Join-Path -Path "$env:VENV_CONFIG_ORG_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "Install.ps1")
+            (Test-Path $configPath) | Should -Be $true
+            $configPath = Join-Path -Path "$env:VENV_CONFIG_USER_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "Install.ps1")
+            (Test-Path $configPath) | Should -Be $true
+            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_ORG_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
+            (Test-Path $zipPath) | Should -Be $true
+            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_USER_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
+            (Test-Path $zipPath) | Should -Be $true
+        }
+
+        AfterEach {
+            Remove-Item -Path $tempDir -Recurse -Force
+        }
+    }
+
+    Context "New-SupportScript" {
+        # TODO
+        # Test to be implemented
     }
 
     Context "New-VirtualEnvironment" {
