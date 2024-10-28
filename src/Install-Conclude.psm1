@@ -1,14 +1,14 @@
 Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 
 $envVarSet = @(
-    [PSCustomObject]@{Name = "VENV_ENVIRONMENT"; DefVal = "loc_dev"; IsDir = $false},
+    [PSCustomObject]@{Name = "VENV_ENVIRONMENT"; DefVal = "loc_dev"; IsDir = $false },
     [PSCustomObject]@{Name = "PROJECTS_BASE_DIR"; DefVal = "~\Projects"; IsDir = $true },
     [PSCustomObject]@{Name = "VENVIT_DIR"; DefVal = "$env:ProgramFiles\VenvIt"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENVIT_SECRETS_ORG_DIR"; DefVal = "$env:VENVIT_DIR\Secrets"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENVIT_SECRETS_DEFAULT_DIR"; DefVal = "$env:VENVIT_DIR\Secrets"; IsDir = $true },
     [PSCustomObject]@{Name = "VENVIT_SECRETS_USER_DIR"; DefVal = "~\VenvIt\Secrets"; IsDir = $true },
     [PSCustomObject]@{Name = "VENV_BASE_DIR"; DefVal = "~\venv"; IsDir = $true },
     [PSCustomObject]@{Name = "VENV_PYTHON_BASE_DIR"; DefVal = "c:\Python"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENV_CONFIG_ORG_DIR"; DefVal = "$env:VENVIT_DIR\Config"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENV_CONFIG_DEFAULT_DIR"; DefVal = "$env:VENVIT_DIR\Config"; IsDir = $true },
     [PSCustomObject]@{Name = "VENV_CONFIG_USER_DIR"; DefVal = "~\VenvIt\Config"; IsDir = $true }
 )
 $separator = "-" * 80
@@ -87,16 +87,16 @@ function Publish-LatestVersion {
 function Publish-Secrets {
     # Move the dev_env_var.ps1 file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
     $sourceFilePath = Join-Path -Path $env:VENVIT_DIR -ChildPath "dev_env_var.ps1"
-    $destinationOrgFilePath = Join-Path -Path $env:VENVIT_SECRETS_ORG_DIR -ChildPath "dev_env_var.ps1"
+    $destinationDefaultFilePath = Join-Path -Path $env:VENVIT_SECRETS_DEFAULT_DIR -ChildPath "dev_env_var.ps1"
     $destinationUserFilePath = Join-Path -Path $env:VENVIT_SECRETS_USER_DIR -ChildPath "dev_env_var.ps1"
 
     if (Test-Path -Path $sourceFilePath) {
-        if (-not (Test-Path -Path $destinationOrgFilePath)) {
-            Write-Host "Moving dev_env_var.ps1 to $env:VENVIT_SECRETS_ORG_DIR..."
-            Copy-Item -Path $sourceFilePath -Destination $destinationOrgFilePath -Force
+        if (-not (Test-Path -Path $destinationDefaultFilePath)) {
+            Write-Host "Moving dev_env_var.ps1 to $env:VENVIT_SECRETS_DEFAULT_DIR..."
+            Copy-Item -Path $sourceFilePath -Destination $destinationDefaultFilePath -Force
         }
         else {
-            Write-Host "dev_env_var.ps1 already exists in $env:VENVIT_SECRETS_ORG_DIR. It will not be overwritten."
+            Write-Host "dev_env_var.ps1 already exists in $env:VENVIT_SECRETS_DEFAULT_DIR. It will not be overwritten."
         }
         if (-not (Test-Path -Path $destinationUserFilePath)) {
             Write-Host "Moving dev_env_var.ps1 to $env:VENVIT_SECRETS_USER_DIR..."
