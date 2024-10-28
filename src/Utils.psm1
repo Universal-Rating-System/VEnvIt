@@ -1,5 +1,30 @@
 ﻿$separator = "-" * 80
 
+function Backup-ScriptToArchiveIfExists {
+    param (
+        [string]$ScriptPath,
+        [string]$ArchiveDir,
+        [string]$TimeStamp
+    )
+
+    # Check if the file exists
+    if (Test-Path $scriptPath) {
+        # Ensure the archive directory exists
+        if (-not (Test-Path $archiveDir)) {
+            New-Item -Path $archiveDir -ItemType Directory
+        }
+        $archivePath = Join-Path -Path $ArchiveDir -ChildPath ($env:PROJECT_NAME + "_" + $TimeStamp + ".zip")
+        if (Test-Path $archivePath) {
+            Compress-Archive -Path $ScriptPath -Update -DestinationPath $archivePath
+        }
+        else {
+            Compress-Archive -Path $ScriptPath -DestinationPath $archivePath
+        }
+        Write-Host "Zipped $ScriptPath."
+    }
+    return $archivePath
+}
+
 function Confirm-EnvironmentVariables {
     # Check for required environment variables and display help if they're missing
     $Result = $true
@@ -94,6 +119,6 @@ function Read-YesOrNo {
 }
 
 
-Export-ModuleMember -Function New-CustomTempDir, Confirm-EnvironmentVariables, Get-ConfigFileName, Invoke-Script
-Export-ModuleMember -Function Read-YesOrNo, Show-EnvironmentVariables
+Export-ModuleMember -Function Backup-ScriptToArchiveIfExists, New-CustomTempDir, Confirm-EnvironmentVariables
+Export-ModuleMember -Function Get-ConfigFileName, Invoke-Script, Read-YesOrNo, Show-EnvironmentVariables
 Export-ModuleMember -Variable separator

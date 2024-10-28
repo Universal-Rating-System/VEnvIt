@@ -4,6 +4,11 @@
         Import-Module "$PSScriptRoot\..\src\Utils.psm1"
     }
 
+    Context "Backup-ScriptToArchiveIfExists" {
+        # TODO
+        # Test to be implemented
+    }
+
     Context "Confirm-EnvironmentVariables" {
         BeforeEach {
             $env:PROJECTS_BASE_DIR = "projects_base_dir"
@@ -43,6 +48,7 @@
             }
         }
     }
+
     Context "Read-YesOrNo" {
         It "Input is Y" {
             Mock -ModuleName "Utils" Read-Host {

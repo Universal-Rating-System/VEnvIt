@@ -50,11 +50,6 @@ Describe "Function testing" {
         $OriginalValues = Set-BackupEnvironmentVariables
     }
 
-    Context "Backup-ScriptToArchiveIfExists" {
-        # TODO
-        # Test to be implemented
-    }
-
     Context "Get-InstallationValues" {
         It "All parameters set" {
             $InstallValues = Get-InstallationValues -ProjectName "MyProject" -PythonVer "311" -Organization "MyOrg" -DevMode "Y" -ResetScripts "Y"
@@ -308,17 +303,7 @@ Describe "Function testing" {
     }
 
     AfterAll {
-        $env:PROJECT_NAME = $OrigPROJECT_NAME
-        $env:PROJECTS_BASE_DIR = $OrigPROJECTS_BASE_DIR
-        $env:VENV_BASE_DIR = $OrigVENV_BASE_DIR
-        $env:VENV_CONFIG_DEFAULT_DIR = $OrigVENV_CONFIG_DEFAULT_DIR
-        $env:VENV_CONFIG_USER_DIR = $OrigVENV_CONFIG_USER_DIR
-        $env:VENV_ENVIRONMENT = $OrigVENV_ENVIRONMENT
-        $env:VENV_ORGANIZATION_NAME = $OrigVENV_ORGANIZATION_NAME
-        $env:VENV_PYTHON_BASE_DIR = $OrigVENV_PYTHON_BASE_DIR
-        $env:VENV_SECRETS_DEFAULT_DIR = $OrigVENV_SECRETS_DEFAULT_DIR
-        $env:VENV_SECRETS_USER_DIR = $OrigVENV_SECRETS_USER_DIR
-        $env:VENVIT_DIR = $OrigVENVIT_DIR
+        Get-BackedupEnvironmentVariables -OriginalValues $originalValues
     }
 }
 

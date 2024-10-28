@@ -58,29 +58,6 @@ Import-Module $PSScriptRoot\Utils.psm1
 #     }
 # }
 
-function Backup-ScriptToArchiveIfExists {
-    param (
-        [string]$ScriptPath,
-        [string]$ArchiveDir,
-        [string]$TimeStamp
-    )
-
-    # Check if the file exists
-    if (Test-Path $scriptPath) {
-        # Ensure the archive directory exists
-        if (-not (Test-Path $archiveDir)) {
-            New-Item -Path $archiveDir -ItemType Directory
-        }
-        $archivePath = Join-Path -Path $ArchiveDir -ChildPath ($env:PROJECT_NAME + "_" + $TimeStamp + ".zip")
-        if (Test-Path $archivePath) {
-            Compress-Archive -Path $ScriptPath -Update -DestinationPath $archivePath
-        } else {
-            Compress-Archive -Path $ScriptPath -DestinationPath $archivePath
-        }
-        Write-Host "Zipped $ScriptPath."
-    }
-}
-
 function CreateDirIfNotExist {
     param (
         [string]$_dir

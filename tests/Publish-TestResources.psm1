@@ -21,7 +21,7 @@ function Get-BackedupEnvironmentVariables {
     $env:VENVIT_DIR = $OriginalValues.VENVIT_DIR
 }
 
-    function Invoke-TestSetup {
+function Invoke-TestSetup {
     $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
     $tempDir = New-CustomTempDir -Prefix "VenvIt"
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
@@ -44,25 +44,36 @@ function Get-BackedupEnvironmentVariables {
     $env:PROJECT_DIR = (Join-Path -Path $mockInstalVal.OrganizationDir -ChildPath $env:PROJECT_NAME)
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value $env:PROJECT_DIR
 
-    New-Item -ItemType Directory -Path $env:PROJECT_DIR | Out-Null
-    New-Item -ItemType Directory -Path $env:VENV_CONFIG_DEFAULT_DIR | Out-Null
-    New-Item -ItemType Directory -Path $env:VENV_CONFIG_USER_DIR | Out-Null
-    New-Item -ItemType Directory -Path $env:VENV_SECRETS_DEFAULT_DIR | Out-Null
-    New-Item -ItemType Directory -Path $env:VENV_SECRETS_USER_DIR | Out-Null
+    #Create the directory structure
+    $directories = @(
+        $env:PROJECT_DIR,
+        "$env:VENV_BASE_DIR\${env:PROJECT_NAME}_env\Scripts",
+        $env:VENV_CONFIG_DEFAULT_DIR,
+        $env:VENV_CONFIG_USER_DIR,
+        $env:VENV_SECRETS_DEFAULT_DIR,
+        $env:VENV_SECRETS_USER_DIR
+    )
+    foreach ($directory in $directories) {
+        New-Item -ItemType Directory -Path $directory | Out-Null
+    }
 
-    $fileName = Get-ConfigFileName -ProjectName $mockInstalVal.ProjectName -Prefix "CustomSetup"
-    $scriptPath = Join-Path -Path $env:VENV_CONFIG_DEFAULT_DIR -ChildPath $fileName
-    New-Item -Path $scriptPath -ItemType File -Force | Out-Null
-    $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath $fileName
-    New-Item -Path $scriptPath -ItemType File -Force | Out-Null
+    # Create the configuration scripts
+    $postfixes = @( "EnvVar", "Install", "CustomSetup" )
+    foreach ($postfix in $postfixes) {
+        $fileName = Get-ConfigFileName -ProjectName $mockInstalVal.ProjectName -Prefix $postfix
+        $scriptPath = Join-Path -Path $env:VENV_CONFIG_DEFAULT_DIR -ChildPath $fileName
+        New-Item -Path $scriptPath -ItemType File -Force | Out-Null
+        $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath $fileName
+        New-Item -Path $scriptPath -ItemType File -Force | Out-Null
+    }
 
-    $scriptPath = Join-Path -Path $env:VENV_SECRETS_DEFAULT_DIR -ChildPath "dev_env_var.ps1"
-    New-Item -Path $scriptPath -ItemType File -Force | Out-Null
-    Set-Content -Path $scriptPath -Value ('Write-Host "Executing ' + $scriptPath + '"')
-
-    $scriptPath = Join-Path -Path $env:VENV_SECRETS_USER_DIR -ChildPath "dev_env_var.ps1"
-    New-Item -Path $scriptPath -ItemType File -Force | Out-Null
-    Set-Content -Path $scriptPath -Value ('Write-Host "Executing ' + $scriptPath + '"')
+    # Create the sccrtet's files
+    $directories = @( $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR )
+    foreach ($directory in $directories) {
+        $scriptPath = Join-Path -Path $directory -ChildPath "dev_env_var.ps1"
+        New-Item -Path $scriptPath -ItemType File -Force | Out-Null
+        Set-Content -Path $scriptPath -Value ('Write-Host "Executing ' + $scriptPath + '"')
+    }
 
     return $mockInstalVal
 }

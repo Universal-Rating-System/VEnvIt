@@ -34,6 +34,9 @@ function Invoke-VirtualEnvironment {
     }
 
     # Remove temporary directories from previous sessions
+    # TODO
+    # Exclude the current temp directory if there is one.
+    # Possibly move this to some clean up procedsure.
     Get-ChildItem -Path $env:TEMP -Directory -Filter "$env:PROJECT_NAME*" | Remove-Item -Recurse -Force
 
     if (Test-Path $env:PROJECT_DIR) {
