@@ -221,7 +221,7 @@ function New-VEnvCustomSetupScripts {
         New-SupportScript -BaseDir $env:VENV_CONFIG_DEFAULT_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp | Out-Null
 
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
-        $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName... -ForegroundColor Yellow`n"
+        $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + $fileName + '..." -ForegroundColor Yellow' + "`n"
         $content += "# Insert customized setup commands specific to the user.`n"
         $content += "# Values in this file will override values set by the Organization custom setup script.`n"
         New-SupportScript -BaseDir $env:VENV_CONFIG_USER_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp | Out-Null
