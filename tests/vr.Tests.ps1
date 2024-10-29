@@ -95,6 +95,7 @@ Describe "Function testing" {
         }
 
         AfterEach {
+            Set-Location -Path $env:TEMP
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }

@@ -98,31 +98,43 @@ Describe "Function testing" {
             Mock Invoke-Script {
                 return "Mock: Default VEnvMyProjectInstall.ps1"
             } -ParameterFilter {
+                Write-Host $Script
+                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectInstall.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectInstall.ps1")).FullName
             }
             Mock Invoke-Script {
                 return "Mock: User VEnvMyProjectInstall.ps1"
             } -ParameterFilter {
+                Write-Host $Script
+                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectInstall.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectInstall.ps1")).FullName
             }
             Mock Invoke-Script {
                 return "Mock: Default VEnvMyProjectEnvVar.ps1"
             } -ParameterFilter {
+                Write-Host $Script
+                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectEnvVar.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectEnvVar.ps1")).FullName
             }
             Mock Invoke-Script {
                 return "Mock: User VEnvMyProjectEnvVar.ps1"
             } -ParameterFilter {
+                Write-Host $Script
+                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectEnvVar.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectEnvVar.ps1")).FullName
             }
             Mock Invoke-Script {
                 return "Mock: Default VEnvMyProjectEnvVar.ps1"
             } -ParameterFilter {
+                Write-Host $Script
+                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectCustomSetup.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectCustomSetup.ps1")).FullName
             }
             Mock Invoke-Script {
                 return "Mock: Default VEnvMyProjectEnvVar.ps1"
             } -ParameterFilter {
+                Write-Host $Script
+                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectCustomSetup.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectCustomSetup.ps1")).FullName
             }
 
@@ -145,6 +157,7 @@ Describe "Function testing" {
         }
 
         AfterEach {
+            Set-Location -Path $env:TEMP
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
@@ -275,9 +288,9 @@ Describe "Function testing" {
             if (Test-Path $mockInstalVal.OrganizationDir) {
                 Remove-Item -Path $mockInstalVal.OrganizationDir -Recurse -Force | Out-Null
             }
-            if (-not (Test-Path $mockInstalVal.ProjectDir)) {
-                Remove-Item -Path $mockInstalVal.ProjectDir -Recurse -Force  | Out-Null
-            }
+            # if (-not (Test-Path $mockInstalVal.ProjectDir)) {
+            #     Remove-Item -Path $mockInstalVal.ProjectDir -Recurse -Force  | Out-Null
+            # }
             $mockInstalVal.psobject.properties.remove('OrganizationDir')
             $mockInstalVal.psobject.properties.remove('ProjectDir')
         }
