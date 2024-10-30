@@ -153,7 +153,7 @@ Describe "Function testing" {
             Assert-MockCalled -CommandName Invoke-Script -ParameterFilter { (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectEnvVar.ps1")).FullName }
             Assert-MockCalled -CommandName Invoke-Script -ParameterFilter { (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectCustomSetup.ps1")).FullName }
             Assert-MockCalled -CommandName Invoke-Script -ParameterFilter { (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectCustomSetup.ps1")).FullName }
-            Get-Location | Should -Be $mockInstalVal.ProjectDir
+            (Get-Location).FullName | Should -Be ($mockInstalVal.ProjectDir).FullName
         }
 
         AfterEach {
