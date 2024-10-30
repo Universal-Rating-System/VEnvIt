@@ -209,6 +209,7 @@ function New-VEnvCustomSetupScripts {
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "CustomSetup.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
+        $content += 'Write-Host "Running $env:VENV_CONFIG_DEFAULT_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
         $content += '# Set/override environment variables by changing them here.  Uncomment them and set the correct value or add a variable by replacing "??"'
         $content += '#$env:INSTALLER_PWD = "??"' + "`n"
         $content += '#$env:INSTALLER_USERID = "??"' + "`n"
@@ -247,7 +248,7 @@ function New-VEnvEnvVarScripts {
         New-SupportScript -BaseDir $env:VENV_CONFIG_DEFAULT_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp | Out-Null
 
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
-        $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName... -ForegroundColor Yellow`n"
+        $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
         $content += "# Insert customized setup commands specific to the user.`n"
         $content += "# Values in this file will override values set by the Organization custom setup script.`n"
         New-SupportScript -BaseDir $env:VENV_CONFIG_USER_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp | Out-Null
@@ -265,13 +266,13 @@ function New-VEnvInstallScripts {
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "Install.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
-        $content += 'Write-Host "Running $env:VENV_CONFIG_DEFAULT_DIR\' + $fileName + '..." -ForegroundColor Yellow' + "`n"
+        $content += 'Write-Host "Running $env:VENV_CONFIG_DEFAULT_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
         $content += "git init`n"
         $content += '& ' + $InstallationValues.ProjectDir + "\install.ps1`n"
         New-SupportScript -BaseDir $env:VENV_CONFIG_DEFAULT_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp | Out-Null
 
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
-        $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName... -ForegroundColor Yellow`n"
+        $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
         $content += "# Insert customized setup commands specific to the user`n"
         $content += "# Values in this file will override values set by the Organization installation script.`n"
         New-SupportScript -BaseDir $env:VENV_CONFIG_USER_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp | Out-Null

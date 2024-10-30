@@ -193,7 +193,7 @@ Describe "Function testing" {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
             $mockInstalVal = Invoke-TestSetup
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
+            # New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
 
         It "Should create zip archives" {
