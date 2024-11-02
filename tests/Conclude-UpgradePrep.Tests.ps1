@@ -1,99 +1,160 @@
 ﻿# Upgrade.Tests.ps1
 
-BeforeAll {
-    . "$PSScriptRoot\..\src\Conclude-UpgradePrep.ps1"
-}
-
-Describe 'Upgrade.ps1 Tests' {
-
-    # Create the mock Manifest.psd1 files in a temporary directory
+Describe "Function testing" {
     BeforeAll {
-        # Mock current Manifest
-        $currentManifestContent = @"
-@{
-    ModuleVersion = '6.0.0'
-    Author        = 'Author Name'
-    Description   = 'Mock Manifest for current version.'
-}
-"@
+        if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
+        if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+        Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
+        Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 
-        # Mock latest Manifest
-        $latestManifestContent = @"
-@{
-    ModuleVersion = '7.0.0'
-    Author        = 'Author Name'
-    Description   = 'Mock Manifest for latest version.'
-}
-"@
+        $ManifestData500 = @{
+            Version     = "5.0.0"
+            Authors     = "Ann Other <ann@other.com>"
+            Description = "Description of 5.0.0"
+        }
+        $ManifestData600 = @{
+            Version     = "6.0.0"
+            Authors     = "Ann Other <ann@other.com>"
+            Description = "Description of 6.0.0"
+        }
+        $ManifestData700 = @{
+            Version     = "7.0.0"
+            Authors     = "Ann Other <ann@other.com>"
+            Description = "Description of 7.0.0"
+        }
+    }
+    Context "Get-ManifestFileName" {
+        # TODO
+        # Test to be implemented
+    }
 
-        # Create a temporary directory
-        $tempDir = New-Item -ItemType Directory -Path ([System.IO.Path]::GetTempPath() + [System.IO.Path]::GetRandomFileName())
-        $currentManifestPath = Join-Path -Path $tempDir.FullName -ChildPath 'current_Manifest.psd1'
-        $latestManifestPath = Join-Path -Path $tempDir.FullName -ChildPath 'latest_Manifest.psd1'
+    Context "Get-Version" {
+        BeforeAll {
+            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+            if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
+            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+            Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
 
-        # Write mock manifest files to the TEMP directory
-        Set-Content -Path $currentManifestPath -Value $currentManifestContent
-        Set-Content -Path $latestManifestPath -Value $latestManifestContent
+            function New-TestVersionStructure_0_0_0 {
+                Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+                $TempDir = New-CustomTempDir -Prefix "VenvIt"
+                Return $TempDir
+            }
+
+            function New-TestVersionStructure_6_0_0 {
+                Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+                $TempDir = New-CustomTempDir -Prefix "VenvIt"
+                $ManifestPath = Join-Path -Path $TempDir -ChildPath (Get-ManifestFileName)
+                New-ManifestPsd1 -FilePath $ManifestPath $ManifestData600
+                Return $TempDir
+            }
+        }
+        It "Should get 0.0.0" {
+            $ScriptDir = New-TestVersionStructure_0_0_0
+            $Version = Get-Version -ScriptDir $ScriptDir
+            $Version | Should -Be "0.0.0"
+            Remove-Item -Path $ScriptDir -Force
+        }
+
+        It "Should get 6.0.0" {
+            $ScriptDir = New-TestVersionStructure_6_0_0
+            $Version = Get-Version -ScriptDir $ScriptDir
+            $Version | Should -Be "6.0.0"
+            Remove-Item -Path $ScriptDir -Force -Recurse
+        }
+
+    }
+
+    Context "Invoke-PrepForUpgrade_6_0_0" {
+        BeforeAll {
+            # This test must be run with administrator rights.
+            if (-not (Test-Admin)) {
+                Throw "Tests must be run as an Administrator. Aborting..."
+            }
+            $OrigRTE_ENVIRONMENT = $env:RTE_ENVIRONMENT
+            $OrigSCRIPTS_DIR = $env:SCRIPTS_DIR
+            $OrigSECRETS_DIR = $env:SECRETS_DIR
+            [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", "rte_environment", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", "scripts_dir", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", "secrets_dir", [System.EnvironmentVariableTarget]::Machine)
+        }
+        It "Should prepare for 6.0.0" {
+            Invoke-PrepForUpgrade_6_0_0
+            $rte_environment = [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
+            $scripts_dir = [System.Environment]::GetEnvironmentVariable("SCRIPTS_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $secrets_dir = [System.Environment]::GetEnvironmentVariable("SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $rte_environment | Should -Be $null
+            $scripts_dir | Should -Be $null
+            $secrets_dir | Should -Be $null
+        }
+
+        AfterAll {
+            if ($OrigRTE_ENVIRONMENT) {
+                [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $OrigRTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
+            }
+            else {
+                Remove-EnvVarIfExists -VarName "RTE_ENVIRONMENT"
+            }
+            if ($SCRIPTS_DIR) {
+                [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $OrigSCRIPTS_DIR, [System.EnvironmentVariableTarget]::Machine)
+            }
+            else {
+                Remove-EnvVarIfExists -VarName "SCRIPTS_DIR"
+            }
+            if ($OrigRTE_ENVIRONMENT) {
+                [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $OrigSECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
+            }
+            else {
+                Remove-EnvVarIfExists -VarName "SECRETS_DIR"
+            }
+        }
+    }
+
+    Context "Invoke-PrepForUpgrade_7_0_0" {
+        # TODO
+        # Test to be implemented
+    }
+
+    Context "Update-PackagePrep" {
+        BeforeAll {
+            if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $OrigVENVIT_DIR = $env:VENVIT_DIR
+        }
+        BeforeEach {
+            $TempDir = New-CustomTempDir -Prefix "venvit"
+            $UpgradeScriptDir = New-Item -ItemType Directory -Path (Join-Path -Path $TempDir -ChildPath "TempUpgradeDir")
+            $env:VENVIT_DIR = Join-Path -Path $TempDir -ChildPath "venvit"
+            New-Item -ItemType Directory -Path $env:VENVIT_DIR
+        }
+
+        It 'Should apply 6.0.0 and 7.0.0' {
+            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+
+            Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 { return $true }
+            Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_7_0_0 { return $true }
+            # Mock -CommandName Invoke-PrepForUpgrade_7_0_0
+            $CurrentManifestPath = Join-Path -Path $env:VENVIT_DIR -ChildPath (Get-ManifestFileName)
+            New-ManifestPsd1 -FilePath $CurrentManifestPath -Data $ManifestData500
+            $UpgradeManifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
+            New-ManifestPsd1 -FilePath $UpgradeManifestPath -data $ManifestData700
+            Update-PackagePrep -UpgradeScriptDir $UpgradeScriptDir
+
+            # Assert that the correct upgrade functions were called in order
+            Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 -Times 1 -Exactly
+            Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_7_0_0 -Times 1 -Exactly
+        }
+        AfterEach {
+            Remove-Item -Path $TempDir -Recurse -Force
+        }
     }
 
     AfterAll {
-        # Clean up temporary files
-        Remove-Item -Path $currentManifestPath -Force
-        Remove-Item -Path $latestManifestPath -Force
-        Remove-Item -Path $tempDir.FullName -Force
-    }
-
-    # Mock version upgrade functions
-    BeforeEach {
-        Mock -CommandName Upgrade_6_0_1
-        Mock -CommandName Upgrade_6_1_0
-        Mock -CommandName Upgrade_7_0_0
-    }
-
-    It 'Should correctly import current and latest manifest files' {
-        # Act
-        Update-Package -currentManifestPath $currentManifestPath -latestManifestPath $latestManifestPath
-
-        # Assert
-        $currentManifest = Import-PowerShellDataFile -Path $currentManifestPath
-        $latestManifest = Import-PowerShellDataFile -Path $latestManifestPath
-
-        $currentManifest.ModuleVersion | Should -BeExactly '6.0.0'
-        $latestManifest.ModuleVersion | Should -BeExactly '7.0.0'
-    }
-
-    It 'Should apply all necessary upgrades from 6.0.0 to 7.0.0' {
-        # Act
-        Update-Package -currentManifestPath $currentManifestPath -latestManifestPath $latestManifestPath
-
-        # Assert that the correct upgrade functions were called in order
-        Assert-MockCalled -CommandName Upgrade_6_0_1 -Exactly 1
-        Assert-MockCalled -CommandName Upgrade_6_1_0 -Exactly 1
-        Assert-MockCalled -CommandName Upgrade_7_0_0 -Exactly 1
-    }
-
-    It 'Should throw an error if manifest paths are not provided' {
-        # Act & Assert
-        { Update-Package -currentManifestPath $null -latestManifestPath $latestManifestPath } | Should -Throw
-        { Update-Package -currentManifestPath $currentManifestPath -latestManifestPath $null } | Should -Throw
-    }
-
-    It 'Should not call upgrade functions if current version equals latest version' {
-        # Arrange - Modify current manifest to be the same as the latest version
-        Set-Content -Path $currentManifestPath -Value @"
-@{
-    ModuleVersion = '7.0.0'
-    Author        = 'Author Name'
-    Description   = 'Mock Manifest for current version.'
-}
-"@
-
-        # Act
-        Update-Package -currentManifestPath $currentManifestPath -latestManifestPath $latestManifestPath
-
-        # Assert that no upgrade functions were called
-        Assert-MockCalled -CommandName Upgrade_6_0_1 -Times 0
-        Assert-MockCalled -CommandName Upgrade_6_1_0 -Times 0
-        Assert-MockCalled -CommandName Upgrade_7_0_0 -Times 0
+        $env:VENVIT_DIR = $OrigVENVIT_DIR
     }
 }

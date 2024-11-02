@@ -1,6 +1,44 @@
 {
   "configurations": [
     {
+      "name": "Install",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Install.ps1"
+    },
+    {
+      "name": "Install -Help",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Install.ps1",
+      "args": [
+        "-Help"
+      ]
+    },
+    {
+      "name": "vn t1 312 HdT -RS -MU",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\vn.ps1",
+      "args": [
+        "Test01",
+        "312",
+        "HdT",
+        "-ResetScripts",
+        "Y",
+        "-DevMode",
+        "Y",
+        "-MultiUser",
+        "y"
+      ]
+    },
+    {
+      "name": "vn no-args",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\vn.ps1"
+    },
+    {
       "name": "Update-Manifest .",
       "type": "PowerShell",
       "request": "launch",

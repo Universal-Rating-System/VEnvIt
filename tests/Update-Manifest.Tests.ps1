@@ -1,8 +1,9 @@
-﻿BeforeAll {
-    . "$PSScriptRoot\..\src\Update-Manifest.ps1"
-}
+﻿Describe "Function Tests" {
+    BeforeAll {
+        if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
+        Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
+    }
 
-Describe "Update-Manifest script tests" {
 
     # Create temporary directory and pyproject.toml file before each test
     BeforeEach {
@@ -49,6 +50,22 @@ authors = [
         }
     }
 
+    # Test for Invoke-UpdateManifest function
+    Describe "Invoke-UpdateManifest function" {
+        It "Should create manifest.psd1 if pyproject.toml exists and is valid" {
+            # Call the function with the path to the temporary directory
+            Invoke-UpdateManifest -ConfigBaseDir $tempDir.FullName
+
+            # Verify that the manifest.psd1 was created
+            $manifestPath = Join-Path -Path $tempDir.FullName -ChildPath "manifest.psd1"
+            Test-Path $manifestPath | Should -BeTrue
+            # Verify the content of manifest.psd1
+            $actualContent = Get-Content -Path $manifestPath -Raw
+            # Compare actual content to the expected content (less strict comparison)
+            $actualContent.Trim() | Should -Be ($expectedManifestContent.Trim())
+        }
+    }
+
     # Test for New-ManifestPsd1 function
     Describe "New-ManifestPsd1 function" {
         It "Should create manifest.psd1 with correct data" {
@@ -63,27 +80,9 @@ authors = [
 
             # Verify that the file was created and contains the expected content
             $actualContent = Get-Content -Path $manifestPath -Raw
-
             # Compare actual content to the expected content (less strict comparison)
             $actualContent.Trim() | Should -Be ($expectedManifestContent.Trim())
         }
     }
 
-    # Test for Invoke-UpdateManifest function
-    Describe "Invoke-UpdateManifest function" {
-        It "Should create manifest.psd1 if pyproject.toml exists and is valid" {
-            # Call the function with the path to the temporary directory
-            Invoke-UpdateManifest -config_base_dir $tempDir.FullName
-
-            # Verify that the manifest.psd1 was created
-            $manifestPath = Join-Path -Path $tempDir.FullName -ChildPath "manifest.psd1"
-            Test-Path $manifestPath | Should -BeTrue
-
-            # Verify the content of manifest.psd1
-            $actualContent = Get-Content -Path $manifestPath -Raw
-
-            # Compare actual content to the expected content (less strict comparison)
-            $actualContent.Trim() | Should -Be ($expectedManifestContent.Trim())
-        }
-    }
 }

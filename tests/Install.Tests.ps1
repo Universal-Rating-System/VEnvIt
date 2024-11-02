@@ -1,97 +1,67 @@
-﻿BeforeAll {
-    . "$PSScriptRoot\..\src\Install.ps1"
-    $tempBaseDir = "$env:TEMP\VenvItTemp"
-    $tempDir = "$tempBaseDir\TempDir"
-    mkdir $tempDir -Force -ErrorAction SilentlyContinue
-    $sourceScriptPath = Join-Path -Path $tempDir -ChildPath "Conclude-Install.ps1"
-    # Mock the environment variables
-    $env:VENVIT_DIR = "$tempBaseDir\VenvIt\VENVIT_DIR"
-    mkdir $env:VENVIT_DIR -Force -ErrorAction SilentlyContinue
-    $env:VENV_SECRETS_DIR = "$tempBaseDir\VenvIt\VENV_SECRETS_DIR"
-    mkdir $env:VENV_SECRETS_DIR  -Force -ErrorAction SilentlyContinue
-}
+﻿Describe "Function testing" {
+    Context "Invoke-Install Function Tests" {
+        BeforeAll {
+            . $PSScriptRoot\..\src\Install.ps1 -Pester
+            if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
 
-Describe "Install.ps1 script tests" {
+            Import-Module "$PSScriptRoot\..\src\Utils.psm1"
+            Import-Module "$PSScriptRoot\..\src\Install-Conclude.psm1"
 
-    # Define some mock variables
-    $mockTag = "v1.0.0"
-    $configBaseDir = "C:\Fake\ConfigBaseDir"
+            $MockTag = "1.0.0"
+            $TempBaseDir = New-CustomTempDir -Prefix "venvit"
+            $OrigVenvIiDir = $env:VENVIT_DIR
+            $OrigVenvSecretsDir = $env:VENV_SECRETS_DIR
+            $env:VENVIT_DIR = "$TempBaseDir\VENVIT_DIR"
+            $env:VENV_SECRETS_DIR = "$TempBaseDir\VENV_SECRETS_DIR"
+            New-Item -ItemType Directory -Path $env:VENVIT_DIR -Force -ErrorAction SilentlyContinue
+            New-Item -ItemType Directory -Path $env:VENV_SECRETS_DIR -Force -ErrorAction SilentlyContinue
+        }
 
-    BeforeEach {
-
-        # Mock New-Item to simulate the creation of the temporary directory
-        Mock New-Item {
-            return @{ FullName = $tempDir }
-        } -Verifiable
-
-        # Mock Invoke-WebRequest for fetching GitHub releases and downloading the Conclude-Install.ps1 script
-        Mock Invoke-WebRequest {
-            Write-Host "Invoke-WebRequest called with Uri: $($args[1])"
-
-            # If the GitHub API release request is made
-            if ($args[1] -like "https://api.github.com/repos/*/releases") {
-                return '[{ "tag_name": "v1.0.0" }]'
+        It "Should Invoke-ConcludeInstall" {
+            Mock Set-ExecutionPolicy {}
+            Mock Invoke-WebRequest {
+                return @"
+                    [{"tag_name": "$MockTag"}]
+"@
+            } -ParameterFilter { $Uri -eq "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" }
+            Mock Invoke-WebRequest {
+                Copy-Item -Path $PSScriptRoot\..\src\Install-Conclude.psm1 -Destination $OutFile
+            } -ParameterFilter { $Uri -eq "https://github.com/BrightEdgeeServices/venvit/releases/download/$MockTag/Install-Conclude.psm1" }
+            Mock Import-Module {
+                $NormalizedModulePath = (Get-Item -Path $PSScriptRoot\..\src\Install-Conclude.psm1).FullName
+                Import-Module $NormalizedModulePath
+            } -ParameterFilter {
+                # Normalize both $Name and $env:TEMP to ensure they are compared in the same format
+                $NormalizedTempPath = (Get-Item -Path $env:TEMP).FullName
+                $NormalizedInputPath = (Get-Item -Path $Name).FullName
+                $NormalizedInputPath.StartsWith($NormalizedTempPath)
             }
-            # If the Conclude-Install.ps1 script request is made
-            elseif ($args[1] -like "https://github.com/*/Conclude-Install.ps1") {
-                # Create a fake script file at the expected path
-                "exit" | Out-File -FilePath $args[3] -Force
+            # Mock -ModuleName Install-Conclude -CommandName Invoke-ConcludeInstall {
+            Mock Invoke-ConcludeInstall {
                 "exit" | Out-File -FilePath "$env:VENVIT_DIR\vn.ps1" -Force
                 "exit" | Out-File -FilePath "$env:VENVIT_DIR\vi.ps1" -Force
-                "exit" | Out-File -FilePath "$env:VENV_SECRETS_DIR\dev_env_var.ps1" -Force
-                return ''
+                "exit" | Out-File -FilePath "$env:VENVIT_DIR\vr.ps1" -Force
+                "exit" | Out-File -FilePath "$env:VENV_SECRETS_DIR\secrets.ps1" -Force
             }
-        # } -ParameterFilter {
-        #     $args[1] -like "https://api.github.com/repos/*/releases" -or
-        #     $args[1] -like "https://github.com/*/Conclude-Install.ps1"
-        } -Verifiable
 
-        # Mock Remove-Item to simulate removing the temp directory
-        Mock Remove-Item -Verifiable
-        # Mock Unblock-File for unblocking files
-        Mock Unblock-File -Verifiable
+            Invoke-Install
+
+            Assert-MockCalled -CommandName "Invoke-WebRequest" -Exactly 2
+            Assert-MockCalled -CommandName "Invoke-ConcludeInstall" -Exactly 1
+        }
+
+        AfterAll {
+            $env:VENVIT_DIR = $OrigVenvItDir
+            $env:VENV_SECRETS_DIR = $OrigVenvSecretsDir
+            Remove-Item -Path $TempBaseDir -Recurse -Force
+        }
     }
-
-    It "Should create a temporary directory and fetch the latest release tag from GitHub" {
-        . "$PSScriptRoot\..\src\Install.ps1" "FakeArg"
-
-        # Verify that the temp directory was created
-        Assert-MockCalled New-Item -Times 1
-
-        # Verify that the latest release was fetched from GitHub
-        # TODO
-        # I have spend hours to get this test right without success. Any help will be appreciated.
-        # Assert-MockCalled Invoke-WebRequest -ParameterFilter { $args[0] -eq "-Uri" -and $args[1] -like "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" } -Times 1
-    }
-
-    It "Should clean up the temporary directory after execution" {
-        . "$PSScriptRoot\..\src\Install.ps1" $configBaseDir
-
-        # Verify that the temporary directory was removed
-        Assert-MockCalled Remove-Item -ParameterFilter { $args[0] -eq $tempDirPath } -Times 1
-    }
-
-    # Optional: Clean up any environment variables after the tests
-    AfterAll {
-        Remove-Variable -Name env:VENVIT_DIR -ErrorAction SilentlyContinue
-        Remove-Variable -Name env:VENV_SECRETS_DIR -ErrorAction SilentlyContinue
-
-        # Only remove the script file if it still exists
-        if (Test-Path -Path $sourceScriptPath) {
-            Remove-Item -Path $sourceScriptPath -Force -Recurse
-        }
-
-        # Only remove the directories if they still exist
-        if (Test-Path -Path $env:VENVIT_DIR) {
-            Remove-Item -Path $env:VENVIT_DIR -Force -Recurse
-        }
-
-        if (Test-Path -Path $env:VENV_SECRETS_DIR) {
-            Remove-Item -Path $env:VENV_SECRETS_DIR -Force -Recurse
-        }
-
-        if (Test-Path -Path $tempDir) {
-            Remove-Item -Path $tempDir -Force -Recurse
-        }
+    Context "Show-Help Function Tests" {
+        # Test to be implemented
     }
 }
+
+Describe "Install.ps1 testing" {
+    # Test to be implemented
+}
+
