@@ -112,7 +112,7 @@ Describe "Function testing" {
             Publish-LatestVersion -Release $latestVersion -UpgradeScriptDir $upgadeScriptDir
 
             (Test-Path -Path $env:VENVIT_DIR\Conclude-UpgradePrep.psm1) | Should -Be $true
-            (Test-Path -Path $env:VENVIT_DIR\dev_env_var.ps1) | Should -Be $true
+            (Test-Path -Path $env:VENVIT_DIR\secrets.ps1) | Should -Be $true
             (Test-Path -Path $env:VENVIT_DIR\Install.ps1) | Should -Be $true
             (Test-Path -Path $env:VENVIT_DIR\Install-Conclude.psm1) | Should -Be $true
             (Test-Path -Path $env:VENVIT_DIR\LICENSE) | Should -Be $true
@@ -141,14 +141,14 @@ Describe "Function testing" {
             New-Item -ItemType Directory -Path $env:VENVIT_SECRETS_DEFAULT_DIR | Out-Null
             New-Item -ItemType Directory -Path $env:VENVIT_SECRETS_USER_DIR | Out-Null
 
-            Copy-Item -Path $PSScriptRoot\..\src\dev_env_var.ps1 -Destination $env:VENVIT_DIR
+            Copy-Item -Path $PSScriptRoot\..\src\secrets.ps1 -Destination $env:VENVIT_DIR
         }
 
         It "Should copy all secrets files" {
             Publish-Secrets
 
-            (Test-Path -Path $env:VENVIT_SECRETS_DEFAULT_DIR\dev_env_var.ps1) | Should -Be $true
-            (Test-Path -Path $env:VENVIT_SECRETS_USER_DIR\dev_env_var.ps1) | Should -Be $true
+            (Test-Path -Path $env:VENVIT_SECRETS_DEFAULT_DIR\secrets.ps1) | Should -Be $true
+            (Test-Path -Path $env:VENVIT_SECRETS_USER_DIR\secrets.ps1) | Should -Be $true
         }
 
         AfterEach {

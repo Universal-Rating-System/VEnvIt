@@ -85,29 +85,29 @@ function Publish-LatestVersion {
 }
 
 function Publish-Secrets {
-    # Move the dev_env_var.ps1 file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
-    $sourceFilePath = Join-Path -Path $env:VENVIT_DIR -ChildPath "dev_env_var.ps1"
-    $destinationDefaultFilePath = Join-Path -Path $env:VENVIT_SECRETS_DEFAULT_DIR -ChildPath "dev_env_var.ps1"
-    $destinationUserFilePath = Join-Path -Path $env:VENVIT_SECRETS_USER_DIR -ChildPath "dev_env_var.ps1"
+    # Move the secrets.ps1 file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
+    $sourceFilePath = Join-Path -Path $env:VENVIT_DIR -ChildPath "secrets.ps1"
+    $destinationDefaultFilePath = Join-Path -Path $env:VENVIT_SECRETS_DEFAULT_DIR -ChildPath "secrets.ps1"
+    $destinationUserFilePath = Join-Path -Path $env:VENVIT_SECRETS_USER_DIR -ChildPath "secrets.ps1"
 
     if (Test-Path -Path $sourceFilePath) {
         if (-not (Test-Path -Path $destinationDefaultFilePath)) {
-            Write-Host "Moving dev_env_var.ps1 to $env:VENVIT_SECRETS_DEFAULT_DIR..."
+            Write-Host "Moving secrets.ps1 to $env:VENVIT_SECRETS_DEFAULT_DIR..."
             Copy-Item -Path $sourceFilePath -Destination $destinationDefaultFilePath -Force
         }
         else {
-            Write-Host "dev_env_var.ps1 already exists in $env:VENVIT_SECRETS_DEFAULT_DIR. It will not be overwritten."
+            Write-Host "secrets.ps1 already exists in $env:VENVIT_SECRETS_DEFAULT_DIR. It will not be overwritten."
         }
         if (-not (Test-Path -Path $destinationUserFilePath)) {
-            Write-Host "Moving dev_env_var.ps1 to $env:VENVIT_SECRETS_USER_DIR..."
+            Write-Host "Moving secrets.ps1 to $env:VENVIT_SECRETS_USER_DIR..."
             Move-Item -Path $sourceFilePath -Destination $destinationUserFilePath -Force
         }
         else {
-            Write-Host "dev_env_var.ps1 already exists in $env:VENVIT_SECRETS_USER_DIR. It will not be overwritten."
+            Write-Host "secrets.ps1 already exists in $env:VENVIT_SECRETS_USER_DIR. It will not be overwritten."
         }
     }
     else {
-        Write-Host "dev_env_var.ps1 not found in $env:VENVIT_DIR."
+        Write-Host "secrets.ps1 not found in $env:VENVIT_DIR."
     }
 
 }

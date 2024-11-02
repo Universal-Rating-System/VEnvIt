@@ -1,4 +1,4 @@
-Write-Host "Running $env:PROJECT_DIR\install.ps1..." -ForegroundColor Yellow
+Write-Host "Running $env:PROJECT_DIR\Install.ps1..." -ForegroundColor Yellow
 (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 poetry init
 poetry config keyring.enabled false
@@ -7,4 +7,4 @@ if (Test-Path -Path "$env:PROJECT_DIR\pyproject.toml") {
 }
 pre-commit install
 pre-commit autoupdate
-if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) {pip install --no-cache-dir -e .[dev]}
+if (Test-Path -Path $env:PROJECT_DIR\pyproject.toml) { pip install --no-cache-dir -e .[dev] }

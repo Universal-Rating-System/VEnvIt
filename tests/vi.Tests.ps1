@@ -28,7 +28,6 @@ Describe "Top level script execution" {
         }
         It "Should call Invoke-VirtualEnvironment function with ProjectName" {
             & $PSScriptRoot\..\src\vi.ps1 "Tes01"
-            # Assert-MockCalled -CommandName "Invoke-MyScript" -Exactly 1 -ParameterFilter { $Var01 -eq 'TestValue' }
             Assert-MockCalled -CommandName "Invoke-VirtualEnvironment" -Exactly 1
             Assert-MockCalled -CommandName "Show-EnvironmentVariables" -Exactly 1
         }
@@ -70,10 +69,10 @@ Describe "Function testing" {
                 } -ParameterFilter { $Script -eq "deactivate" }
                 Mock Invoke-Script { return "Mock: Activated VEnv"
                 } -ParameterFilter { $Script -eq ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1") }
-                Mock Invoke-Script { return "Mock: Default dev_env_var.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_SECRETS_DEFAULT_DIR\dev_env_var.ps1") }
-                Mock Invoke-Script { return "Mock: User dev_env_var.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_SECRETS_USER_DIR\dev_env_var.ps1") }
+                Mock Invoke-Script { return "Mock: Default secrets.ps1"
+                } -ParameterFilter { $Script -eq ("$env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1") }
+                Mock Invoke-Script { return "Mock: User secrets.ps1"
+                } -ParameterFilter { $Script -eq ("$env:VENV_SECRETS_USER_DIR\secrets.ps1") }
                 Mock Invoke-Script { return "Mock: Default EnvVar.ps1"
                 } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Prefix "EnvVar")) }
                 Mock Invoke-Script { return "Mock: User EnvVar.ps1"

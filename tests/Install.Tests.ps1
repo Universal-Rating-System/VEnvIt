@@ -41,7 +41,7 @@
                 "exit" | Out-File -FilePath "$env:VENVIT_DIR\vn.ps1" -Force
                 "exit" | Out-File -FilePath "$env:VENVIT_DIR\vi.ps1" -Force
                 "exit" | Out-File -FilePath "$env:VENVIT_DIR\vr.ps1" -Force
-                "exit" | Out-File -FilePath "$env:VENV_SECRETS_DIR\dev_env_var.ps1" -Force
+                "exit" | Out-File -FilePath "$env:VENV_SECRETS_DIR\secrets.ps1" -Force
             }
 
             Invoke-Install

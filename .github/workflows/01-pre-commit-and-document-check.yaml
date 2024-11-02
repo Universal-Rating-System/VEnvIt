@@ -16,9 +16,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      # - name: Setup PowerShell
-      #   uses: actions/setup-powershell@v2
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -44,9 +41,6 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-
-      # - name: Setup PowerShell
-      #   uses: actions/setup-powershell@v2
 
       - name: Set up Python
         uses: actions/setup-python@v5

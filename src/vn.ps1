@@ -32,31 +32,6 @@ param (
 if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
 Import-Module $PSScriptRoot\Utils.psm1
 
-# function Backup-ConfigScripts {
-#     param (
-#         [PSCustomObject]$InstallationValues,
-#         [string]$TimeStamp
-#     )
-#
-#     # $configScripts = @(
-#     #     "VEnv${ProjectName}Install.ps1",
-#     #     "VEnv${ProjectName}CustomSetup.ps1"
-#     # )
-#     if ($InstallationValues.ResetScripts -eq "Y") {
-#         $OrgArchiveDir = Join-Path -Path $env:VENV_CONFIG_DEFAULT_DIR -ChildPath "Archive"
-#         $fileName = ("VEnv" + $InstallationValues.ProjectName + "Install.ps1")
-#         $scriptPath = Join-Path -Path $env:VENV_CONFIG_DEFAULT_DIR -ChildPath $fileName
-#         Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $OrgArchiveDir -TimeStamp $TimeStamp
-#
-#         # $UserArchiveDir = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "Archive"
-#         # $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "$VEnv${InstallationValues.ProjectName}CustomSetup.ps1"
-#
-#         $UserArchiveDir = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "Archive"
-#         $fileName = ("VEnv" + $InstallationValues.ProjectName + "CustomSetup.ps1")
-#         $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath $fileName
-#         Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $UserArchiveDir -TimeStamp $TimeStamp
-#     }
-# }
 
 function CreateDirIfNotExist {
     param (
@@ -268,7 +243,7 @@ function New-VEnvInstallScripts {
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
         $content += 'Write-Host "Running $env:VENV_CONFIG_DEFAULT_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
         $content += "git init`n"
-        $content += '& ' + $InstallationValues.ProjectDir + "\install.ps1`n"
+        $content += '& ' + $InstallationValues.ProjectDir + "\Install.ps1`n"
         New-SupportScript -BaseDir $env:VENV_CONFIG_DEFAULT_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp | Out-Null
 
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
@@ -286,11 +261,11 @@ function New-ProjectInstallScript {
         [PSCustomObject]$InstallationValues
     )
 
-    $ProjectInstallScriptPath = Join-Path -Path $InstallationValues.ProjectDir -ChildPath "install.ps1"
+    $ProjectInstallScriptPath = Join-Path -Path $InstallationValues.ProjectDir -ChildPath "Install.ps1"
     if (-not (Test-Path -Path $ProjectInstallScriptPath)) {
         $content = @'
 Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
-Write-Host "Running $env:PROJECT_DIR\install.ps1..." -ForegroundColor Yellow
+Write-Host "Running $env:PROJECT_DIR\Install.ps1..." -ForegroundColor Yellow
 Write-Host "Install Pre-Commit and related tools" -ForegroundColor Yellow
 pip install --upgrade --force --no-cache-dir black
 pip install --upgrade --force --no-cache-dir flake8
@@ -364,8 +339,8 @@ function Set-Environment {
     $env:PROJECT_NAME = $InstallationValues.ProjectName
     $env:VENV_ORGANIZATION_NAME = $InstallationValues.Organization
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
-        Invoke-Script -Script ("$env:VENV_SECRETS_DEFAULT_DIR\dev_env_var.ps1")
-        Invoke-Script -Script ("$env:VENV_SECRETS_USER_DIR\dev_env_var.ps1")
+        Invoke-Script -Script ("$env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1")
+        Invoke-Script -Script ("$env:VENV_SECRETS_USER_DIR\secrets.ps1")
     }
 
     $organizationDir = (Join-Path -Path $env:PROJECTS_BASE_DIR -ChildPath $env:VENV_ORGANIZATION_NAME)
@@ -373,7 +348,6 @@ function Set-Environment {
     if (-not (Test-Path $InstallationValues.OrganizationDir)) {
         mkdir $InstallationValues.OrganizationDir | Out-Null
     }
-    # $_project_dir = Join-Path $_organization_dir $ProjectName
     $InstallationValues | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value (Join-Path -Path $InstallationValues.OrganizationDir -ChildPath $env:PROJECT_NAME)
     if (-not (Test-Path $InstallationValues.ProjectDir)) {
         mkdir $InstallationValues.ProjectDir | Out-Null
@@ -385,7 +359,6 @@ function Show-Help {
     $separator = "-" * 80
     Write-Host $separator -ForegroundColor Cyan
 
-    # Usage
     @"
     Usage:
     ------

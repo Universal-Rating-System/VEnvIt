@@ -29,12 +29,13 @@ function Invoke-VirtualEnvironment {
 
     # $env:PROJECT_NAME = $_project_name
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
-        Invoke-Script -Script ("$env:VENV_SECRETS_DEFAULT_DIR\dev_env_var.ps1")
-        Invoke-Script -Script ("$env:VENV_SECRETS_USER_DIR\dev_env_var.ps1")
+        Invoke-Script -Script ("$env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1")
+        Invoke-Script -Script ("$env:VENV_SECRETS_USER_DIR\secrets.ps1")
     }
 
     # Remove temporary directories from previous sessions
     # TODO
+    # https://github.com/BrightEdgeeServices/venvit/issues/21
     # Exclude the current temp directory if there is one.
     # Possibly move this to some clean up procedsure.
     Get-ChildItem -Path $env:TEMP -Directory -Filter "$env:PROJECT_NAME*" | Remove-Item -Recurse -Force
@@ -82,7 +83,7 @@ function Show-Help {
     # Introduction
     @"
 This script, 'vi.ps1', initializes a Python virtual environment. This include running the
-venv_${_project_name}_setup_custom .ps1 script.
+VEnv${_project_name}CustomSetup .ps1 script.
 "@ | Write-Host
 
     Write-Host $separator -ForegroundColor Cyan

@@ -142,7 +142,6 @@ Describe "Function testing" {
 
             Invoke-CreateNewVirtualEnvironment -ProjectName $mockInstalVal.ProjectName -PythonVer $mockInstalVal.PythonVer -Organization $mockInstalVal.Organization -ResetScripts $mockInstalVal.ResetScripts -DevMode $mockInstalVal.DevMode
 
-            # (Test-Path $PythonExePath) | Should -Be $true
             Assert-MockCalled -CommandName Invoke-Script -ParameterFilter { ("$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python -m venv --clear $env:VENV_BASE_DIR\$env:PROJECT_NAME" + "_env") }
             Assert-MockCalled -CommandName Invoke-Script -ParameterFilter { ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1") }
             Assert-MockCalled -CommandName Invoke-Script -ParameterFilter { ("python.exe -m pip install --upgrade pip") }
@@ -171,9 +170,9 @@ Describe "Function testing" {
 
             Mock CreatePreCommitConfigYaml { return $true }
         }
-        It "Should create project install.ps1" {
+        It "Should create project Install.ps1" {
             New-ProjectInstallScript -InstallationValues $mockInstalVal
-            $installScriptPath = (Join-Path -Path $mockInstalVal.ProjectDir -ChildPath "install.ps1")
+            $installScriptPath = (Join-Path -Path $mockInstalVal.ProjectDir -ChildPath "Install.ps1")
             (Test-Path $installScriptPath) | Should -Be $true
             Assert-MockCalled -CommandName CreatePreCommitConfigYaml
         }
@@ -193,7 +192,6 @@ Describe "Function testing" {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
             $mockInstalVal = Invoke-TestSetup
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            # New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
 
         It "Should create zip archives" {
@@ -283,14 +281,9 @@ Describe "Function testing" {
             # Reset necessary values that are populated in Invoke-TestSetup
             $env:PROJECT_NAME = $null
             $env:VENV_ORGANIZATION_NAME = $null
-            # $mockInstalVal | Remove-Member -MemberType NoteProperty -Name "OrganizationDir"
-            # $mockInstalVal | Remove-Member -MemberType NoteProperty -Name "ProjectDir"
             if (Test-Path $mockInstalVal.OrganizationDir) {
                 Remove-Item -Path $mockInstalVal.OrganizationDir -Recurse -Force | Out-Null
             }
-            # if (-not (Test-Path $mockInstalVal.ProjectDir)) {
-            #     Remove-Item -Path $mockInstalVal.ProjectDir -Recurse -Force  | Out-Null
-            # }
             $mockInstalVal.psobject.properties.remove('OrganizationDir')
             $mockInstalVal.psobject.properties.remove('ProjectDir')
         }

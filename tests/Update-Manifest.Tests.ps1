@@ -59,10 +59,8 @@ authors = [
             # Verify that the manifest.psd1 was created
             $manifestPath = Join-Path -Path $tempDir.FullName -ChildPath "manifest.psd1"
             Test-Path $manifestPath | Should -BeTrue
-
             # Verify the content of manifest.psd1
             $actualContent = Get-Content -Path $manifestPath -Raw
-
             # Compare actual content to the expected content (less strict comparison)
             $actualContent.Trim() | Should -Be ($expectedManifestContent.Trim())
         }
@@ -82,7 +80,6 @@ authors = [
 
             # Verify that the file was created and contains the expected content
             $actualContent = Get-Content -Path $manifestPath -Raw
-
             # Compare actual content to the expected content (less strict comparison)
             $actualContent.Trim() | Should -Be ($expectedManifestContent.Trim())
         }

@@ -26,6 +26,10 @@ jobs:
       shell: pwsh
       run: Install-Module -Name Pester -Force -Scope CurrentUser
 
+    # TODO
+    # https://github.com/BrightEdgeeServices/venvit/issues/22
+    # The current zyborg/pester-tests-report@v1 action breaks during the coverage process.
+    # See if it can be fixed or fin a new one.
     - name: Run and Create Pester Report
       id: test_module
       uses: zyborg/pester-tests-report@v1
@@ -51,6 +55,10 @@ jobs:
           throw "There are failing tests!"
         }
 
+    # TODO
+    # https://github.com/BrightEdgeeServices/venvit/issues/22
+    # The current zyborg/pester-tests-report@v1 action breaks during the coverage process.
+    # See if it can be fixed or fin a new one.
     # - name: Upload code coverage report
     #   if: ${{ success() }}
     #   uses: actions/upload-artifact@v4

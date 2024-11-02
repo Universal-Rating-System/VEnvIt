@@ -70,7 +70,7 @@ function Invoke-TestSetup {
     # Create the sccrtet's files
     $directories = @( $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR )
     foreach ($directory in $directories) {
-        $scriptPath = Join-Path -Path $directory -ChildPath "dev_env_var.ps1"
+        $scriptPath = Join-Path -Path $directory -ChildPath "secrets.ps1"
         New-Item -Path $scriptPath -ItemType File -Force | Out-Null
         Set-Content -Path $scriptPath -Value ('Write-Host "Executing ' + $scriptPath + '"')
     }

@@ -19,7 +19,7 @@ function Invoke-Install {
     Invoke-ConcludeInstall -Release $Tag -UpgradeScriptDir $UpgradeScriptDir
     Remove-Item -Path $UpgradeScriptDir -Recurse -Force
     Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }
-    Get-Item "$env:VENV_SECRETS_DIR\dev_env_var.ps1" | ForEach-Object { Unblock-File $_.FullName }
+    Get-Item "$env:VENV_SECRETS_DIR\secrets.ps1" | ForEach-Object { Unblock-File $_.FullName }
     # --[ End copy for readme.md ]----------------------------------------------------
 }
 
