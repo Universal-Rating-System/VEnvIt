@@ -91,8 +91,8 @@ jobs:
         with:
           server_address: mail.realtimeevents.co
           server_port: 465
-          username: ${{ secrets.RELEASE_EMAIL_PASSWORD }}
-          password: ${{ secrets.RELEASE_EMAIL_USER }}
+          username: ${{ secrets.RELEASE_EMAIL_USER }}
+          password: ${{ secrets.RELEASE_EMAIL_PASSWORD }}
           subject: 'New Release: ${{ github.repository }} ${{ github.ref_name }}'
           to: rte-development@brightedge.co.za
           from: Development Messenger
