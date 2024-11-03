@@ -1,5 +1,4 @@
-﻿# A list of version changes (This is just an example)
-$VersionChanges = @{
+﻿$VersionChanges = @{
     '0.0.0' = 'Invoke-Upgrade_0_0_0'
     '6.0.0' = 'Invoke-PrepForUpgrade_6_0_0'
     '7.0.0' = 'Invoke-PrepForUpgrade_7_0_0'
