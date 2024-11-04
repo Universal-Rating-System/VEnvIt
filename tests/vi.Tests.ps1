@@ -58,7 +58,7 @@ Describe "Function testing" {
     Context "Invoke-VirtualEnvironment" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup
+            $mockInstalVal = Invoke-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
@@ -74,13 +74,13 @@ Describe "Function testing" {
                 Mock Invoke-Script { return "Mock: User secrets.ps1"
                 } -ParameterFilter { $Script -eq ("$env:VENV_SECRETS_USER_DIR\secrets.ps1") }
                 Mock Invoke-Script { return "Mock: Default EnvVar.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Prefix "EnvVar")) }
+                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar")) }
                 Mock Invoke-Script { return "Mock: User EnvVar.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Prefix "EnvVar")) }
+                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar")) }
                 Mock Invoke-Script { return "Mock: Default CustomSetup.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Prefix "CustomSetup")) }
+                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup")) }
                 Mock Invoke-Script { return "Mock: User CustomSetup.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Prefix "CustomSetup")) }
+                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup")) }
 
                 Invoke-VirtualEnvironment -ProjectName "MyProject"
 

@@ -1,4 +1,15 @@
-﻿$separator = "-" * 80
+﻿$defEnvVarSet = @(
+    [PSCustomObject]@{Name = "VENV_ENVIRONMENT"; DefVal = "loc_dev"; IsDir = $false },
+    [PSCustomObject]@{Name = "PROJECTS_BASE_DIR"; DefVal = "~\Projects"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENVIT_DIR"; DefVal = "$env:ProgramFiles\VenvIt"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENVIT_SECRETS_DEFAULT_DIR"; DefVal = "$env:VENVIT_DIR\Secrets"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENVIT_SECRETS_USER_DIR"; DefVal = "~\VenvIt\Secrets"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENV_BASE_DIR"; DefVal = "~\venv"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENV_PYTHON_BASE_DIR"; DefVal = "c:\Python"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENV_CONFIG_DEFAULT_DIR"; DefVal = "$env:VENVIT_DIR\Config"; IsDir = $true },
+    [PSCustomObject]@{Name = "VENV_CONFIG_USER_DIR"; DefVal = "~\VenvIt\Config"; IsDir = $true }
+)
+$separator = "-" * 80
 
 function Backup-ScriptToArchiveIfExists {
     param (
@@ -46,9 +57,9 @@ function Confirm-EnvironmentVariables {
 function Get-ConfigFileName {
     param(
         [string]$ProjectName,
-        [string]$Prefix
+        [string]$Postfix
     )
-    return ("VEnv" + $ProjectName + "$Prefix.ps1")
+    return ("VEnv" + $ProjectName + "$Postfix.ps1")
 }
 
 function New-CustomTempDir {
@@ -67,6 +78,29 @@ function Invoke-Script {
     )
     Write-Host $Script
     & $Script
+}
+
+function Set-EnvironmentVariables {
+    param(
+        $EnvVarSet
+    )
+
+    foreach ($envVar in $EnvVarSet) {
+        $existingValue = [System.Environment]::GetEnvironmentVariable($envVar.Name, [System.EnvironmentVariableTarget]::Machine)
+        if ($existingValue) {
+            $promptText = $envVar.Name + " ($existingValue)"
+            $defaultValue = $existingValue
+        }
+        else {
+            $promptText = $envVar.Name + " (" + $envVar.DefVal + ")"
+            $defaultValue = $envVar.DefVal
+        }
+        $newValue = Read-Host -Prompt $promptText
+        if ($newValue -eq "") {
+            $newValue = $defaultValue
+        }
+        [System.Environment]::SetEnvironmentVariable($envVar.Name, $newValue, [System.EnvironmentVariableTarget]::Machine)
+    }
 }
 
 function Show-EnvironmentVariables {
@@ -111,7 +145,8 @@ function Read-YesOrNo {
     } while ($inputValue -ne 'Y' -and $inputValue -ne 'N')
     if ($inputValue -eq "Y") {
         $Result = $true
-    } else {
+    }
+    else {
         $Result = $false
     }
 
@@ -120,5 +155,5 @@ function Read-YesOrNo {
 
 
 Export-ModuleMember -Function Backup-ScriptToArchiveIfExists, New-CustomTempDir, Confirm-EnvironmentVariables
-Export-ModuleMember -Function Get-ConfigFileName, Invoke-Script, Read-YesOrNo, Show-EnvironmentVariables
-Export-ModuleMember -Variable separator
+Export-ModuleMember -Function Get-ConfigFileName, Invoke-Script, Read-YesOrNo, Set-EnvironmentVariables, Show-EnvironmentVariables
+Export-ModuleMember -Variable defEnvVarSet, separator

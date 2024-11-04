@@ -37,7 +37,7 @@
 
     Context "New-CustomTempDir Test" {
         It "Temporary dir with prefix" {
-            $Prefix = "venvit"
+            $Prefix = "VenvIt"
             $TempDir = New-CustomTempDir -Prefix $Prefix
             Test-Path -Path $tempDir | Should -Be $true
         }

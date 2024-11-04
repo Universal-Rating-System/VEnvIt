@@ -9,6 +9,28 @@ $PreVersion600EnvVars = @(
     @("SECRETS_DIR", "$env:SECRETS_DIR")
 )
 
+function Backup-ArchiveOldVersion {
+    param(
+        [string]$ArchiveVersion,
+        [string]$FileList,
+        [string]$TimeStamp
+    )
+
+    $archiveDir = Join-Path -Path $env:SCRIPTS_DIR -ChildPath "Archive"
+    $destination = Join-Path -Path $archiveDir -Child "Version_$ArchiveVersion$TimeStamp.zip"
+    if (-not(Test-Path $archiveDir)) {
+        New-Item -Path $archiveDir -ItemType Directory | Out-Null
+    }
+    $compress = @{
+        Path             = $FileList
+        CompressionLevel = "Fastest"
+        DestinationPath  = $destination
+    }
+    Compress-Archive @compress | Out-Null
+
+    return $destination
+}
+
 function Get-ManifestFileName {
     return "Manifest.psd1"
 }
@@ -30,7 +52,7 @@ function Get-Version {
 }
 
 function Invoke-PrepForUpgrade_6_0_0 {
-    # Apply necessary changes and cleanup to prepare an implement v6.0.0
+    # Apply necessary changes and cleanup to prepare and implement v6.0.0
     # The current installed version is pre v6.0.0
     Write-Host "Applying upgrade for version 6.0.0"
     foreach ($var in $PreVersion600EnvVars) {
@@ -39,7 +61,7 @@ function Invoke-PrepForUpgrade_6_0_0 {
 }
 
 function Invoke-PrepForUpgrade_7_0_0 {
-    # Apply necessary changes and cleanup to prepare an implement v7.0.0
+    # Apply necessary changes and cleanup to prepare and implement v7.0.0
     # The current installed version is pre v7.0.0
     Write-Host "Applying upgrade for version 7.0.0"
     VENV_SECRETS_DIR
@@ -74,6 +96,6 @@ function Update-PackagePrep {
     }
 }
 
-Export-ModuleMember -Function Get-ManifestFileName, Get-Version, Update-PackagePrep, Invoke-PrepForUpgrade_6_0_0
+Export-ModuleMember -Function Backup-ArchiveOldVersion, Get-ManifestFileName, Get-Version, Update-PackagePrep, Invoke-PrepForUpgrade_6_0_0
 Export-ModuleMember -Function Invoke-PrepForUpgrade_7_0_0, Remove-EnvVarIfExists
 Export-ModuleMember -Variable PreVersion600EnvVars

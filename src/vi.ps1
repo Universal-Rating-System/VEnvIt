@@ -18,8 +18,8 @@ function Invoke-VirtualEnvironment {
         [string]$ProjectName
     )
 
-    Invoke-Script ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Prefix "EnvVar"))
-    Invoke-Script ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Prefix "EnvVar"))
+    Invoke-Script ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar"))
+    Invoke-Script ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar"))
 
     if ($env:VIRTUAL_ENV) {
         "Deactivate VEnv $env:VIRTUAL_ENV."
@@ -49,8 +49,8 @@ function Invoke-VirtualEnvironment {
         Set-Location -Path $env:PROJECT_BASE_DIR
     }
 
-    Invoke-Script ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Prefix "CustomSetup"))
-    Invoke-Script ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Prefix "CustomSetup"))
+    Invoke-Script ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup"))
+    Invoke-Script ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup"))
 }
 
 # function ShowEnvVarHelp {

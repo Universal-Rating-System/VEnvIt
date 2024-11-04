@@ -3,12 +3,12 @@
         BeforeAll {
             . $PSScriptRoot\..\src\Install.ps1 -Pester
             if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
-
-            Import-Module "$PSScriptRoot\..\src\Utils.psm1"
-            Import-Module "$PSScriptRoot\..\src\Install-Conclude.psm1"
+            Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
 
             $MockTag = "1.0.0"
-            $TempBaseDir = New-CustomTempDir -Prefix "venvit"
+            $TempBaseDir = New-CustomTempDir -Prefix "VenvIt"
             $OrigVenvIiDir = $env:VENVIT_DIR
             $OrigVenvSecretsDir = $env:VENV_SECRETS_DIR
             $env:VENVIT_DIR = "$TempBaseDir\VENVIT_DIR"
@@ -21,7 +21,7 @@
             Mock Set-ExecutionPolicy {}
             Mock Invoke-WebRequest {
                 return @"
-                    [{"tag_name": "$MockTag"}]
+            [ { "tag_name": "$MockTag" }]
 "@
             } -ParameterFilter { $Uri -eq "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" }
             Mock Invoke-WebRequest {
