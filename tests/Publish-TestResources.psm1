@@ -79,6 +79,8 @@ function Invoke-TestSetup_6_0_0 {
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "OrganizationDir" -Value $organizationDir
     $env:PROJECT_DIR = (Join-Path -Path $mockInstalVal.OrganizationDir -ChildPath $env:PROJECT_NAME)
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value $env:PROJECT_DIR
+    Write-Host $mockInstalVal.OrganizationDir
+    Write-Host $env:PROJECT_DIR
 
     #Create the directory structure
     $directories = @(
