@@ -70,6 +70,7 @@ function Invoke-TestSetup_6_0_0 {
     $env:VENV_BASE_DIR = "$tempDir\VEnv"
     $env:VENV_CONFIG_DIR = "$tempDir\VENV_CONFIG_DIR"
     $env:VENV_ENVIRONMENT = "loc_dev"
+    $env:VENV_ORGANIZATION_NAME = $mockInstalVal.Organization
     $env:VENV_PYTHON_BASE_DIR = "$tempDir\Python"
     $env:VENV_SECRETS_DIR = "$tempDir\VENV_SECRETS_DIR"
     $env:VENVIT_DIR = "$tempDir\VEnvIt"
