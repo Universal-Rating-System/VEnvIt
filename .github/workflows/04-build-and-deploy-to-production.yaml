@@ -67,7 +67,7 @@ jobs:
 
       - name: Create zip of PowerShell and config files
         run: |
-          zip ./Installation-Files.zip ./README.md ./LICENSE ./ReleaseNotes.md
+          zip ./Installation-Files.zip ./README.md ./LICENSE ./ReleaseNotes.md ./Manifest.psd1
           # cd src
           zip ./Installation-Files.zip ./src/*.ps1
           zip ./Installation-Files.zip ./src/*.ps?1
