@@ -221,10 +221,10 @@ Describe "Function testing" {
         }
 
         It "VenvIt already in path" {
-            [System.Environment]::SetEnvironmentVariable("Path", "C:\;D:\;$env:VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("Path", "C:\; D:\; $env:VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine)
             Set-Path
             $newPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
-            $newPath | Should -Be "C:\;D:\;$env:VENVIT_DIR"
+            $newPath | Should -Be "C:\; D:\; $env:VENVIT_DIR"
         }
 
         AfterEach {

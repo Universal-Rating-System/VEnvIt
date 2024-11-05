@@ -1,4 +1,6 @@
 ﻿# Upgrade.Tests.ps1
+if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 
 Describe "Function testing" {
     BeforeAll {
@@ -23,6 +25,24 @@ Describe "Function testing" {
             Description = "Description of 7.0.0"
         }
     }
+
+    Context "Backup-ArchiveOldVersion" {
+        BeforeEach {
+            $mockInstalVal = Invoke-TestSetup_0_0_0
+            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+        }
+
+        It "Should archive version 0.0.0" {
+            # $fileList =
+            $archive = Backup-ArchiveOldVersion -ArchiveVersion "0.0.0" -FileList "$env:SCRIPTS_DIR\*.*" -TimeStamp $timeStamp
+
+            (Test-Path -Path $archive) | Should -Be $true
+        }
+        AfterEach {
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+        }
+    }
+
     Context "Get-ManifestFileName" {
         # TODO
         # Test to be implemented
@@ -127,9 +147,9 @@ Describe "Function testing" {
             $OrigVENVIT_DIR = $env:VENVIT_DIR
         }
         BeforeEach {
-            $TempDir = New-CustomTempDir -Prefix "venvit"
+            $TempDir = New-CustomTempDir -Prefix "VenvIt"
             $UpgradeScriptDir = New-Item -ItemType Directory -Path (Join-Path -Path $TempDir -ChildPath "TempUpgradeDir")
-            $env:VENVIT_DIR = Join-Path -Path $TempDir -ChildPath "venvit"
+            $env:VENVIT_DIR = Join-Path -Path $TempDir -ChildPath "VenvIt"
             New-Item -ItemType Directory -Path $env:VENVIT_DIR
         }
 

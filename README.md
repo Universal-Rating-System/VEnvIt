@@ -152,7 +152,7 @@ where:
 | ----------- | ------------------------ |
 | ProjectName | The name of the project. |
 
-# Installation
+# Server Installation
 
 1. Decide on the values for the System Environment Variables.
 
@@ -172,6 +172,8 @@ where:
    - [x] **Select** "Download debugging tools."
    - [x] **Select** "Download debug binaries (requires VS 2017 or later)."
    - Change the "Customize install location" to e.g. 'C:\\Python\\Python310'
+
+1. The sahred directory VENVIT_DIR must exist and accessible.
 
 1. Open a new **PowerShell with Administrator rights**.  Do not use an existing one.  Paste the following script in the **PowerShell with Administrator rights**.  The script below can also be found in the `Install.ps1` script.
 

@@ -51,7 +51,7 @@ Describe "Function testing" {
     Context "New-ProjectArchive" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup
+            $mockInstalVal = Invoke-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
@@ -62,25 +62,25 @@ Describe "Function testing" {
             $archivePath | Should -Be (
                 Join-Path -Path (
                     Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath "Archive"
-                    ) -ChildPath ($env:PROJECT_NAME + "_" + $TimeStamp + ".zip")
-                )
-            $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath (Get-ConfigFileName -ProjectName $ProjectName -Prefix "EnvVar")
+                ) -ChildPath ($env:PROJECT_NAME + "_" + $TimeStamp + ".zip")
+            )
+            $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar")
             (Test-Path -Path $scriptPath) | Should -Be $false
-            $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath (Get-ConfigFileName -ProjectName $ProjectName -Prefix "Install")
+            $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath (Get-ConfigFileName -ProjectName $ProjectName -Postfix "Install")
             (Test-Path -Path $scriptPath) | Should -Be $false
-            $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath (Get-ConfigFileName -ProjectName $ProjectName -Prefix "CustomSetup")
+            $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup")
             (Test-Path -Path $scriptPath) | Should -Be $false
         }
 
         AfterEach {
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
-     }
+    }
 
     Context "Unregister-VirtualEnvironmen" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup
+            $mockInstalVal = Invoke-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
 

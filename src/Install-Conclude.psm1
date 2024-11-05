@@ -1,16 +1,8 @@
+if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
 Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+Import-Module $PSScriptRoot\..\src\Utils.psm1
 
-$envVarSet = @(
-    [PSCustomObject]@{Name = "VENV_ENVIRONMENT"; DefVal = "loc_dev"; IsDir = $false },
-    [PSCustomObject]@{Name = "PROJECTS_BASE_DIR"; DefVal = "~\Projects"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENVIT_DIR"; DefVal = "$env:ProgramFiles\VenvIt"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENVIT_SECRETS_DEFAULT_DIR"; DefVal = "$env:VENVIT_DIR\Secrets"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENVIT_SECRETS_USER_DIR"; DefVal = "~\VenvIt\Secrets"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENV_BASE_DIR"; DefVal = "~\venv"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENV_PYTHON_BASE_DIR"; DefVal = "c:\Python"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENV_CONFIG_DEFAULT_DIR"; DefVal = "$env:VENVIT_DIR\Config"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENV_CONFIG_USER_DIR"; DefVal = "~\VenvIt\Config"; IsDir = $true }
-)
 $separator = "-" * 80
 
 function Clear-InstallationFiles {
@@ -34,10 +26,9 @@ function Invoke-ConcludeInstall {
         exit
     }
 
-    # Invoke-ConcludeUpgradePrep $UpgradeScriptDir
     Update-PackagePrep $UpgradeScriptDir
     Write-Host $separator -ForegroundColor Cyan
-    Set-EnvironmentVariables
+    Set-EnvironmentVariables -EnvVarSet $defEnvVarSet
     Set-Path
     Write-Host "Environment variables have been set successfully." -ForegroundColor Green
     New-Directories
@@ -110,25 +101,6 @@ function Publish-Secrets {
         Write-Host "secrets.ps1 not found in $env:VENVIT_DIR."
     }
 
-}
-
-function Set-EnvironmentVariables {
-    foreach ($envVar in $envVarSet) {
-        $existingValue = [System.Environment]::GetEnvironmentVariable($envVar.Name, [System.EnvironmentVariableTarget]::Machine)
-        if ($existingValue) {
-            $promptText = $envVar.Name + " ($existingValue)"
-            $defaultValue = $existingValue
-        }
-        else {
-            $promptText = $envVar.Name + " (" + $envVar.DefVal + ")"
-            $defaultValue = $envVar.DefVal
-        }
-        $newValue = Read-Host -Prompt $promptText
-        if ($newValue -eq "") {
-            $newValue = $defaultValue
-        }
-        [System.Environment]::SetEnvironmentVariable($envVar.Name, $newValue, [System.EnvironmentVariableTarget]::Machine)
-    }
 }
 
 function Set-Path {

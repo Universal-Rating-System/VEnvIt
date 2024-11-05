@@ -25,16 +25,15 @@ function New-ProjectArchive {
         "EnvVar",
         "Install",
         "CustomSetup"
-        )
+    )
     foreach ($postfix in $filePostfixToArchive) {
-        $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath (Get-ConfigFileName -ProjectName $ProjectName -Prefix $postfix)
+        $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath (Get-ConfigFileName -ProjectName $ProjectName -Postfix $postfix)
         if (Test-Path -Path $scriptPath) {
             $archivePath = Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $archiveDir -TimeStamp $TimeStamp
             Remove-Item -Path $scriptPath -Recurse -Force
         }
-        return $archivePath
     }
-
+    return $archivePath
 }
 
 function Unregister-VirtualEnvironment {
@@ -55,7 +54,8 @@ function Unregister-VirtualEnvironment {
     if (Test-Path $venv_dir) {
         Remove-Item "$venv_dir" -Recurse -Force -ErrorAction SilentlyContinue
         Write-Host "Removed: $venv_dir."
-    } else {
+    }
+    else {
         Write-Host "Not removed: $venv_dir (does not exist)."
     }
 }
@@ -69,7 +69,7 @@ function Show-Help {
 project.  THe scripts are archived to the installation directory.
 "@ | Write-Host
 
-@"
+    @"
 Usage:
 ------
 vr.ps1 -ProjectName
