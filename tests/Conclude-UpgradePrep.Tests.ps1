@@ -9,10 +9,10 @@ Describe "Function testing" {
         Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
         Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 
-        $ManifestData500 = @{
-            Version     = "5.0.0"
+        $ManifestData000 = @{
+            Version     = "0.0.0"
             Authors     = "Ann Other <ann@other.com>"
-            Description = "Description of 5.0.0"
+            Description = "Description of 0.0.0"
         }
         $ManifestData600 = @{
             Version     = "6.0.0"

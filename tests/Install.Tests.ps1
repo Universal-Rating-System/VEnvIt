@@ -4,6 +4,8 @@
             . $PSScriptRoot\..\src\Install.ps1 -Pester
             if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
             Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
+            if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
+            Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
             if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
             Import-Module $PSScriptRoot\..\src\Utils.psm1
 
@@ -25,8 +27,14 @@
 "@
             } -ParameterFilter { $Uri -eq "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" }
             Mock Invoke-WebRequest {
-                Copy-Item -Path $PSScriptRoot\..\src\Install-Conclude.psm1 -Destination $OutFile
-            } -ParameterFilter { $Uri -eq "https://github.com/BrightEdgeeServices/venvit/releases/download/$MockTag/Install-Conclude.psm1" }
+                New-ManifestPsd1 -FilePath (Join-Path -Path "$PSScriptRoot\.." -ChildPath "Manifest.psd1") -data $ManifestData700
+                $compress = @{
+                    Path             = "$PSScriptRoot\..\*.md", "$PSScriptRoot\..\LICENSE", "$PSScriptRoot\..\Manifest.psd1", "$PSScriptRoot\..\src"
+                    CompressionLevel = "Fastest"
+                    DestinationPath  = $OutFile
+                }
+                Compress-Archive @compress | Out-Null
+            } -ParameterFilter { $Uri -eq "https://github.com/BrightEdgeeServices/venvit/releases/download/$MockTag/Installation-Files.zip" }
             Mock Import-Module {
                 $NormalizedModulePath = (Get-Item -Path $PSScriptRoot\..\src\Install-Conclude.psm1).FullName
                 Import-Module $NormalizedModulePath
