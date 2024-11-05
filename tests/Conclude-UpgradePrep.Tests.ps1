@@ -33,7 +33,6 @@ Describe "Function testing" {
         }
 
         It "Should archive version 0.0.0" {
-            # $fileList =
             $archive = Backup-ArchiveOldVersion -ArchiveVersion "0.0.0" -FileList "$env:SCRIPTS_DIR\*.*" -TimeStamp $timeStamp
 
             (Test-Path -Path $archive) | Should -Be $true
@@ -100,6 +99,7 @@ Describe "Function testing" {
             [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", "scripts_dir", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", "secrets_dir", [System.EnvironmentVariableTarget]::Machine)
         }
+
         It "Should prepare for 6.0.0" {
             Invoke-PrepForUpgrade_6_0_0
             $rte_environment = [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
@@ -115,19 +115,19 @@ Describe "Function testing" {
                 [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $OrigRTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
             }
             else {
-                Remove-EnvVarIfExists -VarName "RTE_ENVIRONMENT"
+                Remove-EnvVarIfExists -EnvVarName "RTE_ENVIRONMENT"
             }
             if ($SCRIPTS_DIR) {
                 [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $OrigSCRIPTS_DIR, [System.EnvironmentVariableTarget]::Machine)
             }
             else {
-                Remove-EnvVarIfExists -VarName "SCRIPTS_DIR"
+                Remove-EnvVarIfExists -EnvVarName "SCRIPTS_DIR"
             }
             if ($OrigRTE_ENVIRONMENT) {
                 [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $OrigSECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
             }
             else {
-                Remove-EnvVarIfExists -VarName "SECRETS_DIR"
+                Remove-EnvVarIfExists -EnvVarName "SECRETS_DIR"
             }
         }
     }
@@ -135,6 +135,28 @@ Describe "Function testing" {
     Context "Invoke-PrepForUpgrade_7_0_0" {
         # TODO
         # Test to be implemented
+    }
+
+    Context "Remove-EnvVarIfExists" {
+        BeforeEach {
+            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+
+            $origVENV_TEST = $env:VENV_TEST
+            $env:VENV_TEST = "testVENV_TEST"
+            [System.Environment]::SetEnvironmentVariable("VENV_TEST", $env:VENV_TEST, [System.EnvironmentVariableTarget]::Machine)
+
+        }
+        It "Values exist" {
+            Remove-EnvVarIfExists -EnvVarName "VENV_TEST"
+
+            [System.Environment]::GetEnvironmentVariable("VENV_TEST", [System.EnvironmentVariableTarget]::Machine) | Should -Be $null
+            $env:VENV_TEST | Should -Be $null
+        }
+        AfterEach {
+            [System.Environment]::SetEnvironmentVariable("VENV_TEST", $origVENV_TEST, [System.EnvironmentVariableTarget]::Machine)
+            $env:VENV_TEST = $origVENV_TEST
+        }
     }
 
     Context "Update-PackagePrep" {
