@@ -5,9 +5,9 @@ Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 Describe "Function testing" {
     BeforeAll {
         if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
-        if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
         Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
-        Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+        # if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+        # Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 
         $ManifestData000 = @{
             Version     = "0.0.0"
@@ -140,13 +140,16 @@ Describe "Function testing" {
     Context "Update-PackagePrep" {
         BeforeAll {
             if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
-            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
             Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
             Import-Module $PSScriptRoot\..\src\Utils.psm1
 
             $OrigVENVIT_DIR = $env:VENVIT_DIR
         }
         BeforeEach {
+            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+
             $TempDir = New-CustomTempDir -Prefix "VenvIt"
             $UpgradeScriptDir = New-Item -ItemType Directory -Path (Join-Path -Path $TempDir -ChildPath "TempUpgradeDir")
             $env:VENVIT_DIR = Join-Path -Path $TempDir -ChildPath "VenvIt"
@@ -154,13 +157,16 @@ Describe "Function testing" {
         }
 
         It 'Should apply 6.0.0 and 7.0.0' {
-            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
-
-            Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 { return $true }
-            Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_7_0_0 { return $true }
+            Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 {
+                return $true
+            }
+            # Mock -CommandName Invoke-PrepForUpgrade_6_0_0 { return $true }
+            Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_7_0_0 {
+                return $true
+            }
             # Mock -CommandName Invoke-PrepForUpgrade_7_0_0
             $CurrentManifestPath = Join-Path -Path $env:VENVIT_DIR -ChildPath (Get-ManifestFileName)
-            New-ManifestPsd1 -FilePath $CurrentManifestPath -Data $ManifestData500
+            New-ManifestPsd1 -FilePath $CurrentManifestPath -Data $ManifestData000
             $UpgradeManifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
             New-ManifestPsd1 -FilePath $UpgradeManifestPath -data $ManifestData700
             Update-PackagePrep -UpgradeScriptDir $UpgradeScriptDir
