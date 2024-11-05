@@ -56,7 +56,7 @@ function Invoke-PrepForUpgrade_6_0_0 {
     # The current installed version is pre v6.0.0
     Write-Host "Applying upgrade for version 6.0.0"
     foreach ($var in $PreVersion600EnvVars) {
-        Remove-EnvVarIfExists -VarName $var[0]
+        Remove-EnvVarIfExists -EnvVarName $var[0]
     }
 }
 
@@ -70,13 +70,17 @@ function Invoke-PrepForUpgrade_7_0_0 {
 
 function Remove-EnvVarIfExists {
     param (
-        [string]$VarName
+        [array]$EnvVarName
     )
-    $existingValue = [System.Environment]::GetEnvironmentVariable($VarName, [System.EnvironmentVariableTarget]::Machine)
+    $existingValue = [System.Environment]::GetEnvironmentVariable($EnvVarName, [System.EnvironmentVariableTarget]::Machine)
     if ($existingValue) {
-        [System.Environment]::SetEnvironmentVariable($VarName, $null, [System.EnvironmentVariableTarget]::Machine)
-        Write-Host "$VarName has been removed."
+        [System.Environment]::SetEnvironmentVariable($EnvVarName, $null, [System.EnvironmentVariableTarget]::Machine)
     }
+    if ((Get-Item "Env:$EnvVarName").Value) {
+        $var = "Env:$EnvVarName"
+        Remove-Item -Path "Env:$EnvVarName"
+    }
+    Write-Host "$VarPair[0] has been removed."
 }
 
 function Update-PackagePrep {
@@ -86,6 +90,15 @@ function Update-PackagePrep {
 
     $CurrentVersion = Get-Version -ScriptDir $env:VENVIT_DIR
     $UpgradeVersion = Get-Version -ScriptDir $UpgradeScriptDir
+
+    $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+    if ($CurrentVersion -eq "0.0.0") {
+        $fileList = "$env:SCRIPTS_DIR\*.*"
+    }
+    else {
+        $fileList = $env:VENVIT_DIR
+    }
+    Backup-ArchiveOldVersion -ArchiveVersion $CurrentVersion -FileList $fileList -TimeStamp $timeStamp
 
     # Apply changes from current version to latest
     foreach ($version in $VersionChanges.Keys | Sort-Object { [version]$_ }) {
