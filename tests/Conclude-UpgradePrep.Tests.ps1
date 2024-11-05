@@ -6,8 +6,6 @@ Describe "Function testing" {
     BeforeAll {
         if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
         Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
-        # if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
-        # Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 
         $ManifestData000 = @{
             Version     = "0.0.0"
@@ -28,6 +26,8 @@ Describe "Function testing" {
 
     Context "Backup-ArchiveOldVersion" {
         BeforeEach {
+            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
             $mockInstalVal = Invoke-TestSetup_0_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         }
