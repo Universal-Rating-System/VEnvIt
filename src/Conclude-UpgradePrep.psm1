@@ -80,7 +80,7 @@ function Remove-EnvVarIfExists {
         $var = "Env:$EnvVarName"
         Remove-Item -Path "Env:$EnvVarName"
     }
-    Write-Host "$VarPair[0] has been removed."
+    Write-Host "$EnvVarName has been removed."
 }
 
 function Update-PackagePrep {
