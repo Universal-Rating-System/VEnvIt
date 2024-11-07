@@ -185,8 +185,6 @@ Describe "Function testing" {
         BeforeAll {
             if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
             Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
-            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            Import-Module $PSScriptRoot\..\src\Utils.psm1
 
             $OrigVENVIT_DIR = $env:VENVIT_DIR
         }
@@ -194,6 +192,8 @@ Describe "Function testing" {
             $OriginalValues = Backup-SessionEnvironmentVariables
             if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
             Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
 
             $mockInstalVal = Set-TestSetup_0_0_0
             $TempDir = New-CustomTempDir -Prefix "VenvIt"
