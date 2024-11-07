@@ -1,6 +1,6 @@
 ﻿$separator = "-" * 80
 
-Write-Host $separator  -ForegroundColor Cyan
+Write-Host $separator -ForegroundColor Cyan
 Write-Host "Current system variable values" -ForegroundColor Green
 Write-Host "PROJECTS_BASE_DIR =        $env:PROJECTS_BASE_DIR"
 Write-Host "VENV_BASE_DIR =            $env:VENV_BASE_DIR"
@@ -10,6 +10,7 @@ Write-Host "VENV_CONFIG_USER_DIR =     $env:VENV_CONFIG_USER_DIR"
 Write-Host "VENV_ENVIRONMENT =         $env:VENV_ENVIRONMENT"
 Write-Host "VENV_PYTHON_BASE_DIR =     $env:VENV_PYTHON_BASE_DIR"
 Write-Host "VENV_SECRETS_DEFAULT_DIR = $env:VENV_SECRETS_DEFAULT_DIR"
+Write-Host "VENV_SECRETS_DIR =         $env:VENV_SECRETS_USER_DIR"
 Write-Host "VENV_SECRETS_USER_DIR =    $env:VENV_SECRETS_USER_DIR"
 Write-Host "VENVIT_DIR =               $env:VENVIT_DIR"
 Write-Host "VENVIT_SECRETS_DIR =       $env:VENVIT_SECRETS_DIR"
@@ -38,6 +39,7 @@ $env:VENV_CONFIG_USER_DIR = "G:\Shared drives\Apps\VenvItClient\Config"
 $env:VENV_ENVIRONMENT = "loc_dev"
 $env:VENV_PYTHON_BASE_DIR = "C:\Python"
 $env:VENV_SECRETS_DEFAULT_DIR = "G:\Shared drives\VenvIt\Secrets"
+$env:VENV_SECRETS_DIR = "G:\Shared drives\Apps\VenvItClient\Secrets"
 $env:VENV_SECRETS_USER_DIR = "G:\Shared drives\Apps\VenvItClient\Secrets"
 $env:VENVIT_DIR = "G:\Shared drives\VenvIt"
 $env:VENVIT_SECRETS_DIR = "G:\Shared drives\VenvIt Secrets"
@@ -55,6 +57,7 @@ Write-Host "VENV_CONFIG_DEFAULT_DIR =  $env:VENV_CONFIG_DEFAULT_DIR"
 Write-Host "VENV_CONFIG_USER_DIR =     $env:VENV_CONFIG_USER_DIR"
 Write-Host "VENV_ENVIRONMENT =         $env:VENV_ENVIRONMENT"
 Write-Host "VENV_SECRETS_DEFAULT_DIR = $env:VENV_SECRETS_DEFAULT_DIR"
+Write-Host "VENV_SECRETS_DIR =         $env:VENV_SECRETS_DIR"
 Write-Host "VENV_SECRETS_USER_DIR =    $env:VENV_SECRETS_USER_DIR"
 Write-Host "VENV_PYTHON_BASE_DIR =     $env:VENV_PYTHON_BASE_DIR"
 Write-Host "VENVIT_DIR =               $env:VENVIT_DIR"
