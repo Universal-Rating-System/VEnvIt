@@ -51,14 +51,14 @@ Describe "Top level script execution" {
 Describe "Function testing" {
     BeforeAll {
         . $PSScriptRoot\..\src\vi.ps1 -Pester
-        $OriginalValues = Set-BackupEnvironmentVariables
+        $OriginalValues = Backup-SessionEnvironmentVariables
         Mock -CommandName "Show-Help" -MockWith { Write-Host "Mock: Show-Help called" }
     }
 
     Context "Invoke-VirtualEnvironment" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup_7_0_0
+            $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
@@ -99,7 +99,7 @@ Describe "Function testing" {
         # Test to be implemented
     }
     AfterAll {
-        Get-BackedupEnvironmentVariables -OriginalValues $originalValues
+        Restore-SessionEnvironmentVariables -OriginalValues $originalValues
     }
 }
 

@@ -76,7 +76,7 @@ authors = [
             }
 
             $manifestPath = Join-Path -Path $tempDir.FullName -ChildPath "manifest.psd1"
-            New-ManifestPsd1 -filePath $manifestPath -data $data
+            New-ManifestPsd1 -DestinationPath $manifestPath -data $data
 
             # Verify that the file was created and contains the expected content
             $actualContent = Get-Content -Path $manifestPath -Raw

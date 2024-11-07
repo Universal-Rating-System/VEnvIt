@@ -47,7 +47,7 @@ Describe "Top level script execution" {
 Describe "Function testing" {
     BeforeAll {
         . $PSScriptRoot\..\src\vn.ps1 -Pester
-        $OriginalValues = Set-BackupEnvironmentVariables
+        $OriginalValues = Backup-SessionEnvironmentVariables
     }
 
     Context "Get-InstallationValues" {
@@ -80,7 +80,7 @@ Describe "Function testing" {
     Context "Invoke-VirtualEnvironment" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup_7_0_0
+            $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
@@ -164,7 +164,7 @@ Describe "Function testing" {
     Context "New-ProjectInstallScript" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup_7_0_0
+            $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
 
@@ -190,7 +190,7 @@ Describe "Function testing" {
     Context "New-VEnvCustomSetupScripts" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup_7_0_0
+            $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         }
 
@@ -215,7 +215,7 @@ Describe "Function testing" {
     Context "New-VEnvEnvVarScripts" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup_7_0_0
+            $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
 
@@ -243,7 +243,7 @@ Describe "Function testing" {
     Context "New-VEnvInstallScripts" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup_7_0_0
+            $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
@@ -274,11 +274,11 @@ Describe "Function testing" {
     Context "Set-Environment" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup_7_0_0
+            $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
 
-            # Reset necessary values that are populated in Invoke-TestSetup_7_0_0
+            # Reset necessary values that are populated in Set-TestSetup_7_0_0
             $env:PROJECT_NAME = $null
             $env:VENV_ORGANIZATION_NAME = $null
             if (Test-Path $mockInstalVal.OrganizationDir) {
@@ -309,7 +309,7 @@ Describe "Function testing" {
     }
 
     AfterAll {
-        Get-BackedupEnvironmentVariables -OriginalValues $originalValues
+        Restore-SessionEnvironmentVariables -OriginalValues $originalValues
     }
 }
 

@@ -15,6 +15,7 @@ Write-Host "VENVIT_DIR =               $env:VENVIT_DIR"
 Write-Host "VENVIT_SECRETS_DIR =       $env:VENVIT_SECRETS_DIR"
 Write-Host "`nCurrent session variable values" -ForegroundColor Green
 Write-Host "PROJECT_DIR =              $env:PROJECT_DIR"
+Write-Host "PROJECT_NAME =             $env:PROJECT_NAME"
 Write-Host "VIRTUAL_ENV =              $env:VIRTUAL_ENV"
 
 [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", "D:\Dropbox\Projects", [System.EnvironmentVariableTarget]::Machine)
@@ -42,6 +43,7 @@ $env:VENVIT_DIR = "G:\Shared drives\VenvIt"
 $env:VENVIT_SECRETS_DIR = "G:\Shared drives\VenvIt Secrets"
 
 $env:PROJECT_DIR = "D:\Dropbox\Projects\BEE\venvit"
+$env:PROJECT_NAME = "VenvIt"
 $env:VIRTUAL_ENV = "D:\GoogleDrive\venv\venvit_env"
 
 Write-Host $separator -ForegroundColor Cyan
@@ -59,4 +61,5 @@ Write-Host "VENVIT_DIR =               $env:VENVIT_DIR"
 Write-Host "VENVIT_SECRETS_DIR =       $env:VENVIT_SECRETS_DIR"
 Write-Host "`nAfter resetting session variables" -ForegroundColor Green
 Write-Host "PROJECT_DIR =              $env:PROJECT_DIR"
+Write-Host "PROJECT_NAME =             $env:PROJECT_NAME"
 Write-Host "VIRTUAL_ENV =              $env:VIRTUAL_ENV`n"

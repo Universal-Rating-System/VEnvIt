@@ -45,13 +45,13 @@ Describe "Top level script execution" {
 Describe "Function testing" {
     BeforeAll {
         . $PSScriptRoot\..\src\vr.ps1 -Pester
-        $OriginalValues = Set-BackupEnvironmentVariables
+        $OriginalValues = Backup-SessionEnvironmentVariables
     }
 
     Context "New-ProjectArchive" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup_7_0_0
+            $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
@@ -80,7 +80,7 @@ Describe "Function testing" {
     Context "Unregister-VirtualEnvironmen" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Invoke-TestSetup_7_0_0
+            $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
 
@@ -101,7 +101,7 @@ Describe "Function testing" {
     }
 
     AfterAll {
-        Get-BackedupEnvironmentVariables -OriginalValues $originalValues
+        Restore-SessionEnvironmentVariables -OriginalValues $originalValues
     }
 }
 
