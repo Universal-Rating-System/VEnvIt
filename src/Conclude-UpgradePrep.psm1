@@ -6,11 +6,8 @@ $VersionChanges = @{
     '6.0.0' = 'Invoke-PrepForUpgrade_6_0_0'
     '7.0.0' = 'Invoke-PrepForUpgrade_7_0_0'
 }
-$PreVersion600EnvVars = @(
-    @("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT),
-    @("SCRIPTS_DIR", "$env:SCRIPTS_DIR"),
-    @("SECRETS_DIR", "$env:SECRETS_DIR")
-)
+$PreVersion600EnvVars = @( "RTE_ENVIRONMENT", "SCRIPTS_DIR", "SECRETS_DIR" )
+$PreVersion700EnvVars = @("VENV_CONFIG_DIR", "VENV_SECRETS_DIR" )
 
 function Backup-ArchiveOldVersion {
     param(
@@ -63,8 +60,12 @@ function Invoke-PrepForUpgrade_6_0_0 {
     $env:VENV_SECRETS_DIR = $env:SECRETS_DIR
     $env:VENVIT_DIR = $env:SCRIPTS_DIR
 
+    [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DIR", $env:VENV_CONFIG_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DIR", $env:VENV_SECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $env:VENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
+
     foreach ($var in $PreVersion600EnvVars) {
-        Remove-EnvVarIfExists -EnvVarName $var[0]
+        Remove-EnvVarIfExists -EnvVarName $var
     }
 }
 
@@ -74,13 +75,30 @@ function Invoke-PrepForUpgrade_7_0_0 {
     Write-Host "Applying upgrade for version 7.0.0"
 
     $env:VENV_CONFIG_USER_DIR = $env:VENV_CONFIG_DIR
+    $env:VENV_SECRETS_USER_DIR = $env:VENV_SECRETS_DIR
+
+    [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $env:VENV_CONFIG_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $env:VENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
 
 
-    $fileName = "venv_*"
-    $scriptPath = Join-Path -Path $env:SCRIPTS_DIR -ChildPath $fileName
-    Move-Item -Path $scriptPath -Destination $env:VENVIT_DIR -Force
-    VENV_SECRETS_DIR
-    VENV_CONFIG_DIR
+    $postFix = @(@("install", "Install"), @("setup_custom", "CustomSetup"))
+    foreach ($postfix in $postFix) {
+        $filenameFilter = "venv_*_" + $postFix[0] + ".ps1"
+        $files = Get-ChildItem -Path $env:VENV_CONFIG_USER_DIR -Filter $filenameFilter
+        foreach ($file in $files) {
+            $filterRe = "venv_(.+)_" + $postFix[0] + "\.ps1"
+            if ($file.Name -match $filterRe) {
+                $projectName = $matches[1]
+                $newFileName = "VEnv$ProjectName" + $postFix[1] + ".ps1"
+                Rename-Item -Path $file.FullName -NewName $newFileName
+                Write-Host "Renamed '$($file.Name)' to '$newFileName'"
+            }
+        }
+    }
+
+    foreach ($var in $PreVersion700EnvVars) {
+        Remove-EnvVarIfExists -EnvVarName $var
+    }
 }
 
 function Remove-EnvVarIfExists {

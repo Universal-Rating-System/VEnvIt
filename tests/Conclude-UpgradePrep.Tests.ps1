@@ -113,24 +113,6 @@ Describe "Function testing" {
         }
 
         AfterAll {
-            if ($OrigRTE_ENVIRONMENT) {
-                [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $OrigRTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
-            }
-            else {
-                Remove-EnvVarIfExists -EnvVarName "RTE_ENVIRONMENT"
-            }
-            if ($SCRIPTS_DIR) {
-                [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $OrigSCRIPTS_DIR, [System.EnvironmentVariableTarget]::Machine)
-            }
-            else {
-                Remove-EnvVarIfExists -EnvVarName "SCRIPTS_DIR"
-            }
-            if ($OrigRTE_ENVIRONMENT) {
-                [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $OrigSECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
-            }
-            else {
-                Remove-EnvVarIfExists -EnvVarName "SECRETS_DIR"
-            }
         }
     }
 
@@ -151,41 +133,25 @@ Describe "Function testing" {
 
         It "Should prepare for 7.0.0" {
             Invoke-PrepForUpgrade_7_0_0
-            $rte_environment = [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
-            $secrets_dir = [System.Environment]::GetEnvironmentVariable("SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $scripts_dir = [System.Environment]::GetEnvironmentVariable("SCRIPTS_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $rte_environment | Should -Be $null
+
+            $config_dir = [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $config_dir | Should -Be $null
+            $secrets_dir = [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine)
             $secrets_dir | Should -Be $null
-            $scripts_dir | Should -Be $null
+
+            $config_user_dir = [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_USER_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $config_user_dir | Should -Be $env:VENV_CONFIG_USER_DIR
+            $secrets_user_dir = [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_USER_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $secrets_user_dir | Should -Be $env:VENV_SECRETS_USER_DIR
         }
 
         AfterEach {
-            Remove-EnvVarIfExists -EnvVarName "RTE_ENVIRONMENT"
-            Remove-EnvVarIfExists -EnvVarName "SECRETS_DIR"
-            Remove-EnvVarIfExists -EnvVarName "SCRIPTS_DIR"
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
             Restore-SessionEnvironmentVariables -OriginalValues $originalValues
         }
 
         AfterAll {
-            if ($OrigRTE_ENVIRONMENT) {
-                [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $OrigRTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
-            }
-            else {
-                Remove-EnvVarIfExists -EnvVarName "RTE_ENVIRONMENT"
-            }
-            if ($SCRIPTS_DIR) {
-                [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $OrigSCRIPTS_DIR, [System.EnvironmentVariableTarget]::Machine)
-            }
-            else {
-                Remove-EnvVarIfExists -EnvVarName "SCRIPTS_DIR"
-            }
-            if ($OrigRTE_ENVIRONMENT) {
-                [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $OrigSECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
-            }
-            else {
-                Remove-EnvVarIfExists -EnvVarName "SECRETS_DIR"
-            }
+
         }
     }
 
