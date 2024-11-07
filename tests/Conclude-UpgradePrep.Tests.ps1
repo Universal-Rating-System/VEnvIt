@@ -66,7 +66,7 @@ Describe "Function testing" {
             if (Test-Path "env:SCRIPTS_DIR") {
                 Remove-Item -Path "Env:SCRIPTS_DIR"
             }
-            $mockInstalVal = Invoke-TestSetup_7_0_0
+            $mockInstalVal = Set-TestSetup_7_0_0
             $Version = Get-Version -ScriptDir $env:SCRIPTS_DIR
             $Version | Should -Be "7.0.0"
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
