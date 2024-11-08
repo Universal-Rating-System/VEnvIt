@@ -1,24 +1,63 @@
-﻿if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+﻿if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
+Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
+if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
 Import-Module $PSScriptRoot\..\src\Utils.psm1
 
-function Get-BackedupEnvironmentVariables {
-    param(
-        [PSCustomObject]$OriginalValues
-    )
-    $env:PROJECT_NAME = $OriginalValues.PROJECT_NAME
-    $env:PROJECTS_BASE_DIR = $OriginalValues.PROJECTS_BASE_DIR
-    $env:VENV_BASE_DIR = $OriginalValues.VENV_BASE_DIR
-    $env:VENV_CONFIG_DEFAULT_DIR = $OriginalValues.VENV_CONFIG_DEFAULT_DIR
-    $env:VENV_CONFIG_USER_DIR = $OriginalValues.VENV_CONFIG_USER_DIR
-    $env:VENV_ENVIRONMENT = $OriginalValues.VENV_ENVIRONMENT
-    $env:VENV_ORGANIZATION_NAME = $OriginalValues.VENV_ORGANIZATION_NAME
-    $env:VENV_PYTHON_BASE_DIR = $OriginalValues.VENV_PYTHON_BASE_DIR
-    $env:VENV_SECRETS_DEFAULT_DIR = $OriginalValues.VENV_SECRETS_DEFAULT_DIR
-    $env:VENV_SECRETS_USER_DIR = $OriginalValues.VENV_SECRETS_USER_DIR
-    $env:VENVIT_DIR = $OriginalValues.VENVIT_DIR
+$ManifestData000 = @{
+    Version     = "0.0.0"
+    Authors     = "Ann Other <ann@other.com>"
+    Description = "Description of 0.0.0"
+}
+$ManifestData600 = @{
+    Version     = "6.0.0"
+    Authors     = "Ann Other <ann@other.com>"
+    Description = "Description of 6.0.0"
+}
+$ManifestData700 = @{
+    Version     = "7.0.0"
+    Authors     = "Ann Other <ann@other.com>"
+    Description = "Description of 7.0.0"
 }
 
-function Invoke-TestSetup_0_0_0 {
+function Backup-SessionEnvironmentVariables {
+    return [PSCustomObject]@{
+        PROJECT_NAME             = $env:PROJECT_NAME
+        PROJECTS_BASE_DIR        = $env:PROJECTS_BASE_DIR
+        RTE_ENVIRONMENT          = $env:RTE_ENVIRONMENT
+        SECRETS_DIR              = $env:SECRETS_DIR
+        SCRIPTS_DIR              = $env:SCRIPTS_DIR
+        VENV_BASE_DIR            = $env:VENV_BASE_DIR
+        VENV_CONFIG_USER_DIR     = $env:VENV_CONFIG_USER_DIR
+        VENV_CONFIG_DEFAULT_DIR  = $env:VENV_CONFIG_DEFAULT_DIR
+        VENV_ENVIRONMENT         = $env:VENV_ENVIRONMENT
+        VENV_ORGANIZATION_NAME   = $env:VENV_ORGANIZATION_NAME
+        VENV_PYTHON_BASE_DIR     = $env:VENV_PYTHON_BASE_DIR
+        VENV_SECRETS_DEFAULT_DIR = $env:VENV_SECRETS_DEFAULT_DIR
+        VENV_SECRETS_USER_DIR    = $env:VENV_SECRETS_USER_DIR
+        VENVIT_DIR               = $env:VENVIT_DIR
+    }
+}
+
+function Backup-SystemEnvironmentVariables {
+    return [PSCustomObject]@{
+        PROJECT_NAME             = [System.Environment]::GetEnvironmentVariable("PROJECT_NAME", [System.EnvironmentVariableTarget]::Machine)
+        PROJECTS_BASE_DIR        = [System.Environment]::GetEnvironmentVariable("PROJECTS_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
+        RTE_ENVIRONMENT          = [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
+        SECRETS_DIR              = [System.Environment]::GetEnvironmentVariable("SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine)
+        SCRIPTS_DIR              = [System.Environment]::GetEnvironmentVariable("SCRIPTS_DIR", [System.EnvironmentVariableTarget]::Machine)
+        VENV_BASE_DIR            = [System.Environment]::GetEnvironmentVariable("VENV_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
+        VENV_CONFIG_USER_DIR     = [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_USER_DIR", [System.EnvironmentVariableTarget]::Machine)
+        VENV_CONFIG_DEFAULT_DIR  = [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine)
+        VENV_ENVIRONMENT         = [System.Environment]::GetEnvironmentVariable("VENV_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
+        VENV_ORGANIZATION_NAME   = [System.Environment]::GetEnvironmentVariable("VENV_ORGANIZATION_NAME", [System.EnvironmentVariableTarget]::Machine)
+        VENV_PYTHON_BASE_DIR     = [System.Environment]::GetEnvironmentVariable("VENV_PYTHON_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
+        VENV_SECRETS_DEFAULT_DIR = [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine)
+        VENV_SECRETS_USER_DIR    = [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_USER_DIR", [System.EnvironmentVariableTarget]::Machine)
+        VENVIT_DIR               = [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine)
+    }
+}
+
+function Set-TestSetup_0_0_0 {
     $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
     $tempDir = New-CustomTempDir -Prefix "VenvIt"
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
@@ -26,9 +65,17 @@ function Invoke-TestSetup_0_0_0 {
     $env:ENVIRONMENT = "loc_dev"
     $env:PROJECTS_BASE_DIR = "$tempDir\Projects"
     $env:RTE_ENVIRONMENT = "loc_dev"
+    $env:SECRETS_DIR = "$tempDir\Batch"
     $env:SCRIPTS_DIR = "$tempDir\Batch"
     $env:VENV_BASE_DIR = "$tempDir\venv"
     $env:VENV_PYTHON_BASE_DIR = "$tempDir\Python"
+    $env:VIRTUAL_ENV = ("$env:VENV_BASE_DIR\" + $mockInstalVal.ProjectName)
+
+    $env:VENV_CONFIG_DIR = $null
+    $env:VENV_ENVIRONMENT = $null
+    $env:VENV_ORGANIZATION_NAME = $null
+    $env:VENV_SECRETS_DIR = $null
+    $env:VENVIT_DIR = $null
 
     #Create the directory structure
     $directories = @(
@@ -60,7 +107,7 @@ function Invoke-TestSetup_0_0_0 {
     return $mockInstalVal
 }
 
-function Invoke-TestSetup_6_0_0 {
+function Set-TestSetup_6_0_0 {
     $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
     $tempDir = New-CustomTempDir -Prefix "VenvIt"
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
@@ -113,20 +160,21 @@ function Invoke-TestSetup_6_0_0 {
     return $mockInstalVal
 }
 
-function Invoke-TestSetup_7_0_0 {
+function Set-TestSetup_7_0_0 {
     $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
     $tempDir = New-CustomTempDir -Prefix "VenvIt"
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
 
-    $env:PROJECT_NAME = $mockInstalVal.ProjectName
-    $env:PROJECTS_BASE_DIR = "$tempDir\Projects"
-    $env:VENV_BASE_DIR = "$tempDir\VEnv"
     $env:VENVIT_DIR = "$tempDir\VEnvIt"
+    $env:PROJECTS_BASE_DIR = "$tempDir\Projects"
 
+    $env:PROJECT_NAME = $mockInstalVal.ProjectName
+    $env:VENV_BASE_DIR = "$tempDir\VEnv"
     $env:VENV_CONFIG_DEFAULT_DIR = "$env:VENVIT_DIR\VENV_CONFIG_DEFAULT_DIR"
     $env:VENV_CONFIG_USER_DIR = "$tempDir\User\VENV_CONFIG_USER_DIR"
     $env:VENV_ENVIRONMENT = "loc_dev"
     $env:VENV_ORGANIZATION_NAME = $mockInstalVal.Organization
+    $env:VENV_PYTHON_BASE_DIR = "$tempDir\Python"
     $env:VENV_SECRETS_DEFAULT_DIR = "$env:VENVIT_DIR\VENV_SECRETS_DEFAULT_DIR"
     $env:VENV_SECRETS_USER_DIR = "$tempDir\User\VENV_SECRETS_USER_DIR"
     $env:VIRTUAL_ENV = ("$env:VENV_BASE_DIR\" + $mockInstalVal.ProjectName)
@@ -138,10 +186,12 @@ function Invoke-TestSetup_7_0_0 {
 
     #Create the directory structure
     $directories = @(
+        $env:PROJECTS_BASE_DIR,
         $env:PROJECT_DIR,
         "$env:VENV_BASE_DIR\${env:PROJECT_NAME}_env\Scripts",
         $env:VENV_CONFIG_DEFAULT_DIR,
         $env:VENV_CONFIG_USER_DIR,
+        $env:VENV_PYTHON_BASE_DIR,
         $env:VENV_SECRETS_DEFAULT_DIR,
         $env:VENV_SECRETS_USER_DIR
     )
@@ -161,13 +211,16 @@ function Invoke-TestSetup_7_0_0 {
         Set-Content -Path $scriptPath -Value ('Write-Host "Executing ' + $fileName + '"')
     }
 
-    # Create the sccrtet's files
+    # Create the secrtet's files
     $directories = @( $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR )
     foreach ($directory in $directories) {
         $scriptPath = Join-Path -Path $directory -ChildPath "secrets.ps1"
         New-Item -Path $scriptPath -ItemType File -Force | Out-Null
         Set-Content -Path $scriptPath -Value ('Write-Host "Executing ' + $scriptPath + '"')
     }
+
+    # Create a manifest
+    New-ManifestPsd1 -DestinationPath (Join-Path -Path $env:VENVIT_DIR -ChildPath (Get-ManifestFileName)) -Data $ManifestData700
 
     return $mockInstalVal
 }
@@ -184,21 +237,47 @@ function New-CreateAppScripts {
     }
 }
 
-function Set-BackupEnvironmentVariables {
-    return [PSCustomObject]@{
-        PROJECT_NAME             = $env:PROJECT_NAME
-        PROJECTS_BASE_DIR        = $env:PROJECTS_BASE_DIR
-        VENV_BASE_DIR            = $env:VENV_BASE_DIR
-        VENV_CONFIG_USER_DIR     = $env:VENV_CONFIG_USER_DIR
-        VENV_CONFIG_DEFAULT_DIR  = $env:VENV_CONFIG_DEFAULT_DIR
-        VENV_ENVIRONMENT         = $env:VENV_ENVIRONMENT
-        VENV_ORGANIZATION_NAME   = $env:VENV_ORGANIZATION_NAME
-        VENV_PYTHON_BASE_DIR     = $env:VENV_PYTHON_BASE_DIR
-        VENV_SECRETS_DEFAULT_DIR = $env:VENV_SECRETS_DEFAULT_DIR
-        VENV_SECRETS_USER_DIR    = $env:VENV_SECRETS_USER_DIR
-        VENVIT_DIR               = $env:VENVIT_DIR
-    }
+function Restore-SessionEnvironmentVariables {
+    param(
+        [PSCustomObject]$OriginalValues
+    )
+    $env:PROJECT_NAME = $OriginalValues.PROJECT_NAME
+    $env:PROJECTS_BASE_DIR = $OriginalValues.PROJECTS_BASE_DIR
+    $env:RTE_ENVIRONMENT = $OriginalValues.RTE_ENVIRONMENT
+    $env:SECRETS_DIR = $OriginalValues.SECRETS_DIR
+    $env:SCRIPTS_DIR = $OriginalValues.SCRIPTS_DIR
+    $env:VENV_BASE_DIR = $OriginalValues.VENV_BASE_DIR
+    $env:VENV_CONFIG_DEFAULT_DIR = $OriginalValues.VENV_CONFIG_DEFAULT_DIR
+    $env:VENV_CONFIG_USER_DIR = $OriginalValues.VENV_CONFIG_USER_DIR
+    $env:VENV_ENVIRONMENT = $OriginalValues.VENV_ENVIRONMENT
+    $env:VENV_ORGANIZATION_NAME = $OriginalValues.VENV_ORGANIZATION_NAME
+    $env:VENV_PYTHON_BASE_DIR = $OriginalValues.VENV_PYTHON_BASE_DIR
+    $env:VENV_SECRETS_DEFAULT_DIR = $OriginalValues.VENV_SECRETS_DEFAULT_DIR
+    $env:VENV_SECRETS_USER_DIR = $OriginalValues.VENV_SECRETS_USER_DIR
+    $env:VENVIT_DIR = $OriginalValues.VENVIT_DIR
 }
 
-Export-ModuleMember -Function Get-BackedupEnvironmentVariables, Invoke-TestSetup_0_0_0, Invoke-TestSetup_6_0_0, Invoke-TestSetup_7_0_0
-Export-ModuleMember -Function New-CreateAppScripts, New-TestEnvironment, Set-BackupEnvironmentVariables
+function Restore-SystemEnvironmentVariables {
+    param(
+        [PSCustomObject]$OriginalValues
+    )
+    [System.Environment]::SetEnvironmentVariable("PROJECT_NAME", $OriginalValues.PROJECT_NAME, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $OriginalValues.PROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $OriginalValues.RTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $OriginalValues.SECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $OriginalValues.SCRIPTS_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $OriginalValues.VENV_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $OriginalValues.VENV_CONFIG_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $OriginalValues.VENV_CONFIG_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $OriginalValues.VENV_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENV_ORGANIZATION_NAME", $OriginalValues.VENV_ORGANIZATION_NAME, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $OriginalValues.VENV_PYTHON_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $OriginalValues.VENV_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $OriginalValues.VENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $OriginalValues.VENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
+}
+
+Export-ModuleMember -Function Backup-SessionEnvironmentVariables, Backup-SystemEnvironmentVariables, Set-TestSetup_0_0_0
+Export-ModuleMember -Function Set-TestSetup_6_0_0, Set-TestSetup_7_0_0, New-CreateAppScripts, New-TestEnvironment
+Export-ModuleMember -Function Restore-SessionEnvironmentVariables, Restore-SystemEnvironmentVariables
+Export-ModuleMember -Variable ManifestData000, ManifestData600, ManifestData700

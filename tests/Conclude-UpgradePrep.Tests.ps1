@@ -6,29 +6,14 @@ Describe "Function testing" {
     BeforeAll {
         if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
         Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
-
-        $ManifestData000 = @{
-            Version     = "0.0.0"
-            Authors     = "Ann Other <ann@other.com>"
-            Description = "Description of 0.0.0"
-        }
-        $ManifestData600 = @{
-            Version     = "6.0.0"
-            Authors     = "Ann Other <ann@other.com>"
-            Description = "Description of 6.0.0"
-        }
-        $ManifestData700 = @{
-            Version     = "7.0.0"
-            Authors     = "Ann Other <ann@other.com>"
-            Description = "Description of 7.0.0"
-        }
     }
 
     Context "Backup-ArchiveOldVersion" {
         BeforeEach {
+            $OriginalValues = Backup-SessionEnvironmentVariables
             if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
             Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
-            $mockInstalVal = Invoke-TestSetup_0_0_0
+            $mockInstalVal = Set-TestSetup_0_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         }
 
@@ -39,106 +24,145 @@ Describe "Function testing" {
         }
         AfterEach {
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
         }
     }
 
     Context "Get-ManifestFileName" {
-        # TODO
-        # Test to be implemented
+        BeforeEach {
+            $OriginalValues = Backup-SessionEnvironmentVariables
+        }
+
+        It "TODO Get-ManifestFileName" {
+        }
+        AfterEach {
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+        }
     }
 
     Context "Get-Version" {
         BeforeAll {
             if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
-            if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
             Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+            if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
             Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
-
-            function New-TestVersionStructure_0_0_0 {
-                Import-Module $PSScriptRoot\..\src\Utils.psm1
-
-                $TempDir = New-CustomTempDir -Prefix "VenvIt"
-                Return $TempDir
-            }
-
-            function New-TestVersionStructure_6_0_0 {
-                Import-Module $PSScriptRoot\..\src\Utils.psm1
-
-                $TempDir = New-CustomTempDir -Prefix "VenvIt"
-                $ManifestPath = Join-Path -Path $TempDir -ChildPath (Get-ManifestFileName)
-                New-ManifestPsd1 -FilePath $ManifestPath $ManifestData600
-                Return $TempDir
-            }
         }
+
+        BeforeEach {
+            $OriginalValues = Backup-SessionEnvironmentVariables
+        }
+
         It "Should get 0.0.0" {
-            $ScriptDir = New-TestVersionStructure_0_0_0
-            $Version = Get-Version -ScriptDir $ScriptDir
+            $mockInstalVal = Set-TestSetup_0_0_0
+            $Version = Get-Version -SourceDir $env:SCRIPTS_DIR
             $Version | Should -Be "0.0.0"
-            Remove-Item -Path $ScriptDir -Force
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
 
         It "Should get 6.0.0" {
-            $ScriptDir = New-TestVersionStructure_6_0_0
-            $Version = Get-Version -ScriptDir $ScriptDir
+            if (Test-Path "env:SCRIPTS_DIR") {
+                Remove-Item -Path "Env:SCRIPTS_DIR"
+            }
+            $mockInstalVal = Set-TestSetup_6_0_0
+            $Version = Get-Version -SourceDir $env:VENVIT_DIR
             $Version | Should -Be "6.0.0"
-            Remove-Item -Path $ScriptDir -Force -Recurse
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
 
+        It "Should get 7.0.0" {
+            if (Test-Path "env:SCRIPTS_DIR") {
+                Remove-Item -Path "Env:SCRIPTS_DIR"
+            }
+            $mockInstalVal = Set-TestSetup_7_0_0
+            $Version = Get-Version -SourceDir $env:VENVIT_DIR
+            $Version | Should -Be "7.0.0"
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+        }
+        AfterEach {
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+        }
     }
 
     Context "Invoke-PrepForUpgrade_6_0_0" {
         BeforeAll {
             # This test must be run with administrator rights.
-            if (-not (Test-Admin)) {
-                Throw "Tests must be run as an Administrator. Aborting..."
-            }
-            $OrigRTE_ENVIRONMENT = $env:RTE_ENVIRONMENT
-            $OrigSCRIPTS_DIR = $env:SCRIPTS_DIR
-            $OrigSECRETS_DIR = $env:SECRETS_DIR
-            [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", "rte_environment", [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", "scripts_dir", [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", "secrets_dir", [System.EnvironmentVariableTarget]::Machine)
+            if (-not (Test-Admin)) {Throw "Tests must be run as an Administrator. Aborting..."}
+            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+        }
+
+        BeforeEach {
+            $OriginalValues = Backup-SessionEnvironmentVariables
+            $mockInstalVal = Set-TestSetup_0_0_0
+            [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $env:SECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $env:SCRIPTS_DIR, [System.EnvironmentVariableTarget]::Machine)
         }
 
         It "Should prepare for 6.0.0" {
             Invoke-PrepForUpgrade_6_0_0
             $rte_environment = [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
-            $scripts_dir = [System.Environment]::GetEnvironmentVariable("SCRIPTS_DIR", [System.EnvironmentVariableTarget]::Machine)
             $secrets_dir = [System.Environment]::GetEnvironmentVariable("SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $scripts_dir = [System.Environment]::GetEnvironmentVariable("SCRIPTS_DIR", [System.EnvironmentVariableTarget]::Machine)
             $rte_environment | Should -Be $null
-            $scripts_dir | Should -Be $null
             $secrets_dir | Should -Be $null
+            $scripts_dir | Should -Be $null
+        }
+
+        AfterEach {
+            Remove-EnvVarIfExists -EnvVarName "RTE_ENVIRONMENT"
+            Remove-EnvVarIfExists -EnvVarName "SECRETS_DIR"
+            Remove-EnvVarIfExists -EnvVarName "SCRIPTS_DIR"
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
         }
 
         AfterAll {
-            if ($OrigRTE_ENVIRONMENT) {
-                [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $OrigRTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
-            }
-            else {
-                Remove-EnvVarIfExists -EnvVarName "RTE_ENVIRONMENT"
-            }
-            if ($SCRIPTS_DIR) {
-                [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $OrigSCRIPTS_DIR, [System.EnvironmentVariableTarget]::Machine)
-            }
-            else {
-                Remove-EnvVarIfExists -EnvVarName "SCRIPTS_DIR"
-            }
-            if ($OrigRTE_ENVIRONMENT) {
-                [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $OrigSECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
-            }
-            else {
-                Remove-EnvVarIfExists -EnvVarName "SECRETS_DIR"
-            }
         }
     }
 
     Context "Invoke-PrepForUpgrade_7_0_0" {
-        # TODO
-        # Test to be implemented
+        BeforeAll {
+            # This test must be run with administrator rights.
+            if (-not (Test-Admin)) {
+                Throw "Tests must be run as an Administrator. Aborting..."
+            }
+            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+        }
+
+        BeforeEach {
+            $OriginalValues = Backup-SessionEnvironmentVariables
+            $mockInstalVal = Set-TestSetup_6_0_0
+        }
+
+        It "Should prepare for 7.0.0" {
+            Invoke-PrepForUpgrade_7_0_0
+
+            $config_dir = [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $config_dir | Should -Be $null
+            $secrets_dir = [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $secrets_dir | Should -Be $null
+
+            $config_user_dir = [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_USER_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $config_user_dir | Should -Be $env:VENV_CONFIG_USER_DIR
+            $secrets_user_dir = [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_USER_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $secrets_user_dir | Should -Be $env:VENV_SECRETS_USER_DIR
+        }
+
+        AfterEach {
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+        }
+
+        AfterAll {
+
+        }
     }
 
     Context "Remove-EnvVarIfExists" {
         BeforeEach {
+            $OriginalValues = Backup-SessionEnvironmentVariables
             if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
             Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 
@@ -147,15 +171,18 @@ Describe "Function testing" {
             [System.Environment]::SetEnvironmentVariable("VENV_TEST", $env:VENV_TEST, [System.EnvironmentVariableTarget]::Machine)
 
         }
+
         It "Values exist" {
             Remove-EnvVarIfExists -EnvVarName "VENV_TEST"
 
             [System.Environment]::GetEnvironmentVariable("VENV_TEST", [System.EnvironmentVariableTarget]::Machine) | Should -Be $null
             $env:VENV_TEST | Should -Be $null
         }
+
         AfterEach {
             [System.Environment]::SetEnvironmentVariable("VENV_TEST", $origVENV_TEST, [System.EnvironmentVariableTarget]::Machine)
             $env:VENV_TEST = $origVENV_TEST
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
         }
     }
 
@@ -163,19 +190,19 @@ Describe "Function testing" {
         BeforeAll {
             if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
             Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
+        }
+        BeforeEach {
+            $OriginalValues = Backup-SessionEnvironmentVariables
+            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
             if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
             Import-Module $PSScriptRoot\..\src\Utils.psm1
 
-            $OrigVENVIT_DIR = $env:VENVIT_DIR
-        }
-        BeforeEach {
-            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
-            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
-
+            $mockInstalVal = Set-TestSetup_0_0_0
             $TempDir = New-CustomTempDir -Prefix "VenvIt"
             $UpgradeScriptDir = New-Item -ItemType Directory -Path (Join-Path -Path $TempDir -ChildPath "TempUpgradeDir")
-            $env:VENVIT_DIR = Join-Path -Path $TempDir -ChildPath "VenvIt"
-            New-Item -ItemType Directory -Path $env:VENVIT_DIR
+            # $env:VENVIT_DIR = Join-Path -Path $TempDir -ChildPath "VenvIt"
+            # New-Item -ItemType Directory -Path $env:VENVIT_DIR
         }
 
         It 'Should apply 6.0.0 and 7.0.0' {
@@ -187,10 +214,10 @@ Describe "Function testing" {
                 return $true
             }
             # Mock -CommandName Invoke-PrepForUpgrade_7_0_0
-            $CurrentManifestPath = Join-Path -Path $env:VENVIT_DIR -ChildPath (Get-ManifestFileName)
-            New-ManifestPsd1 -FilePath $CurrentManifestPath -Data $ManifestData000
+            $CurrentManifestPath = Join-Path -Path $env:SCRIPTS_DIR -ChildPath (Get-ManifestFileName)
+            New-ManifestPsd1 -DestinationPath $CurrentManifestPath -Data $ManifestData000
             $UpgradeManifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
-            New-ManifestPsd1 -FilePath $UpgradeManifestPath -data $ManifestData700
+            New-ManifestPsd1 -DestinationPath $UpgradeManifestPath -data $ManifestData700
             Update-PackagePrep -UpgradeScriptDir $UpgradeScriptDir
 
             # Assert that the correct upgrade functions were called in order
@@ -199,10 +226,11 @@ Describe "Function testing" {
         }
         AfterEach {
             Remove-Item -Path $TempDir -Recurse -Force
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
         }
     }
 
     AfterAll {
-        $env:VENVIT_DIR = $OrigVENVIT_DIR
     }
 }

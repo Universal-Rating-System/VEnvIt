@@ -63,7 +63,7 @@ function Invoke-UpdateManifest {
         # Check if all necessary data was extracted
         if ($pyprojectData.Version -and $pyprojectData.Authors -and $pyprojectData.Description) {
             # Create the manifest.psd1
-            New-ManifestPsd1 -filePath $manifestPath -data $pyprojectData
+            New-ManifestPsd1 -DestinationPath $manifestPath -data $pyprojectData
             Write-Host "Manifest.psd1 created successfully at $manifestPath"
         }
         else {
@@ -77,19 +77,19 @@ function Invoke-UpdateManifest {
 
 function New-ManifestPsd1 {
     param (
-        [string]$FilePath,
-        [hashtable]$data
+        [string]$DestinationPath,
+        [hashtable]$Data
     )
 
     $content = @"
 @{
-    ModuleVersion = '$($data.Version)'
-    Author        = '$($data.Authors)'
-    Description   = '$($data.Description)'
+    ModuleVersion = '$($Data.Version)'
+    Author        = '$($Data.Authors)'
+    Description   = '$($Data.Description)'
 }
 "@
 
-    Set-Content -Path $FilePath -Value $content
+    Set-Content -Path $DestinationPath -Value $content
 }
 
 Export-ModuleMember -Function Convert-PyprojectToml, Invoke-UpdateManifest, New-ManifestPsd1

@@ -1,14 +1,21 @@
-﻿$defEnvVarSet = @(
-    [PSCustomObject]@{Name = "VENV_ENVIRONMENT"; DefVal = "loc_dev"; IsDir = $false },
-    [PSCustomObject]@{Name = "PROJECTS_BASE_DIR"; DefVal = "~\Projects"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENVIT_DIR"; DefVal = "$env:ProgramFiles\VenvIt"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENVIT_SECRETS_DEFAULT_DIR"; DefVal = "$env:VENVIT_DIR\Secrets"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENVIT_SECRETS_USER_DIR"; DefVal = "~\VenvIt\Secrets"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENV_BASE_DIR"; DefVal = "~\venv"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENV_PYTHON_BASE_DIR"; DefVal = "c:\Python"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENV_CONFIG_DEFAULT_DIR"; DefVal = "$env:VENVIT_DIR\Config"; IsDir = $true },
-    [PSCustomObject]@{Name = "VENV_CONFIG_USER_DIR"; DefVal = "~\VenvIt\Config"; IsDir = $true }
-)
+﻿$defEnvVarSet = @{
+    PROJECTS_BASE_DIR        = @{DefVal = "~\Projects"; IsDir = $true }
+    VENV_BASE_DIR            = @{DefVal = "~\venv"; IsDir = $true }
+    VENV_CONFIG_DEFAULT_DIR  = @{DefVal = "$env:ProgramFiles\VenvIt\Config"; IsDir = $true }
+    VENV_CONFIG_USER_DIR     = @{DefVal = "~\VenvIt\Config"; IsDir = $true }
+    VENV_ENVIRONMENT         = @{DefVal = "loc_dev"; IsDir = $false }
+    VENV_PYTHON_BASE_DIR     = @{DefVal = "c:\Python"; IsDir = $true }
+    VENV_SECRETS_DEFAULT_DIR = @{DefVal = "$env:ProgramFiles\VenvIt\Secrets"; IsDir = $true }
+    VENV_SECRETS_USER_DIR    = @{DefVal = "~\VenvIt\Secrets"; IsDir = $true }
+    VENVIT_DIR               = @{DefVal = "$env:ProgramFiles\VenvIt"; IsDir = $true }
+}
+
+# $defEnvVarSet = @{
+#     First  = @{ Key1 = "Value1"; Key2 = "Value2" }
+#     Second = @{ KeyA = "ValueA"; KeyB = "ValueB" }
+#     Third  = @{ KeyX = "ValueX"; KeyY = "ValueY" }
+# }
+
 $separator = "-" * 80
 
 function Backup-ScriptToArchiveIfExists {
@@ -62,6 +69,10 @@ function Get-ConfigFileName {
     return ("VEnv" + $ProjectName + "$Postfix.ps1")
 }
 
+function Get-ManifestFileName {
+    return "Manifest.psd1"
+}
+
 function New-CustomTempDir {
     param (
         [Parameter(Mandatory = $true)]
@@ -85,21 +96,21 @@ function Set-EnvironmentVariables {
         $EnvVarSet
     )
 
-    foreach ($envVar in $EnvVarSet) {
-        $existingValue = [System.Environment]::GetEnvironmentVariable($envVar.Name, [System.EnvironmentVariableTarget]::Machine)
+    foreach ($envVar in $EnvVarSet.Keys) {
+        $existingValue = [System.Environment]::GetEnvironmentVariable($envVar, [System.EnvironmentVariableTarget]::Machine)
         if ($existingValue) {
-            $promptText = $envVar.Name + " ($existingValue)"
+            $promptText = $envVar + " ($existingValue)"
             $defaultValue = $existingValue
         }
         else {
-            $promptText = $envVar.Name + " (" + $envVar.DefVal + ")"
-            $defaultValue = $envVar.DefVal
+            $promptText = $envVar + " (" + $EnvVarSet[$envVar]["DefVal"] + ")"
+            $defaultValue = $EnvVarSet[$envVar]["DefVal"]
         }
         $newValue = Read-Host -Prompt $promptText
         if ($newValue -eq "") {
             $newValue = $defaultValue
         }
-        [System.Environment]::SetEnvironmentVariable($envVar.Name, $newValue, [System.EnvironmentVariableTarget]::Machine)
+        [System.Environment]::SetEnvironmentVariable($envVar, $newValue, [System.EnvironmentVariableTarget]::Machine)
     }
 }
 
@@ -155,5 +166,6 @@ function Read-YesOrNo {
 
 
 Export-ModuleMember -Function Backup-ScriptToArchiveIfExists, New-CustomTempDir, Confirm-EnvironmentVariables
-Export-ModuleMember -Function Get-ConfigFileName, Invoke-Script, Read-YesOrNo, Set-EnvironmentVariables, Show-EnvironmentVariables
+Export-ModuleMember -Function Get-ConfigFileName, Get-ManifestFileName, Invoke-Script, Read-YesOrNo, Set-EnvironmentVariables
+Export-ModuleMember -Function Show-EnvironmentVariables
 Export-ModuleMember -Variable defEnvVarSet, separator

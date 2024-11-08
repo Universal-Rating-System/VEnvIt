@@ -48,6 +48,9 @@ Describe "Function testing" {
 
     Context "New-Directories" {
         BeforeAll {
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
+
         }
         BeforeEach {
             [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", "loc_dev", [System.EnvironmentVariableTarget]::Machine)
@@ -84,6 +87,10 @@ Describe "Function testing" {
         }
         AfterEach {
             Remove-Item -Path $TempDir -Recurse -Force
+        }
+        AfterAll {
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
         }
     }
 
@@ -161,7 +168,7 @@ Describe "Function testing" {
         # Test to be implemented
     }
 
-    Context "Set-EnvironmentVariables tests" {
+    Context "Set-EnvironmentVariables" {
         BeforeEach {
             [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", "venv_environment", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", "projects_base_dir", [System.EnvironmentVariableTarget]::Machine)
@@ -232,7 +239,7 @@ Describe "Function testing" {
         }
     }
 
-    Context "Test-Admin Function" {
+    Context "Test-Admin" {
         BeforeAll {
             if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
             Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
