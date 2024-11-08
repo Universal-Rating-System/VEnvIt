@@ -109,10 +109,10 @@ function Set-Path {
     if ($path -notlike "*$env:VENVIT_DIR*") {
         $newPath = "$path;$env:VENVIT_DIR"
         [System.Environment]::SetEnvironmentVariable("Path", $newPath, [System.EnvironmentVariableTarget]::Machine)
-        Write-Host "VENVIT_DIR has been added to the System Path." -ForegroundColor Green
+        Write-Host "VENVIT_DIR has been added to the System Path." -ForegroundColor Yellow
     }
     else {
-        Write-Host "VENVIT_DIR is already in the System Path." -ForegroundColor Green
+        Write-Host "VENVIT_DIR is already in the System Path." -ForegroundColor Yellow
     }
 }
 
