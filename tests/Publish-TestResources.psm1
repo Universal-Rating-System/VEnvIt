@@ -69,6 +69,13 @@ function Set-TestSetup_0_0_0 {
     $env:SCRIPTS_DIR = "$tempDir\Batch"
     $env:VENV_BASE_DIR = "$tempDir\venv"
     $env:VENV_PYTHON_BASE_DIR = "$tempDir\Python"
+    $env:VIRTUAL_ENV = ("$env:VENV_BASE_DIR\" + $mockInstalVal.ProjectName)
+
+    $env:VENV_CONFIG_DIR = $null
+    $env:VENV_ENVIRONMENT = $null
+    $env:VENV_ORGANIZATION_NAME = $null
+    $env:VENV_SECRETS_DIR = $null
+    $env:VENVIT_DIR = $null
 
     #Create the directory structure
     $directories = @(

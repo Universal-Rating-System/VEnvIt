@@ -29,8 +29,15 @@ Describe "Function testing" {
     }
 
     Context "Get-ManifestFileName" {
-        # TODO
-        # Test to be implemented
+        BeforeEach {
+            $OriginalValues = Backup-SessionEnvironmentVariables
+        }
+
+        It "TODO Get-ManifestFileName" {
+        }
+        AfterEach {
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+        }
     }
 
     Context "Get-Version" {
@@ -47,7 +54,7 @@ Describe "Function testing" {
 
         It "Should get 0.0.0" {
             $mockInstalVal = Set-TestSetup_0_0_0
-            $Version = Get-Version -ScriptDir $env:SCRIPTS_DIR
+            $Version = Get-Version -SourceDir $env:SCRIPTS_DIR
             $Version | Should -Be "0.0.0"
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
@@ -57,7 +64,7 @@ Describe "Function testing" {
                 Remove-Item -Path "Env:SCRIPTS_DIR"
             }
             $mockInstalVal = Set-TestSetup_6_0_0
-            $Version = Get-Version -ScriptDir $env:SCRIPTS_DIR
+            $Version = Get-Version -SourceDir $env:VENVIT_DIR
             $Version | Should -Be "6.0.0"
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
@@ -67,7 +74,7 @@ Describe "Function testing" {
                 Remove-Item -Path "Env:SCRIPTS_DIR"
             }
             $mockInstalVal = Set-TestSetup_7_0_0
-            $Version = Get-Version -ScriptDir $env:SCRIPTS_DIR
+            $Version = Get-Version -SourceDir $env:VENVIT_DIR
             $Version | Should -Be "7.0.0"
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
@@ -79,9 +86,7 @@ Describe "Function testing" {
     Context "Invoke-PrepForUpgrade_6_0_0" {
         BeforeAll {
             # This test must be run with administrator rights.
-            if (-not (Test-Admin)) {
-                Throw "Tests must be run as an Administrator. Aborting..."
-            }
+            if (-not (Test-Admin)) {Throw "Tests must be run as an Administrator. Aborting..."}
             if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
             Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
         }
@@ -185,8 +190,6 @@ Describe "Function testing" {
         BeforeAll {
             if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
             Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
-
-            $OrigVENVIT_DIR = $env:VENVIT_DIR
         }
         BeforeEach {
             $OriginalValues = Backup-SessionEnvironmentVariables

@@ -32,20 +32,22 @@ function Backup-ArchiveOldVersion {
 }
 
 function Get-Version {
-    if (Test-Path "env:SCRIPTS_DIR") {
-            $version = "0.0.0"
-    } elseif (Test-Path "env:VENVIT_DIR") {
-        $manifestPath = Join-Path -Path $env:VENVIT_DIR -ChildPath (Get-ManifestFileName)
+    param (
+        [Parameter(Mandatory = $true)]
+        [String]$SourceDir
+    )
+    $version = $null
+    if (Test-Path $SourceDir) {
+        $manifestPath = Join-Path -Path $SourceDir -ChildPath (Get-ManifestFileName)
         if (Test-Path $manifestPath) {
             $Manifest = Import-PowerShellDataFile -Path $manifestPath
             $version = [version]$Manifest.ModuleVersion
-        } else {
+        } elseif (Test-Path "env:VENVIT_DIR") {
             $version = "6.0.0"
+        } elseif (Test-Path "env:SCRIPTS_DIR") {
+            $version = "0.0.0"
         }
-    } else {
-        $version = $null
     }
-
     return $version
 }
 
@@ -120,8 +122,12 @@ function Update-PackagePrep {
         [string]$UpgradeScriptDir
     )
 
-    $CurrentVersion = Get-Version -ScriptDir $env:VENVIT_DIR
-    $UpgradeVersion = Get-Version -ScriptDir $UpgradeScriptDir
+    if (Test-Path "env:VENVIT_DIR") {
+        $CurrentVersion = Get-Version -SourceDir $env:VENVIT_DIR
+    } else {
+        $CurrentVersion = Get-Version -SourceDir $env:SCRIPTS_DIR
+    }
+    $UpgradeVersion = Get-Version --SourceDir $UpgradeScriptDir
 
     $timeStamp = Get-Date -Format "yyyyMMddHHmm"
     if ($CurrentVersion -eq "0.0.0") {
