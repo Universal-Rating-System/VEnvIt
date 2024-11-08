@@ -42,9 +42,11 @@ function Get-Version {
         if (Test-Path $manifestPath) {
             $Manifest = Import-PowerShellDataFile -Path $manifestPath
             $version = [version]$Manifest.ModuleVersion
-        } elseif (Test-Path "env:VENVIT_DIR") {
+        }
+        elseif (Test-Path "env:VENVIT_DIR") {
             $version = "6.0.0"
-        } elseif (Test-Path "env:SCRIPTS_DIR") {
+        }
+        elseif (Test-Path "env:SCRIPTS_DIR") {
             $version = "0.0.0"
         }
     }
@@ -124,10 +126,11 @@ function Update-PackagePrep {
 
     if (Test-Path "env:VENVIT_DIR") {
         $CurrentVersion = Get-Version -SourceDir $env:VENVIT_DIR
-    } else {
+    }
+    else {
         $CurrentVersion = Get-Version -SourceDir $env:SCRIPTS_DIR
     }
-    $UpgradeVersion = Get-Version --SourceDir $UpgradeScriptDir
+    $UpgradeVersion = Get-Version -SourceDir $UpgradeScriptDir
 
     $timeStamp = Get-Date -Format "yyyyMMddHHmm"
     if ($CurrentVersion -eq "0.0.0") {
