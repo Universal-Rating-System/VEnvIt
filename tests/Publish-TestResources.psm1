@@ -57,6 +57,29 @@ function Backup-SystemEnvironmentVariables {
     }
 }
 
+function Set-TestSetup_New {
+    $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
+    $tempDir = New-CustomTempDir -Prefix "VenvIt"
+    $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
+
+    $env:PROJECT_NAME = $null
+    $env:PROJECTS_BASE_DIR = $null
+    $env:VENV_BASE_DIR = $null
+    $env:VENV_CONFIG_DEFAULT_DIR = $null
+    $env:VENV_CONFIG_DIR = $null
+    $env:VENV_CONFIG_USER_DIR = $null
+    $env:VENV_ENVIRONMENT = $null
+    $env:VENV_ORGANIZATION_NAME = $null
+    $env:VENV_SECRETS_DEFAULT_DIR = $null
+    $env:VENV_PYTHON_BASE_DIR = $null
+    $env:VENV_SECRETS_USER_DIR = $null
+    $env:VENV_SECRETS_DIR = $null
+    $env:VENVIT_DIR = $null
+    $env:VIRTUAL_ENV = $null
+
+    return $mockInstalVal
+}
+
 function Set-TestSetup_0_0_0 {
     $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
     $tempDir = New-CustomTempDir -Prefix "VenvIt"
@@ -277,7 +300,7 @@ function Restore-SystemEnvironmentVariables {
     [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $OriginalValues.VENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
 }
 
-Export-ModuleMember -Function Backup-SessionEnvironmentVariables, Backup-SystemEnvironmentVariables, Set-TestSetup_0_0_0
-Export-ModuleMember -Function Set-TestSetup_6_0_0, Set-TestSetup_7_0_0, New-CreateAppScripts, New-TestEnvironment
-Export-ModuleMember -Function Restore-SessionEnvironmentVariables, Restore-SystemEnvironmentVariables
+Export-ModuleMember -Function Backup-SessionEnvironmentVariables, Backup-SystemEnvironmentVariables, Set-TestSetup_New
+Export-ModuleMember -Function Set-TestSetup_0_0_0, Set-TestSetup_6_0_0, Set-TestSetup_7_0_0, New-CreateAppScripts
+Export-ModuleMember -Function New-TestEnvironment, Restore-SessionEnvironmentVariables, Restore-SystemEnvironmentVariables
 Export-ModuleMember -Variable ManifestData000, ManifestData600, ManifestData700
