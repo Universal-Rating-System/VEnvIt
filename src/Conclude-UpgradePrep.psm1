@@ -28,7 +28,7 @@ function Backup-ArchiveOldVersion {
 
     if ($fileList) {
         $archiveDir = Join-Path -Path $InstallationDir -ChildPath "Archive"
-        $destination = Join-Path -Path $archiveDir -Child "Version_$ArchiveVersion$TimeStamp.zip"
+        $destination = Join-Path -Path $archiveDir -Child ("Version_$ArchiveVersion" + "_" + "$TimeStamp.zip")
         if (-not(Test-Path $archiveDir)) {
             New-Item -Path $archiveDir -ItemType Directory | Out-Null
         }

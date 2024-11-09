@@ -61,33 +61,38 @@ function New-Directories {
 
 function Publish-LatestVersion {
     param (
-        [string]$Release,
+        # [string]$Release,
         [string]$UpgradeScriptDir
     )
-    $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$Release/Installation-Files.zip"
-    $zipFilePath = Join-Path -Path $UpgradeScriptDir -ChildPath "Installation-Files.zip"
+    # $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$Release/Installation-Files.zip"
+    # $zipFilePath = Join-Path -Path $UpgradeScriptDir -ChildPath "Installation-Files.zip"
 
     # Download the zip file
-    Write-Host "Downloading installation files from $url..."
-    Invoke-WebRequest -Uri $url -OutFile $zipFilePath
+    # Write-Host "Downloading installation files from $url..."
+    # Invoke-WebRequest -Uri $url -OutFile $zipFilePath
     # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
-    Write-Host "Unzipping Installation-Files.zip to $env:VENVIT_DIR..."
-    Expand-Archive -Path $zipFilePath -DestinationPath $env:VENVIT_DIR -Force
+    Write-Host "Copy source files to to $env:VENVIT_DIR..."
+    # Expand-Archive -Path $zipFilePath -DestinationPath $env:VENVIT_DIR -Force
+    Copy-Item -Path "$UpgradeScriptDir\src\vi.ps1" -Destination $env:VENVIT_DIR | Out-Null
+    Copy-Item -Path "$UpgradeScriptDir\src\vn.ps1" -Destination $env:VENVIT_DIR | Out-Null
+    Copy-Item -Path "$UpgradeScriptDir\src\vr.ps1" -Destination $env:VENVIT_DIR | Out-Null
+    Copy-Item -Path "$UpgradeScriptDir\src\utils.psm1" -Destination $env:VENVIT_DIR | Out-Null
+
 }
 
 function Publish-Secrets {
     # Move the secrets.ps1 file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
     $sourceFilePath = Join-Path -Path $env:VENVIT_DIR -ChildPath "secrets.ps1"
-    $destinationDefaultFilePath = Join-Path -Path $env:VENVIT_SECRETS_DEFAULT_DIR -ChildPath "secrets.ps1"
-    $destinationUserFilePath = Join-Path -Path $env:VENVIT_SECRETS_USER_DIR -ChildPath "secrets.ps1"
+    $destinationDefaultFilePath = Join-Path -Path $env:VENV_SECRETS_DEFAULT_DIR -ChildPath "secrets.ps1"
+    $destinationUserFilePath = Join-Path -Path $env:VENV_SECRETS_USER_DIR -ChildPath "secrets.ps1"
 
     if (Test-Path -Path $sourceFilePath) {
         if (-not (Test-Path -Path $destinationDefaultFilePath)) {
-            Write-Host "Moving secrets.ps1 to $env:VENVIT_SECRETS_DEFAULT_DIR..."
+            Write-Host "Moving secrets.ps1 to $env:VENV_SECRETS_DEFAULT_DIR..."
             Copy-Item -Path $sourceFilePath -Destination $destinationDefaultFilePath -Force
         }
         else {
-            Write-Host "secrets.ps1 already exists in $env:VENVIT_SECRETS_DEFAULT_DIR. It will not be overwritten."
+            Write-Host "secrets.ps1 already exists in $env:VENV_SECRETS_DEFAULT_DIR. It will not be overwritten."
         }
         if (-not (Test-Path -Path $destinationUserFilePath)) {
             Write-Host "Moving secrets.ps1 to $env:VENVIT_SECRETS_USER_DIR..."

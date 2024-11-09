@@ -38,7 +38,7 @@ function Backup-ScriptToArchiveIfExists {
         else {
             Compress-Archive -Path $ScriptPath -DestinationPath $archivePath
         }
-        Write-Host "Zipped $ScriptPath."
+        # Write-Host "Zipped $ScriptPath."
     }
     return $archivePath
 }

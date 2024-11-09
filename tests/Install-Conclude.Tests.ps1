@@ -4,8 +4,8 @@ Describe "Function testing" {
     BeforeAll {
         # if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
         if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
-        if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
         Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
+        if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
         Import-Module $PSScriptRoot\..\src\Utils.psm1
 
         # This test must be run with administrator rights.
@@ -15,8 +15,8 @@ Describe "Function testing" {
         $OrigVENV_ENVIRONMENT = $env:VENV_ENVIRONMENT
         $OrigPROJECTS_BASE_DIR = $env:PROJECTS_BASE_DIR
         $OrigVENVIT_DIR = $env:VENVIT_DIR
-        $OrigVENVIT_SECRETS_DEFAULT_DIR = $env:VENVIT_SECRETS_DEFAULT_DIR
-        $OrigVENVIT_SECRETS_USER_DIR = $env:VENVIT_SECRETS_USER_DIR
+        $OrigVENV_SECRETS_DEFAULT_DIR = $env:VENV_SECRETS_DEFAULT_DIR
+        $OrigVENV_SECRETS_USER_DIR = $env:VENVIT_SECRETS_USER_DIR
         $OrigVENV_BASE_DIR = $env:VENV_BASE_DIR
         $OrigVENV_PYTHON_BASE_DIR = $env:VENV_PYTHON_BASE_DIR
         $OrigVENV_CONFIG_DEFAULT_DIR = $env:VENV_CONFIG_DEFAULT_DIR
@@ -56,7 +56,7 @@ Describe "Function testing" {
             [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", "loc_dev", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", "~\Projects", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", "$env:ProgramFiles\VenvIt", [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENVIT_SECRETS_DEFAULT_DIR", "$env:VENVIT_DIR\Secrets", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", "$env:VENVIT_DIR\Secrets", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENVIT_SECRETS_USER_DIR", "~\VenvIt\Secrets", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", "~\venv", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", "c:\Python", [System.EnvironmentVariableTarget]::Machine)
@@ -140,13 +140,13 @@ Describe "Function testing" {
     Context "Publish-Secrets" {
         BeforeEach {
             $tempDir = New-CustomTempDir -Prefix "VenvIt"
-            $env:VENVIT_SECRETS_DEFAULT_DIR = "$tempDir\DefaultSecrets"
-            $env:VENVIT_SECRETS_USER_DIR = "$tempDir\UserSecrets"
+            $env:VENV_SECRETS_DEFAULT_DIR = "$tempDir\DefaultSecrets"
+            $env:VENV_SECRETS_USER_DIR = "$tempDir\UserSecrets"
             $env:VENVIT_DIR = "$tempDir\VenvIt"
 
             New-Item -ItemType Directory -Path $env:VENVIT_DIR | Out-Null
-            New-Item -ItemType Directory -Path $env:VENVIT_SECRETS_DEFAULT_DIR | Out-Null
-            New-Item -ItemType Directory -Path $env:VENVIT_SECRETS_USER_DIR | Out-Null
+            New-Item -ItemType Directory -Path $env:VENV_SECRETS_DEFAULT_DIR | Out-Null
+            New-Item -ItemType Directory -Path $env:VENV_SECRETS_USER_DIR | Out-Null
 
             Copy-Item -Path $PSScriptRoot\..\src\secrets.ps1 -Destination $env:VENVIT_DIR
         }
@@ -154,7 +154,7 @@ Describe "Function testing" {
         It "Should copy all secrets files" {
             Publish-Secrets
 
-            (Test-Path -Path $env:VENVIT_SECRETS_DEFAULT_DIR\secrets.ps1) | Should -Be $true
+            (Test-Path -Path $env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1) | Should -Be $true
             (Test-Path -Path $env:VENVIT_SECRETS_USER_DIR\secrets.ps1) | Should -Be $true
         }
 
@@ -173,7 +173,7 @@ Describe "Function testing" {
             [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", "venv_environment", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", "projects_base_dir", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", "venvit_dir", [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENVIT_SECRETS_DEFAULT_DIR", "venvit_secrets_default_dir", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", "VENV_SECRETS_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENVIT_SECRETS_USER_DIR", "venvit_secrets_user_dir", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", "venv_base_dir", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", "venv_python_base_dir", [System.EnvironmentVariableTarget]::Machine)
@@ -184,8 +184,8 @@ Describe "Function testing" {
             Mock -ModuleName Install-Conclude Read-Host { return "venv_environment" } -ParameterFilter { $Prompt -eq "VENV_ENVIRONMENT (venv_environment)" }
             Mock -ModuleName Install-Conclude Read-Host { return "projects_base_dir" } -ParameterFilter { $Prompt -eq "PROJECTS_BASE_DIR (projects_base_dir)" }
             Mock -ModuleName Install-Conclude Read-Host { return "venvit_dir" } -ParameterFilter { $Prompt -eq "VENVIT_DIR (venvit_dir)" }
-            Mock -ModuleName Install-Conclude Read-Host { return "venvit_secrets_default_dir" } -ParameterFilter { $Prompt -eq "VENVIT_SECRETS_DEFAULT_DIR (venvit_secrets_default_dir)" }
-            Mock -ModuleName Install-Conclude Read-Host { return "venvit_secrets_user_dir" } -ParameterFilter { $Prompt -eq "VENVIT_SECRETS_USER_DIR (venvit_secrets_user_dir)" }
+            Mock -ModuleName Install-Conclude Read-Host { return "VENV_SECRETS_DEFAULT_DIR" } -ParameterFilter { $Prompt -eq "VENV_SECRETS_DEFAULT_DIR (VENV_SECRETS_DEFAULT_DIR)" }
+            Mock -ModuleName Install-Conclude Read-Host { return "venvit_secrets_user_dir" } -ParameterFilter { $Prompt -eq "VENV_SECRETS_USER_DIR (venvit_secrets_user_dir)" }
             Mock -ModuleName Install-Conclude Read-Host { return "venv_base_dir" } -ParameterFilter { $Prompt -eq "VENV_BASE_DIR (venv_base_dir)" }
             Mock -ModuleName Install-Conclude Read-Host { return "venv_python_base_dir" } -ParameterFilter { $Prompt -eq "VENV_PYTHON_BASE_DIR (venv_python_base_dir)" }
             Mock -ModuleName Install-Conclude Read-Host { return "venv_config_org_dir" } -ParameterFilter { $Prompt -eq "VENV_CONFIG_DEFAULT_DIR (venv_config_org_dir)" }
@@ -198,8 +198,8 @@ Describe "Function testing" {
             $projectsBaseDir | Should -Be "projects_base_dir"
             $venvitDir = [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine)
             $venvitDir | Should -Be "venvit_dir"
-            $venvitSecretsDefaultDir = [System.Environment]::GetEnvironmentVariable("VENVIT_SECRETS_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $venvitSecretsDefaultDir | Should -Be "venvit_secrets_default_dir"
+            $venvitSecretsDefaultDir = [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $venvitSecretsDefaultDir | Should -Be "VENV_SECRETS_DEFAULT_DIR"
             $venvitSecretsUserDir = [System.Environment]::GetEnvironmentVariable("VENVIT_SECRETS_USER_DIR", [System.EnvironmentVariableTarget]::Machine)
             $venvitSecretsUserDir | Should -Be "venvit_secrets_user_dir"
             $venvBaseDir = [System.Environment]::GetEnvironmentVariable("VENV_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
@@ -261,7 +261,7 @@ Describe "Function testing" {
         [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $OrigVENV_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
         [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $OrigPROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
         [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $OrigVENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
-        [System.Environment]::SetEnvironmentVariable("VENVIT_SECRETS_DEFAULT_DIR", $OrigVENVIT_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
+        [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $OrigVENV_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
         [System.Environment]::SetEnvironmentVariable("VENVIT_SECRETS_USER_DIR", $OrigVENVIT_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
         [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $OrigVENV_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
         [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $OrigVENV_PYTHON_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
