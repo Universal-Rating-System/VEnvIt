@@ -57,6 +57,29 @@ function Backup-SystemEnvironmentVariables {
     }
 }
 
+function Set-TestSetup_New {
+    $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
+    $tempDir = New-CustomTempDir -Prefix "VenvIt"
+    $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
+
+    $env:PROJECT_NAME = $null
+    $env:PROJECTS_BASE_DIR = $null
+    $env:VENV_BASE_DIR = $null
+    $env:VENV_CONFIG_DEFAULT_DIR = $null
+    $env:VENV_CONFIG_DIR = $null
+    $env:VENV_CONFIG_USER_DIR = $null
+    $env:VENV_ENVIRONMENT = $null
+    $env:VENV_ORGANIZATION_NAME = $null
+    $env:VENV_SECRETS_DEFAULT_DIR = $null
+    $env:VENV_PYTHON_BASE_DIR = $null
+    $env:VENV_SECRETS_USER_DIR = $null
+    $env:VENV_SECRETS_DIR = $null
+    $env:VENVIT_DIR = $null
+    $env:VIRTUAL_ENV = $null
+
+    return $mockInstalVal
+}
+
 function Set-TestSetup_0_0_0 {
     $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
     $tempDir = New-CustomTempDir -Prefix "VenvIt"
@@ -103,29 +126,6 @@ function Set-TestSetup_0_0_0 {
     Set-Content -Path $scriptPath -Value "Mock secrets file"
 
     New-CreateAppScripts -BaseDirectory $env:SCRIPTS_DIR
-
-    return $mockInstalVal
-}
-
-function Set-TestSetup_New {
-    $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
-    $tempDir = New-CustomTempDir -Prefix "VenvIt"
-    $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
-
-    $env:PROJECT_NAME = $null
-    $env:PROJECTS_BASE_DIR = $null
-    $env:VENV_BASE_DIR = $null
-    $env:VENV_CONFIG_DEFAULT_DIR = $null
-    $env:VENV_CONFIG_DIR = $null
-    $env:VENV_CONFIG_USER_DIR = $null
-    $env:VENV_ENVIRONMENT = $null
-    $env:VENV_ORGANIZATION_NAME = $null
-    $env:VENV_SECRETS_DEFAULT_DIR = $null
-    $env:VENV_PYTHON_BASE_DIR = $null
-    $env:VENV_SECRETS_USER_DIR = $null
-    $env:VENV_SECRETS_DIR = $null
-    $env:VENVIT_DIR = $null
-    $env:VIRTUAL_ENV = $null
 
     return $mockInstalVal
 }

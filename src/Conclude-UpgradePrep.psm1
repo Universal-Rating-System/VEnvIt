@@ -149,6 +149,8 @@ function Update-PackagePrep {
             }
         }
     }
+
+    return $CurrentVersion
 }
 
 Export-ModuleMember -Function Backup-ArchiveOldVersion, Get-ManifestFileName, Get-Version, Update-PackagePrep, Invoke-PrepForUpgrade_6_0_0
