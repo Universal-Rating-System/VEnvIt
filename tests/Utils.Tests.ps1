@@ -81,20 +81,8 @@ Describe "Function Tests" {
 
     Context "Set-EnvironmentVariables" {
         BeforeAll {
-            $origPROJECT_NAME = [System.Environment]::GetEnvironmentVariable("PROJECT_NAME", [System.EnvironmentVariableTarget]::Machine)
-            $origPROJECTS_BASE_DIR = [System.Environment]::GetEnvironmentVariable("PROJECTS_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $origRTE_ENVIRONMENT = [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
-            $origSECRETS_DIR = [System.Environment]::GetEnvironmentVariable("SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $origSCRIPTS_DIR = [System.Environment]::GetEnvironmentVariable("SCRIPTS_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $origVENV_BASE_DIR = [System.Environment]::GetEnvironmentVariable("VENV_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $origVENV_CONFIG_DEFAULT_DIR = [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $origVENV_CONFIG_USER_DIR = [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_USER_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $origVENV_ENVIRONMENT = [System.Environment]::GetEnvironmentVariable("VENV_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
-            $origVENV_ORGANIZATION_NAME = [System.Environment]::GetEnvironmentVariable("VENV_ORGANIZATION_NAME", [System.EnvironmentVariableTarget]::Machine)
-            $origVENV_PYTHON_BASE_DIR = [System.Environment]::GetEnvironmentVariable("VENV_PYTHON_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $origVENV_SECRETS_DEFAULT_DIR = [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $origVENV_SECRETS_USER_DIR = [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_USER_DIR", [System.EnvironmentVariableTarget]::Machine)
-            $origVENVIT_DIR = [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine)
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
 
             $mockInstalVal = Set-TestSetup_7_0_0
             [System.Environment]::SetEnvironmentVariable("PROJECT_NAME", $mockInstalVal.ProjectName, [System.EnvironmentVariableTarget]::Machine)
@@ -138,24 +126,19 @@ Describe "Function Tests" {
             [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"]
             [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_USER_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"]
             [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENVIT_DIR"]["DefVal"]
+
+            $env:PROJECTS_BASE_DIR | Should -Be $defEnvVarSet["PROJECTS_BASE_DIR"]["DefVal"]
+            $env:VENV_BASE_DIR | Should -Be $defEnvVarSet["VENV_BASE_DIR"]["DefVal"]
+            $env:VENV_CONFIG_DEFAULT_DIR | Should -Be $defEnvVarSet["VENV_CONFIG_DEFAULT_DIR"]["DefVal"]
+            $env:VENV_CONFIG_USER_DIR | Should -Be $defEnvVarSet["VENV_CONFIG_USER_DIR"]["DefVal"]
+            $env:VENV_ENVIRONMENT | Should -Be $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"]
+            $env:VENV_PYTHON_BASE_DIR | Should -Be $defEnvVarSet["VENV_PYTHON_BASE_DIR"]["DefVal"]
+            $env:VENV_SECRETS_DEFAULT_DIR | Should -Be $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"]
+            $env:VENV_SECRETS_USER_DIR | Should -Be $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"]
         }
         AfterAll {
-            [System.Environment]::SetEnvironmentVariable("PROJECT_NAME", $origPROJECT_NAME, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $origPROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $origRTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $origSECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $origSCRIPTS_DIR, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $origVENV_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $origVENV_CONFIG_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $origVENV_CONFIG_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $origVENV_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_ORGANIZATION_NAME", $origVENV_ORGANIZATION_NAME, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $origVENV_PYTHON_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $origVENV_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $origVENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $origVENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
-
-            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
         }
     }
 

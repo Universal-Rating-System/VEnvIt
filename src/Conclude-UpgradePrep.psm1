@@ -7,7 +7,7 @@ $VersionChanges = @{
     '7.0.0' = 'Invoke-PrepForUpgrade_7_0_0'
 }
 $PreVersion600EnvVars = @( "RTE_ENVIRONMENT", "SCRIPTS_DIR", "SECRETS_DIR" )
-$PreVersion700EnvVars = @("VENV_CONFIG_DIR", "VENV_SECRETS_DIR" )
+$PreVersion700EnvVars = @( "VENV_CONFIG_DIR", "VENV_SECRETS_DIR" )
 
 function Backup-ArchiveOldVersion {
     param(
@@ -156,7 +156,6 @@ function Update-PackagePrep {
         # Apply changes from current version to latest
         foreach ($version in $VersionChanges.Keys | Sort-Object { [version]$_ }) {
             if ([version]$version -gt $currentVersion -and [version]$version -le $UpgradeVersion) {
-                Write-Host "Applying changes for version $version"
                 & $VersionChanges[$version]  | Out-Null # Call the corresponding upgrade function
             }
         }

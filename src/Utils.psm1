@@ -104,6 +104,7 @@ function Set-EnvironmentVariables {
         if ($newValue -eq "") {
             $newValue = $defaultValue
         }
+        Set-Item -Path env:$envVar -Value $newValue
         [System.Environment]::SetEnvironmentVariable($envVar, $newValue, [System.EnvironmentVariableTarget]::Machine)
     }
 }
