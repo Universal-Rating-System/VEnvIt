@@ -140,12 +140,12 @@ function Update-PackagePrep {
 
     if ($CurrentVersion) {
         $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-        Backup-ArchiveOldVersion -ArchiveVersion $CurrentVersion -FileList $currentInstallDir -TimeStamp $timeStamp
+        Backup-ArchiveOldVersion -ArchiveVersion $CurrentVersion -FileList $currentInstallDir -TimeStamp $timeStamp | Out-Null
         # Apply changes from current version to latest
         foreach ($version in $VersionChanges.Keys | Sort-Object { [version]$_ }) {
             if ([version]$version -gt $currentVersion -and [version]$version -le $UpgradeVersion) {
                 Write-Host "Applying changes for version $version"
-                & $VersionChanges[$version]  # Call the corresponding upgrade function
+                & $VersionChanges[$version]  | Out-Null # Call the corresponding upgrade function
             }
         }
     }
