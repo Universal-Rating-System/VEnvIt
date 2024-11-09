@@ -19,8 +19,7 @@ Describe "Function testing" {
         It "Should archive version 0.0.0" {
             $mockInstalVal = Set-TestSetup_0_0_0
             $installationDir = "$env:SCRIPTS_DIR"
-            $FileList = $env:SCRIPTS_DIR
-            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -FileList $FileList -TimeStamp $timeStamp
+            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -TimeStamp $timeStamp
 
             (Test-Path -Path $archive) | Should -Be $true
         }
@@ -28,8 +27,7 @@ Describe "Function testing" {
         It "Should archive version 6.0.0" {
             $mockInstalVal = Set-TestSetup_6_0_0
             $installationDir = "$env:VENVIT_DIR"
-            $FileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DIR, $env:VENV_SECRETS_DIR
-            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -FileList $FileList -TimeStamp $timeStamp
+            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -TimeStamp $timeStamp
 
             (Test-Path -Path $archive) | Should -Be $true
         }
@@ -38,7 +36,7 @@ Describe "Function testing" {
             $mockInstalVal = Set-TestSetup_7_0_0
             $installationDir = "$env:VENVIT_DIR"
             $FileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
-            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -FileList $FileList -TimeStamp $timeStamp
+            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -TimeStamp $timeStamp
 
             (Test-Path -Path $archive) | Should -Be $true
         }

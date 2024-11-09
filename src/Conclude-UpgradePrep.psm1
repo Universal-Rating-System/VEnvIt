@@ -12,21 +12,33 @@ $PreVersion700EnvVars = @("VENV_CONFIG_DIR", "VENV_SECRETS_DIR" )
 function Backup-ArchiveOldVersion {
     param(
         [string]$InstallationDir,
-        [Object]$FileList,
         [string]$TimeStamp
     )
+    $fileList = $null
+    $destination = $null
     $ArchiveVersion = Get-Version -SourceDir $InstallationDir
-    $archiveDir = Join-Path -Path $InstallationDir -ChildPath "Archive"
-    $destination = Join-Path -Path $archiveDir -Child "Version_$ArchiveVersion$TimeStamp.zip"
-    if (-not(Test-Path $archiveDir)) {
-        New-Item -Path $archiveDir -ItemType Directory | Out-Null
+    if ($ArchiveVersion -eq "0.0.0") {
+        $fileList = $env:SCRIPTS_DIR
+    } elseif ($ArchiveVersion -eq "6.0.0") {
+        $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DIR, $env:VENV_SECRETS_DIR
     }
-    $compress = @{
-        Path             = $FileList
-        CompressionLevel = "Fastest"
-        DestinationPath  = $destination
+    elseif ($ArchiveVersion -eq "7.0.0") {
+        $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
     }
-    Compress-Archive @compress | Out-Null
+
+    if ($fileList) {
+        $archiveDir = Join-Path -Path $InstallationDir -ChildPath "Archive"
+        $destination = Join-Path -Path $archiveDir -Child "Version_$ArchiveVersion$TimeStamp.zip"
+        if (-not(Test-Path $archiveDir)) {
+            New-Item -Path $archiveDir -ItemType Directory | Out-Null
+        }
+        $compress = @{
+            Path             = $fileList
+            CompressionLevel = "Fastest"
+            DestinationPath  = $destination
+        }
+        Compress-Archive @compress | Out-Null
+    }
 
     return $destination
 }
@@ -136,11 +148,11 @@ function Update-PackagePrep {
         $CurrentVersion = $null
         $currentInstallDir = $null
     }
-    $UpgradeVersion = Get-Version -SourceDir $UpgradeScriptDir
+    $UpgradeVersion = Get-Version -InstallationDir $UpgradeScriptDir
 
     if ($CurrentVersion) {
         $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-        Backup-ArchiveOldVersion -ArchiveVersion $CurrentVersion -FileList $currentInstallDir -TimeStamp $timeStamp | Out-Null
+        Backup-ArchiveOldVersion -FileList $currentInstallDir -TimeStamp $timeStamp | Out-Null
         # Apply changes from current version to latest
         foreach ($version in $VersionChanges.Keys | Sort-Object { [version]$_ }) {
             if ([version]$version -gt $currentVersion -and [version]$version -le $UpgradeVersion) {
