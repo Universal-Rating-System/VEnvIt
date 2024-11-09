@@ -35,6 +35,9 @@ function Invoke-ConcludeInstall {
     Publish-LatestVersion -Release $Release -UpgradeScriptDir $UpgradeScriptDir
     Publish-Secrets -UpgradeScriptDir $UpgradeScriptDir
     Write-Host $separator -ForegroundColor Cyan
+    Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }
+    Get-Item "$env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1" | ForEach-Object { Unblock-File $_.FullName }
+    Get-Item "$env:VENV_SECRETS_USER_DIR\secrets.ps1" | ForEach-Object { Unblock-File $_.FullName }
     Clear-InstallationFiles -UpgradeScriptDir $UpgradeScriptDir
     Write-Host "Installation and configuration are complete." -ForegroundColor Green
 }
@@ -124,4 +127,5 @@ function Test-Admin {
 
 Export-ModuleMember -Function Clear-InstallationFiles, Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories
 Export-ModuleMember -Function Publish-LatestVersion, Publish-Secrets, Set-Path, Test-Admin
+Export-ModuleMember -Variable envVarSet
 Export-ModuleMember -Variable envVarSet
