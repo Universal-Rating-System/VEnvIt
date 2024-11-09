@@ -53,7 +53,7 @@ function Invoke-UpdateManifest {
 
     # Construct the paths for pyproject.toml and manifest.psd1 based on the provided directory
     $pyprojectPath = Join-Path -Path $ConfigBaseDir -ChildPath "pyproject.toml"
-    $manifestPath = Join-Path -Path $ConfigBaseDir -ChildPath "Manifest.psd1"
+    $manifestPath = Join-Path -Path $ConfigBaseDir -ChildPath (Get-ManifestFileName)
 
     # Check if pyproject.toml exists
     if (Test-Path -Path $pyprojectPath) {

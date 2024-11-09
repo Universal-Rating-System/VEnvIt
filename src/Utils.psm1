@@ -10,12 +10,6 @@
     VENVIT_DIR               = @{DefVal = "$env:ProgramFiles\VenvIt"; IsDir = $true }
 }
 
-# $defEnvVarSet = @{
-#     First  = @{ Key1 = "Value1"; Key2 = "Value2" }
-#     Second = @{ KeyA = "ValueA"; KeyB = "ValueB" }
-#     Third  = @{ KeyX = "ValueX"; KeyY = "ValueY" }
-# }
-
 $separator = "-" * 80
 
 function Backup-ScriptToArchiveIfExists {
@@ -38,7 +32,7 @@ function Backup-ScriptToArchiveIfExists {
         else {
             Compress-Archive -Path $ScriptPath -DestinationPath $archivePath
         }
-        Write-Host "Zipped $ScriptPath."
+        # Write-Host "Zipped $ScriptPath."
     }
     return $archivePath
 }

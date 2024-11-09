@@ -75,7 +75,7 @@ authors = [
                 Description = 'Test project'
             }
 
-            $manifestPath = Join-Path -Path $tempDir.FullName -ChildPath "manifest.psd1"
+            $manifestPath = Join-Path -Path $tempDir.FullName -ChildPath (Get-ManifestFileName)
             New-ManifestPsd1 -DestinationPath $manifestPath -data $data
 
             # Verify that the file was created and contains the expected content
