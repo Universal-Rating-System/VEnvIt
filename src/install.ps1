@@ -18,9 +18,6 @@ function Invoke-Install {
     Expand-Archive -Path $UpgradeScriptPath -DestinationPath $UpgradeScriptDir
     Import-Module -Name (Join-Path -Path $UpgradeScriptDir.FullName -ChildPath "src/Install-Conclude.psm1")
     Invoke-ConcludeInstall -Release $Tag -UpgradeScriptDir $UpgradeScriptDir
-    Remove-Item -Path $UpgradeScriptDir -Recurse -Force
-    Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }
-    Get-Item "$env:VENV_SECRETS_DIR\secrets.ps1" | ForEach-Object { Unblock-File $_.FullName }
     # --[ End copy for readme.md ]----------------------------------------------------
 }
 
