@@ -148,11 +148,11 @@ function Update-PackagePrep {
         $CurrentVersion = $null
         $currentInstallDir = $null
     }
-    $UpgradeVersion = Get-Version -InstallationDir $UpgradeScriptDir
+    $UpgradeVersion = Get-Version -SourceDir $UpgradeScriptDir
 
     if ($CurrentVersion) {
         $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-        Backup-ArchiveOldVersion -FileList $currentInstallDir -TimeStamp $timeStamp | Out-Null
+        Backup-ArchiveOldVersion -InstallationDir $currentInstallDir -TimeStamp $timeStamp | Out-Null
         # Apply changes from current version to latest
         foreach ($version in $VersionChanges.Keys | Sort-Object { [version]$_ }) {
             if ([version]$version -gt $currentVersion -and [version]$version -le $UpgradeVersion) {

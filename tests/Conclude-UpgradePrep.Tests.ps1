@@ -238,7 +238,7 @@ Describe "Function testing" {
             $CurrentVersion = Update-PackagePrep -UpgradeScriptDir $UpgradeScriptDir
 
             $CurrentVersion | Should -Be $null
-            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+            # Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
 
         It "Should apply 6.0.0 and 7.0.0 for 0.0.0 installation" {
@@ -261,11 +261,10 @@ Describe "Function testing" {
             $CurrentVersion | Should -Be "0.0.0"
             Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 -Times 1 -Exactly
             Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_7_0_0 -Times 1 -Exactly
-
-            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
         AfterEach {
             Remove-Item -Path $TempDir -Recurse -Force
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
             Restore-SessionEnvironmentVariables -OriginalValues $originalValues
         }
     }
