@@ -198,14 +198,34 @@ Describe "Function testing" {
             if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
             Import-Module $PSScriptRoot\..\src\Utils.psm1
 
-            $mockInstalVal = Set-TestSetup_0_0_0
             $TempDir = New-CustomTempDir -Prefix "VenvIt"
             $UpgradeScriptDir = New-Item -ItemType Directory -Path (Join-Path -Path $TempDir -ChildPath "TempUpgradeDir")
-            # $env:VENVIT_DIR = Join-Path -Path $TempDir -ChildPath "VenvIt"
-            # New-Item -ItemType Directory -Path $env:VENVIT_DIR
         }
 
-        It 'Should apply 6.0.0 and 7.0.0' {
+        It "Should bypass for new installation" {
+            # Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 {
+            #     return $true
+            # }
+            # # Mock -CommandName Invoke-PrepForUpgrade_6_0_0 { return $true }
+            # Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_7_0_0 {
+            #     return $true
+            # }
+            # Mock -CommandName Invoke-PrepForUpgrade_7_0_0
+            # $CurrentManifestPath = Join-Path -Path $env:SCRIPTS_DIR -ChildPath (Get-ManifestFileName)
+            # New-ManifestPsd1 -DestinationPath $CurrentManifestPath -Data $ManifestData000
+            $UpgradeManifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
+            New-ManifestPsd1 -DestinationPath $UpgradeManifestPath -data $ManifestData700
+            Update-PackagePrep -UpgradeScriptDir $UpgradeScriptDir
+
+            # Assert that the correct upgrade functions were called in order
+            Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 -Times 1 -Exactly
+            Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_7_0_0 -Times 1 -Exactly
+
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+        }
+
+        It "Should apply 6.0.0 and 7.0.0 for 0.0.0 installation" {
+            $mockInstalVal = Set-TestSetup_0_0_0
             Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 {
                 return $true
             }
@@ -223,10 +243,11 @@ Describe "Function testing" {
             # Assert that the correct upgrade functions were called in order
             Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 -Times 1 -Exactly
             Assert-MockCalled -Scope It -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_7_0_0 -Times 1 -Exactly
+
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
         AfterEach {
             Remove-Item -Path $TempDir -Recurse -Force
-            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
             Restore-SessionEnvironmentVariables -OriginalValues $originalValues
         }
     }
