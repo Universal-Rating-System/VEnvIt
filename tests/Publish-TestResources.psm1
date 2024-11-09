@@ -112,50 +112,20 @@ function Set-TestSetup_New {
     $tempDir = New-CustomTempDir -Prefix "VenvIt"
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
 
-    $env:PROJECT_NAME = $mockInstalVal.ProjectName
-    $env:PROJECTS_BASE_DIR = "$tempDir\Projects"
-    $env:VENV_BASE_DIR = "$tempDir\VEnv"
-    $env:VENV_CONFIG_DIR = "$tempDir\VENV_CONFIG_DIR"
-    $env:VENV_ENVIRONMENT = "loc_dev"
-    $env:VENV_ORGANIZATION_NAME = $mockInstalVal.Organization
-    $env:VENV_PYTHON_BASE_DIR = "$tempDir\Python"
-    $env:VENV_SECRETS_DIR = "$tempDir\VENV_SECRETS_DIR"
-    $env:VENVIT_DIR = "$tempDir\VEnvIt"
-    $env:VIRTUAL_ENV = ("$env:VENV_BASE_DIR\" + $mockInstalVal.ProjectName)
-
-    $organizationDir = (Join-Path -Path $env:PROJECTS_BASE_DIR -ChildPath $env:VENV_ORGANIZATION_NAME)
-    $mockInstalVal | Add-Member -MemberType NoteProperty -Name "OrganizationDir" -Value $organizationDir
-    $env:PROJECT_DIR = (Join-Path -Path $mockInstalVal.OrganizationDir -ChildPath $env:PROJECT_NAME)
-    $mockInstalVal | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value $env:PROJECT_DIR
-    Write-Host $mockInstalVal.OrganizationDir
-    Write-Host $env:PROJECT_DIR
-
-    #Create the directory structure
-    $directories = @(
-        $env:PROJECT_DIR,
-        "$env:VENV_BASE_DIR\${env:PROJECT_NAME}_env\Scripts",
-        $env:VENV_CONFIG_DIR,
-        $env:VENV_PYTHON_BASE_DIR,
-        $env:VENV_SECRETS_DIR,
-        $env:VENVIT_DIR
-    )
-    foreach ($directory in $directories) {
-        New-Item -ItemType Directory -Path $directory | Out-Null
-    }
-
-    # Create the configuration scripts
-    $postfixes = @( "setup_mandatory", "install", "setup_custom" )
-    foreach ($postfix in $postfixes) {
-        $fileName = "venv_" + $mockInstalVal.ProjectName + "_$postfix.ps1"
-        $scriptPath = Join-Path -Path $env:VENV_CONFIG_DIR -ChildPath $fileName
-        New-Item -Path $scriptPath -ItemType File -Force | Out-Null
-        Set-Content -Path $scriptPath -Value "Mock $fileName file"
-    }
-
-    # Create the sccrtet's files
-    $scriptPath = Join-Path -Path $env:VENV_SECRETS_DIR -ChildPath "dev_env_var.ps1"
-    New-Item -Path $scriptPath -ItemType File -Force | Out-Null
-    Set-Content -Path $scriptPath -Value "Mock $scriptPath file"
+    $env:PROJECT_NAME = $null
+    $env:PROJECTS_BASE_DIR = $null
+    $env:VENV_BASE_DIR = $null
+    $env:VENV_CONFIG_DEFAULT_DIR = $null
+    $env:VENV_CONFIG_DIR = $null
+    $env:VENV_CONFIG_USER_DIR = $null
+    $env:VENV_ENVIRONMENT = $null
+    $env:VENV_ORGANIZATION_NAME = $null
+    $env:VENV_SECRETS_DEFAULT_DIR = $null
+    $env:VENV_PYTHON_BASE_DIR = $null
+    $env:VENV_SECRETS_USER_DIR = $null
+    $env:VENV_SECRETS_DIR = $null
+    $env:VENVIT_DIR = $null
+    $env:VIRTUAL_ENV = $null
 
     return $mockInstalVal
 }
@@ -330,7 +300,7 @@ function Restore-SystemEnvironmentVariables {
     [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $OriginalValues.VENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
 }
 
-Export-ModuleMember -Function Backup-SessionEnvironmentVariables, Backup-SystemEnvironmentVariables, Set-TestSetup_0_0_0
-Export-ModuleMember -Function Set-TestSetup_6_0_0, Set-TestSetup_7_0_0, New-CreateAppScripts, New-TestEnvironment
-Export-ModuleMember -Function Restore-SessionEnvironmentVariables, Restore-SystemEnvironmentVariables
+Export-ModuleMember -Function Backup-SessionEnvironmentVariables, Backup-SystemEnvironmentVariables, Set-TestSetup_New
+Export-ModuleMember -Function Set-TestSetup_0_0_0, Set-TestSetup_6_0_0, Set-TestSetup_7_0_0, New-CreateAppScripts
+Export-ModuleMember -Function New-TestEnvironment, Restore-SessionEnvironmentVariables, Restore-SystemEnvironmentVariables
 Export-ModuleMember -Variable ManifestData000, ManifestData600, ManifestData700

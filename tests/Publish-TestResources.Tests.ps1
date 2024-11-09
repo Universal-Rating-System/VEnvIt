@@ -86,6 +86,37 @@ Describe "Function testing" {
         }
     }
 
+    Context "Set-TestSetup_New" {
+        BeforeEach {
+            $OriginalValues = Backup-SessionEnvironmentVariables
+        }
+        It "Should create mock app scripts" {
+            $mockInstalVal = Set-TestSetup_New
+
+            $env:PROJECT_NAME | Should -Be $null
+            $env:PROJECTS_BASE_DIR | Should -Be $null
+            $env:VENV_BASE_DIR | Should -Be $null
+            $env:VENV_CONFIG_DEFAULT_DIR | Should -Be $null
+            $env:VENV_CONFIG_DIR | Should -Be $null
+            $env:VENV_CONFIG_USER_DIR | Should -Be $null
+            $env:VENV_ENVIRONMENT | Should -Be $null
+            $env:VENV_ORGANIZATION_NAME | Should -Be $null
+            $env:VENV_SECRETS_DEFAULT_DIR | Should -Be $null
+            $env:VENV_PYTHON_BASE_DIR | Should -Be $null
+            $env:VENV_SECRETS_USER_DIR | Should -Be $null
+            $env:VENV_SECRETS_DIR | Should -Be $null
+            $env:VENVIT_DIR | Should -Be $null
+            $env:VIRTUAL_ENV | Should -Be $null
+
+            Test-Path -Path $mockInstalVal.TempDir | Should -Be $true
+        }
+
+        AfterEach {
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+        }
+    }
+
     Context "Set-TestSetup_0_0_0" {
         BeforeEach {
             $OriginalValues = Backup-SessionEnvironmentVariables
@@ -224,6 +255,7 @@ Describe "Function testing" {
             Remove-Item -Path $TempDir -Recurse -Force
         }
     }
+
     Context "Restore-SessionEnvironmentVariables" {
         # TODO
         # Test to be implemented
