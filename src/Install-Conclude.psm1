@@ -33,7 +33,7 @@ function Invoke-ConcludeInstall {
     Write-Host "Environment variables have been set successfully." -ForegroundColor Green
     New-Directories
     Publish-LatestVersion -Release $Release -UpgradeScriptDir $UpgradeScriptDir
-    Publish-Secrets
+    Publish-Secrets -UpgradeScriptDir $UpgradeScriptDir
     Write-Host $separator -ForegroundColor Cyan
     Clear-InstallationFiles -UpgradeScriptDir $UpgradeScriptDir
     Write-Host "Installation and configuration are complete." -ForegroundColor Green
@@ -85,31 +85,20 @@ function Publish-LatestVersion {
 }
 
 function Publish-Secrets {
+    param(
+        [string]$UpgradeScriptDir
+    )
     # Move the secrets.ps1 file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
-    $sourceFilePath = Join-Path -Path $env:VENVIT_DIR -ChildPath "secrets.ps1"
-    $destinationDefaultFilePath = Join-Path -Path $env:VENV_SECRETS_DEFAULT_DIR -ChildPath "secrets.ps1"
-    $destinationUserFilePath = Join-Path -Path $env:VENV_SECRETS_USER_DIR -ChildPath "secrets.ps1"
-
-    if (Test-Path -Path $sourceFilePath) {
-        if (-not (Test-Path -Path $destinationDefaultFilePath)) {
-            Write-Host "Moving secrets.ps1 to $env:VENV_SECRETS_DEFAULT_DIR..."
-            Copy-Item -Path $sourceFilePath -Destination $destinationDefaultFilePath -Force
-        }
-        else {
-            Write-Host "secrets.ps1 already exists in $env:VENV_SECRETS_DEFAULT_DIR. It will not be overwritten."
-        }
-        if (-not (Test-Path -Path $destinationUserFilePath)) {
-            Write-Host "Moving secrets.ps1 to $env:VENVIT_SECRETS_USER_DIR..."
-            Move-Item -Path $sourceFilePath -Destination $destinationUserFilePath -Force
-        }
-        else {
-            Write-Host "secrets.ps1 already exists in $env:VENVIT_SECRETS_USER_DIR. It will not be overwritten."
+    $copiedFiles = @()
+    $directories = @( $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR )
+    foreach ($directory in $directories) {
+        $secretsPath = Join-Path -Path $directory -ChildPath (Get-SecretsFileName)
+        if ( -not(Test-Path -Path $secretsPath)) {
+            Copy-Item -Path $UpgradeScriptDir -Destination $secretsPath -Force
+            $copiedFiles += $secretsPath
         }
     }
-    else {
-        Write-Host "secrets.ps1 not found in $env:VENVIT_DIR."
-    }
-
+    return $copiedFiles
 }
 
 function Set-Path {

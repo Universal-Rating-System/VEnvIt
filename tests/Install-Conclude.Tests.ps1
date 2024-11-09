@@ -15,6 +15,11 @@ Describe "Function testing" {
     }
 
     Context "Clear-InstallationFiles" {
+        BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+        }
+
         BeforeEach {
             $OriginalValues = Backup-SessionEnvironmentVariables
             $tempDir = New-CustomTempDir -Prefix "VenvIt"
@@ -47,7 +52,8 @@ Describe "Function testing" {
         BeforeAll {
             $originalSessionValues = Backup-SessionEnvironmentVariables
             $originalSystemValues = Backup-SystemEnvironmentVariables
-
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
         }
         BeforeEach {
             $tempDir = New-CustomTempDir -Prefix "VenvIt"
@@ -91,7 +97,6 @@ Describe "Function testing" {
         BeforeEach {
             $originalSessionValues = Backup-SessionEnvironmentVariables
             $mockInstalVal = Set-TestSetup_6_0_0
-            # Remove-Item -Path (Join-Path -Path $env:VENVIT_DIR -ChildPath (Get-ManifestFileName)) -Recurse -Force
 
             $TempDir = New-CustomTempDir -Prefix "VenvIt"
             $upgradeScriptDir = Join-Path -Path $TempDir -ChildPath "TempUpgradeDir"
@@ -130,28 +135,54 @@ Describe "Function testing" {
     }
 
     Context "Publish-Secrets" {
+        BeforeAll {
+            if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
+            Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+        }
         BeforeEach {
-            $tempDir = New-CustomTempDir -Prefix "VenvIt"
-            $env:VENV_SECRETS_DEFAULT_DIR = "$tempDir\DefaultSecrets"
-            $env:VENV_SECRETS_USER_DIR = "$tempDir\UserSecrets"
-            $env:VENVIT_DIR = "$tempDir\VenvIt"
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $mockInstalVal = Set-TestSetup_7_0_0
 
-            New-Item -ItemType Directory -Path $env:VENVIT_DIR | Out-Null
-            New-Item -ItemType Directory -Path $env:VENV_SECRETS_DEFAULT_DIR | Out-Null
-            New-Item -ItemType Directory -Path $env:VENV_SECRETS_USER_DIR | Out-Null
+            $TempDir = New-CustomTempDir -Prefix "VenvIt"
+            $upgradeScriptDir = Join-Path -Path $TempDir -ChildPath "TempUpgradeDir"
+            New-Item -ItemType Directory -Path "$upgradeScriptDir\src"
+            Copy-Item -Path "$PSScriptRoot\..\README.md" -Destination $upgradeScriptDir
+            Copy-Item -Path "$PSScriptRoot\..\LICENSE" -Destination $upgradeScriptDir
+            Copy-Item -Path "$PSScriptRoot\..\ReleaseNotes.md" -Destination $upgradeScriptDir
+            Copy-Item -Path "$PSScriptRoot\..\src\vi.ps1" -Destination "$upgradeScriptDir\src"
+            Copy-Item -Path "$PSScriptRoot\..\src\vn.ps1" -Destination "$upgradeScriptDir\src"
+            Copy-Item -Path "$PSScriptRoot\..\src\vr.ps1" -Destination "$upgradeScriptDir\src"
+            Copy-Item -Path "$PSScriptRoot\..\src\utils.psm1" -Destination "$upgradeScriptDir\src"
+            Copy-Item -Path "$PSScriptRoot\..\src\secrets.ps1" -Destination "$upgradeScriptDir\src"
+            $manifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
+            New-ManifestPsd1 -DestinationPath $manifestPath -data $ManifestData700
 
-            Copy-Item -Path $PSScriptRoot\..\src\secrets.ps1 -Destination $env:VENVIT_DIR
         }
 
         It "Should copy all secrets files" {
-            Publish-Secrets
+            $secretsPath = Join-Path -Path $env:VENV_SECRETS_DEFAULT_DIR -ChildPath (Get-SecretsFileName)
+            Remove-Item -Path $secretsPath -Recurse -Force
+            $secretsPath = Join-Path -Path $env:VENV_SECRETS_USER_DIR -ChildPath (Get-SecretsFileName)
+            Remove-Item -Path $secretsPath -Recurse -Force
+            $secretsDirList = Publish-Secrets -UpgradeScriptDir $upgradeScriptDir
 
-            (Test-Path -Path $env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1) | Should -Be $true
-            (Test-Path -Path $env:VENVIT_SECRETS_USER_DIR\secrets.ps1) | Should -Be $true
+            $secretsDirList | Should -Be @("$env:VENV_SECRETS_DEFAULT_DIR\Secrets.ps1", "$env:VENV_SECRETS_USER_DIR\Secrets.ps1")
+        }
+
+        It "Should only copy VENV_SECRETS_DEFAULT_DIR secrets files" {
+            $secretsPath = Join-Path -Path $env:VENV_SECRETS_DEFAULT_DIR -ChildPath (Get-SecretsFileName)
+            Remove-Item -Path $secretsPath -Recurse -Force
+            $secretsDirList = Publish-Secrets -UpgradeScriptDir $upgradeScriptDir
+
+            $secretsDirList | Should -Be @("$env:VENV_SECRETS_DEFAULT_DIR\Secrets.ps1")
         }
 
         AfterEach {
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
             Remove-Item -Path $TempDir -Recurse -Force
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
 
@@ -202,7 +233,7 @@ Describe "Function testing" {
         [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $OrigPROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
         [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $OrigVENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
         [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $OrigVENV_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
-        [System.Environment]::SetEnvironmentVariable("VENVIT_SECRETS_USER_DIR", $OrigVENVIT_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
+        [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $OrigVENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
         [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $OrigVENV_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
         [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $OrigVENV_PYTHON_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
         [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $OrigVENV_CONFIG_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
