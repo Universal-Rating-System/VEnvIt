@@ -67,6 +67,9 @@ function Get-ManifestFileName {
     return "Manifest.psd1"
 }
 
+function Get-SecretsFileName {
+    return "Secrets.ps1"
+}
 function New-CustomTempDir {
     param (
         [Parameter(Mandatory = $true)]
@@ -161,6 +164,6 @@ function Read-YesOrNo {
 
 
 Export-ModuleMember -Function Backup-ScriptToArchiveIfExists, New-CustomTempDir, Confirm-EnvironmentVariables
-Export-ModuleMember -Function Get-ConfigFileName, Get-ManifestFileName, Invoke-Script, Read-YesOrNo, Set-EnvironmentVariables
-Export-ModuleMember -Function Show-EnvironmentVariables
+Export-ModuleMember -Function Get-ConfigFileName, Get-ManifestFileName, Get-SecretsFileName, Invoke-Script, Read-YesOrNo
+Export-ModuleMember -Function Set-EnvironmentVariables, Show-EnvironmentVariables
 Export-ModuleMember -Variable defEnvVarSet, separator

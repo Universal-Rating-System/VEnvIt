@@ -42,18 +42,26 @@ Describe "Function Tests" {
     }
 
     Context "Get-ConfigFileName" {
-        # TODO
-        # Test to be implemented
         BeforeAll {}
-        It "TODO Get-ConfigFileName" {}
+        It "Should return secrets filename" {
+            Get-ConfigFileName -ProjectName "MyProject" -Postfix "Postfix" | Should -Be "VEnvMyProjectPostfix.ps1"
+        }
         AfterAll {}
     }
 
     Context "Get-ManifestFileName" {
-        # TODO
-        # Test to be implemented
         BeforeAll {}
-        It "TODO Get-ManifestFileName" {}
+        It "Should return manifest filename" {
+            Get-ManifestFileName | Should -Be "Manifest.psd1"
+        }
+        AfterAll {}
+    }
+
+    Context "Get-SecretsFileName" {
+        BeforeAll {}
+        It "Should return secrets filename" {
+            Get-SecretsFileName | Should -Be "Secrets.ps1"
+        }
         AfterAll {}
     }
 
@@ -69,14 +77,6 @@ Describe "Function Tests" {
                 Remove-Item -Path $tempDir -Recurse -Force
             }
         }
-    }
-
-    Context "Get-ConfigFileName" {
-        # TODO
-        # Test to be implemented
-        BeforeAll {}
-        It "TODO Get-ConfigFileName" {}
-        AfterAll {}
     }
 
     Context "Set-EnvironmentVariables" {
