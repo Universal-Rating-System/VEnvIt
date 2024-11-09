@@ -1,5 +1,5 @@
 ﻿Describe "Function testing" {
-    Context "Invoke-Install Function Tests" {
+    Context "Invoke-Install" {
         BeforeAll {
             . $PSScriptRoot\..\src\Install.ps1 -Pester
             if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
@@ -27,7 +27,7 @@
 "@
             } -ParameterFilter { $Uri -eq "https://api.github.com/repos/BrightEdgeeServices/venvit/releases" }
             Mock Invoke-WebRequest {
-                New-ManifestPsd1 -DestinationPath (Join-Path -Path "$PSScriptRoot\.." -ChildPath "Manifest.psd1") -data $ManifestData700
+                New-ManifestPsd1 -DestinationPath (Join-Path -Path "$PSScriptRoot\.." -ChildPath (Get-ManifestFileName)) -data $ManifestData700
                 $compress = @{
                     Path             = "$PSScriptRoot\..\*.md", "$PSScriptRoot\..\LICENSE", "$PSScriptRoot\..\Manifest.psd1", "$PSScriptRoot\..\src"
                     CompressionLevel = "Fastest"

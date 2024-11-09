@@ -73,11 +73,15 @@ function Publish-LatestVersion {
     # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
     Write-Host "Copy source files to to $env:VENVIT_DIR..."
     # Expand-Archive -Path $zipFilePath -DestinationPath $env:VENVIT_DIR -Force
+    Copy-Item -Path "$UpgradeScriptDir\LICENSE" -Destination $env:VENVIT_DIR | Out-Null
+    Copy-Item -Path "$UpgradeScriptDir\Manifest.psd1" -Destination $env:VENVIT_DIR | Out-Null
+    Copy-Item -Path "$UpgradeScriptDir\README.md" -Destination $env:VENVIT_DIR | Out-Null
+    Copy-Item -Path "$UpgradeScriptDir\ReleaseNotes.md" -Destination $env:VENVIT_DIR | Out-Null
     Copy-Item -Path "$UpgradeScriptDir\src\vi.ps1" -Destination $env:VENVIT_DIR | Out-Null
     Copy-Item -Path "$UpgradeScriptDir\src\vn.ps1" -Destination $env:VENVIT_DIR | Out-Null
     Copy-Item -Path "$UpgradeScriptDir\src\vr.ps1" -Destination $env:VENVIT_DIR | Out-Null
     Copy-Item -Path "$UpgradeScriptDir\src\utils.psm1" -Destination $env:VENVIT_DIR | Out-Null
-
+    Copy-Item -Path "$UpgradeScriptDir\src\utils.psm1" -Destination $env:VENVIT_DIR | Out-Null
 }
 
 function Publish-Secrets {
@@ -130,6 +134,5 @@ function Test-Admin {
 }
 
 Export-ModuleMember -Function Clear-InstallationFiles, Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories
-Export-ModuleMember -Function Publish-LatestVersion, Publish-Secrets, Remove-EnvVarIfExists, Set-EnvironmentVariables
-Export-ModuleMember -Function Set-Path, Test-Admin
+Export-ModuleMember -Function Publish-LatestVersion, Publish-Secrets, Set-Path, Test-Admin
 Export-ModuleMember -Variable envVarSet

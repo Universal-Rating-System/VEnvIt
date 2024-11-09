@@ -70,8 +70,8 @@ function Set-TestSetup_New {
     $env:VENV_CONFIG_USER_DIR = $null
     $env:VENV_ENVIRONMENT = $null
     $env:VENV_ORGANIZATION_NAME = $null
-    $env:VENV_SECRETS_DEFAULT_DIR = $null
     $env:VENV_PYTHON_BASE_DIR = $null
+    $env:VENV_SECRETS_DEFAULT_DIR = $null
     $env:VENV_SECRETS_USER_DIR = $null
     $env:VENV_SECRETS_DIR = $null
     $env:VENVIT_DIR = $null
