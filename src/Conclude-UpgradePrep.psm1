@@ -126,26 +126,27 @@ function Update-PackagePrep {
 
     if (Test-Path "env:VENVIT_DIR") {
         $CurrentVersion = Get-Version -SourceDir $env:VENVIT_DIR
+        $currentInstallDir = $env:VENVIT_DIR
+    }
+    elseif (Test-Path "env:SCRIPTS_DIR") {
+        $CurrentVersion = Get-Version -SourceDir $env:SCRIPTS_DIR
+        $currentInstallDir = $env:SCRIPTS_DIR
     }
     else {
-        $CurrentVersion = Get-Version -SourceDir $env:SCRIPTS_DIR
+        $CurrentVersion = $null
+        $currentInstallDir = $null
     }
     $UpgradeVersion = Get-Version -SourceDir $UpgradeScriptDir
 
-    $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-    if ($CurrentVersion -eq "0.0.0") {
-        $fileList = "$env:SCRIPTS_DIR"
-    }
-    else {
-        $fileList = $env:VENVIT_DIR
-    }
-    Backup-ArchiveOldVersion -ArchiveVersion $CurrentVersion -FileList $fileList -TimeStamp $timeStamp
-
-    # Apply changes from current version to latest
-    foreach ($version in $VersionChanges.Keys | Sort-Object { [version]$_ }) {
-        if ([version]$version -gt $currentVersion -and [version]$version -le $UpgradeVersion) {
-            Write-Host "Applying changes for version $version"
-            & $VersionChanges[$version]  # Call the corresponding upgrade function
+    if ($CurrentVersion) {
+        $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+        Backup-ArchiveOldVersion -ArchiveVersion $CurrentVersion -FileList $currentInstallDir -TimeStamp $timeStamp
+        # Apply changes from current version to latest
+        foreach ($version in $VersionChanges.Keys | Sort-Object { [version]$_ }) {
+            if ([version]$version -gt $currentVersion -and [version]$version -le $UpgradeVersion) {
+                Write-Host "Applying changes for version $version"
+                & $VersionChanges[$version]  # Call the corresponding upgrade function
+            }
         }
     }
 }
