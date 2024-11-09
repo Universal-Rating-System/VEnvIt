@@ -11,12 +11,12 @@ $PreVersion700EnvVars = @("VENV_CONFIG_DIR", "VENV_SECRETS_DIR" )
 
 function Backup-ArchiveOldVersion {
     param(
-        [string]$ArchiveVersion,
-        [string]$FileList,
+        [string]$InstallationDir,
+        [Object]$FileList,
         [string]$TimeStamp
     )
-
-    $archiveDir = Join-Path -Path $env:SCRIPTS_DIR -ChildPath "Archive"
+    $ArchiveVersion = Get-Version -SourceDir $InstallationDir
+    $archiveDir = Join-Path -Path $InstallationDir -ChildPath "Archive"
     $destination = Join-Path -Path $archiveDir -Child "Version_$ArchiveVersion$TimeStamp.zip"
     if (-not(Test-Path $archiveDir)) {
         New-Item -Path $archiveDir -ItemType Directory | Out-Null

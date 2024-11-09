@@ -13,15 +13,36 @@ Describe "Function testing" {
             $OriginalValues = Backup-SessionEnvironmentVariables
             if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
             Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
-            $mockInstalVal = Set-TestSetup_0_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         }
 
         It "Should archive version 0.0.0" {
-            $archive = Backup-ArchiveOldVersion -ArchiveVersion "0.0.0" -FileList "$env:SCRIPTS_DIR\*.*" -TimeStamp $timeStamp
+            $mockInstalVal = Set-TestSetup_0_0_0
+            $installationDir = "$env:SCRIPTS_DIR"
+            $FileList = $env:SCRIPTS_DIR
+            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -FileList $FileList -TimeStamp $timeStamp
 
             (Test-Path -Path $archive) | Should -Be $true
         }
+
+        It "Should archive version 6.0.0" {
+            $mockInstalVal = Set-TestSetup_6_0_0
+            $installationDir = "$env:VENVIT_DIR"
+            $FileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DIR, $env:VENV_SECRETS_DIR
+            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -FileList $FileList -TimeStamp $timeStamp
+
+            (Test-Path -Path $archive) | Should -Be $true
+        }
+
+        It "Should archive version 7.0.0" {
+            $mockInstalVal = Set-TestSetup_7_0_0
+            $installationDir = "$env:VENVIT_DIR"
+            $FileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
+            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -FileList $FileList -TimeStamp $timeStamp
+
+            (Test-Path -Path $archive) | Should -Be $true
+        }
+
         AfterEach {
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
             Restore-SessionEnvironmentVariables -OriginalValues $originalValues
