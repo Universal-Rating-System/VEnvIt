@@ -11,22 +11,34 @@ $PreVersion700EnvVars = @("VENV_CONFIG_DIR", "VENV_SECRETS_DIR" )
 
 function Backup-ArchiveOldVersion {
     param(
-        [string]$ArchiveVersion,
-        [string]$FileList,
+        [string]$InstallationDir,
         [string]$TimeStamp
     )
+    $fileList = $null
+    $destination = $null
+    $ArchiveVersion = Get-Version -SourceDir $InstallationDir
+    if ($ArchiveVersion -eq "0.0.0") {
+        $fileList = $env:SCRIPTS_DIR
+    } elseif ($ArchiveVersion -eq "6.0.0") {
+        $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DIR, $env:VENV_SECRETS_DIR
+    }
+    elseif ($ArchiveVersion -eq "7.0.0") {
+        $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
+    }
 
-    $archiveDir = Join-Path -Path $env:SCRIPTS_DIR -ChildPath "Archive"
-    $destination = Join-Path -Path $archiveDir -Child "Version_$ArchiveVersion$TimeStamp.zip"
-    if (-not(Test-Path $archiveDir)) {
-        New-Item -Path $archiveDir -ItemType Directory | Out-Null
+    if ($fileList) {
+        $archiveDir = Join-Path -Path $InstallationDir -ChildPath "Archive"
+        $destination = Join-Path -Path $archiveDir -Child "Version_$ArchiveVersion$TimeStamp.zip"
+        if (-not(Test-Path $archiveDir)) {
+            New-Item -Path $archiveDir -ItemType Directory | Out-Null
+        }
+        $compress = @{
+            Path             = $fileList
+            CompressionLevel = "Fastest"
+            DestinationPath  = $destination
+        }
+        Compress-Archive @compress | Out-Null
     }
-    $compress = @{
-        Path             = $FileList
-        CompressionLevel = "Fastest"
-        DestinationPath  = $destination
-    }
-    Compress-Archive @compress | Out-Null
 
     return $destination
 }
@@ -140,7 +152,7 @@ function Update-PackagePrep {
 
     if ($CurrentVersion) {
         $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-        Backup-ArchiveOldVersion -ArchiveVersion $CurrentVersion -FileList $currentInstallDir -TimeStamp $timeStamp | Out-Null
+        Backup-ArchiveOldVersion -InstallationDir $currentInstallDir -TimeStamp $timeStamp | Out-Null
         # Apply changes from current version to latest
         foreach ($version in $VersionChanges.Keys | Sort-Object { [version]$_ }) {
             if ([version]$version -gt $currentVersion -and [version]$version -le $UpgradeVersion) {
