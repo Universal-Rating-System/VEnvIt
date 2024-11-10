@@ -60,49 +60,6 @@ Describe "Function Testing" {
         }
     }
 
-    Context "Get-Version" {
-        BeforeAll {
-            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
-            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
-            if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
-            Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
-        }
-
-        BeforeEach {
-            $OriginalValues = Backup-SessionEnvironmentVariables
-        }
-
-        It "Should get 0.0.0" {
-            $mockInstalVal = Set-TestSetup_0_0_0
-            $Version = Get-Version -SourceDir $env:SCRIPTS_DIR
-            $Version | Should -Be "0.0.0"
-            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
-        }
-
-        It "Should get 6.0.0" {
-            if (Test-Path "env:SCRIPTS_DIR") {
-                Remove-Item -Path "Env:SCRIPTS_DIR"
-            }
-            $mockInstalVal = Set-TestSetup_6_0_0
-            $Version = Get-Version -SourceDir $env:VENVIT_DIR
-            $Version | Should -Be "6.0.0"
-            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
-        }
-
-        It "Should get 7.0.0" {
-            if (Test-Path "env:SCRIPTS_DIR") {
-                Remove-Item -Path "Env:SCRIPTS_DIR"
-            }
-            $mockInstalVal = Set-TestSetup_7_0_0
-            $Version = Get-Version -SourceDir $env:VENVIT_DIR
-            $Version | Should -Be "7.0.0"
-            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
-        }
-        AfterEach {
-            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
-        }
-    }
-
     Context "Invoke-PrepForUpgrade_6_0_0" {
         BeforeAll {
             # This test must be run with administrator rights.

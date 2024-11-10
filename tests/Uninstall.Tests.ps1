@@ -6,7 +6,6 @@ Describe "Top level script execution" {
     }
 
     BeforeEach {
-        # . $PSScriptRoot\..\src\Uninstall.ps1 -Pester
         Mock -CommandName "Show-Help" -MockWith { Write-Host "Mock: Show-Help called" }
     }
 
@@ -21,7 +20,6 @@ Describe "Top level script execution" {
         BeforeAll {
         }
         BeforeEach {
-            # . $PSScriptRoot\..\src\Uninstall.ps1 -Pester
             Mock "Invoke-Uninstall" -MockWith { Write-Host "Mock: Invoke-Uninstall called with BackupDir = $BackupDir" }
         }
         It "Should call Invoke-BackupDir function with BackupDir" {
@@ -32,7 +30,6 @@ Describe "Top level script execution" {
 
     Context "When BackupDir is an empty string and Help is not passed" {
         BeforeAll {
-            # . $PSScriptRoot\..\src\Uninstall.ps1 -Pester
         }
         It "Should call Show-Help function" {
             & $PSScriptRoot\..\src\Uninstall.ps1 -BackupDir $null
@@ -42,7 +39,6 @@ Describe "Top level script execution" {
 
     Context "When no parameters are passed" {
         BeforeAll {
-            # . $PSScriptRoot\..\src\Uninstall.ps1 -Pester
         }
         It "Should call Show-Help function" {
             & $PSScriptRoot\..\src\Uninstall.ps1
@@ -53,44 +49,21 @@ Describe "Top level script execution" {
 
 Describe "Function Testing" {
     BeforeAll {
-        . $PSScriptRoot\..\src\vi.ps1 -Pester
-        $OriginalValues = Backup-SessionEnvironmentVariables
-        Mock -CommandName "Show-Help" -MockWith { Write-Host "Mock: Show-Help called" }
+        $originalSessionValues = Backup-SessionEnvironmentVariables
+        $originalSystemValues = Backup-SystemEnvironmentVariables
+        . $PSScriptRoot\..\src\Uninstall.ps1 -Pester
     }
 
-    Context "Invoke-VirtualEnvironment" {
+    Context "Uninstall" {
         BeforeEach {
-            . $PSScriptRoot\..\src\vn.ps1 -Pester
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
 
-        Context "With virtual environment activated" {
-            It "Should invoke the virtual environment" {
-                Mock Invoke-Script { return "Mock: Deactivated current VEnv"
-                } -ParameterFilter { $Script -eq "deactivate" }
-                Mock Invoke-Script { return "Mock: Activated VEnv"
-                } -ParameterFilter { $Script -eq ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1") }
-                Mock Invoke-Script { return "Mock: Default secrets.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1") }
-                Mock Invoke-Script { return "Mock: User secrets.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_SECRETS_USER_DIR\secrets.ps1") }
-                Mock Invoke-Script { return "Mock: Default EnvVar.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar")) }
-                Mock Invoke-Script { return "Mock: User EnvVar.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar")) }
-                Mock Invoke-Script { return "Mock: Default CustomSetup.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup")) }
-                Mock Invoke-Script { return "Mock: User CustomSetup.ps1"
-                } -ParameterFilter { $Script -eq ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup")) }
-
-                Invoke-VirtualEnvironment -ProjectName "MyProject"
-
-                Assert-MockCalled -CommandName "Invoke-Script" -ParameterFilter { $Script -eq "deactivate" }
-                # (Test-Path $tempDir) | Should -Be $true
-            }
+        It "Should archive v7.0.0. to default" {
+            Invoke-Uninstall
         }
+
         AfterEach {
             Set-Location -Path $env:TEMP
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
@@ -98,11 +71,19 @@ Describe "Function Testing" {
     }
 
     Context "Show-Help" {
-        # TODO
-        # Test to be implemented
+        BeforeEach {
+        }
+
+        It "TODO Should Show-Help" {
+        }
+
+        AfterEach {
+        }
     }
+
     AfterAll {
-        Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+        Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+        Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
     }
 }
 

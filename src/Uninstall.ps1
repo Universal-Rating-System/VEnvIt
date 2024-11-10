@@ -12,11 +12,21 @@ param (
     [Switch]$Pester
 )
 
+if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+Import-Module $PSScriptRoot\Utils.psm1
+
 function Invoke-Uninstall {
     param (
     [string]$BackupDir
     )
-    Return "Hello"
+    if (-not $BackupDir) {
+        $BackupDir = "~.\VEnvIt Backup"
+    }
+    $version = Get-Version
+    Backup-ScriptToArchiveIfExists -ScriptPath $ScriptPath
+            [string]$ArchiveDir,
+            [string]$TimeStamp
+    return "Hello"
 }
 
 function Show-Help {

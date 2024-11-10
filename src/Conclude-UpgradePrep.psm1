@@ -48,28 +48,6 @@ function Backup-ArchiveOldVersion {
     return $destination
 }
 
-function Get-Version {
-    param (
-        [Parameter(Mandatory = $true)]
-        [String]$SourceDir
-    )
-    $version = $null
-    if (Test-Path $SourceDir) {
-        $manifestPath = Join-Path -Path $SourceDir -ChildPath (Get-ManifestFileName)
-        if (Test-Path $manifestPath) {
-            $Manifest = Import-PowerShellDataFile -Path $manifestPath
-            $version = [version]$Manifest.ModuleVersion
-        }
-        elseif (Test-Path "env:VENVIT_DIR") {
-            $version = "6.0.0"
-        }
-        elseif (Test-Path "env:SCRIPTS_DIR") {
-            $version = "0.0.0"
-        }
-    }
-    return $version
-}
-
 function Invoke-PrepForUpgrade_6_0_0 {
     # Apply necessary changes and cleanup to prepare and implement v6.0.0
     # The current installed version is pre v6.0.0

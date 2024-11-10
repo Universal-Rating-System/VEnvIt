@@ -72,6 +72,28 @@ function Get-ManifestFileName {
 function Get-SecretsFileName {
     return "Secrets.ps1"
 }
+function Get-Version {
+    param (
+        [Parameter(Mandatory = $true)]
+        [String]$SourceDir
+    )
+    $version = $null
+    if (Test-Path $SourceDir) {
+        $manifestPath = Join-Path -Path $SourceDir -ChildPath (Get-ManifestFileName)
+        if (Test-Path $manifestPath) {
+            $Manifest = Import-PowerShellDataFile -Path $manifestPath
+            $version = [version]$Manifest.ModuleVersion
+        }
+        elseif (Test-Path "env:VENVIT_DIR") {
+            $version = "6.0.0"
+        }
+        elseif (Test-Path "env:SCRIPTS_DIR") {
+            $version = "0.0.0"
+        }
+    }
+    return $version
+}
+
 function New-CustomTempDir {
     param (
         [Parameter(Mandatory = $true)]
@@ -166,6 +188,6 @@ function Read-YesOrNo {
 
 
 Export-ModuleMember -Function Backup-ScriptToArchiveIfExists, New-CustomTempDir, Confirm-EnvironmentVariables
-Export-ModuleMember -Function Get-ConfigFileName, Get-ManifestFileName, Get-SecretsFileName, Invoke-Script, Read-YesOrNo
-Export-ModuleMember -Function Set-EnvironmentVariables, Show-EnvironmentVariables
+Export-ModuleMember -Function Get-ConfigFileName, Get-ManifestFileName, Get-SecretsFileName, Get-Version, Invoke-Script
+Export-ModuleMember -Function Read-YesOrNo, Set-EnvironmentVariables, Show-EnvironmentVariables
 Export-ModuleMember -Variable defEnvVarSet, separator
