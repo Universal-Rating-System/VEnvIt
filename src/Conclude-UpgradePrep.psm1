@@ -17,15 +17,18 @@ function Backup-ArchiveOldVersion {
     $fileList = $null
     $destination = $null
     $ArchiveVersion = Get-Version -SourceDir $InstallationDir
+    Write-Host $ArchiveVersion
     if ($ArchiveVersion -eq "0.0.0") {
         $fileList = $env:SCRIPTS_DIR
-    } elseif ($ArchiveVersion -eq "6.0.0") {
+    }
+    elseif ($ArchiveVersion -eq "6.0.0") {
         $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DIR, $env:VENV_SECRETS_DIR
     }
     elseif ($ArchiveVersion -eq "7.0.0") {
         $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
     }
 
+    Write-Host $fileList
     if ($fileList) {
         $archiveDir = Join-Path -Path $InstallationDir -ChildPath "Archive"
         $destination = Join-Path -Path $archiveDir -Child ("Version_$ArchiveVersion" + "_" + "$TimeStamp.zip")
