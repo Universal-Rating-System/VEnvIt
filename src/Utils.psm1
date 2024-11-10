@@ -1,4 +1,6 @@
-﻿$defEnvVarSet = @{
+﻿# Utils.psm1
+
+$defEnvVarSet = @{
     PROJECTS_BASE_DIR        = @{DefVal = "~\Projects"; IsDir = $true }
     VENV_BASE_DIR            = @{DefVal = "~\venv"; IsDir = $true }
     VENV_CONFIG_DEFAULT_DIR  = @{DefVal = "$env:ProgramFiles\VenvIt\Config"; IsDir = $true }

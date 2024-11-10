@@ -1,4 +1,6 @@
-﻿if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+﻿# Publish-TestResources.Tests.ps1
+
+if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
 Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
 Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1

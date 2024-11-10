@@ -1,4 +1,6 @@
-﻿if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+﻿# Utils.Test.ps1
+
+if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
 Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 
 Describe "Function Tests" {

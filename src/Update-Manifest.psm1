@@ -1,4 +1,6 @@
-﻿if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+﻿# Update-Manifest.psm1
+
+if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
 Import-Module $PSScriptRoot\..\src\Utils.psm1
 function Convert-PyprojectToml {
     param (
