@@ -17,7 +17,7 @@ function Backup-ArchiveOldVersion {
     $fileList = $null
     $destination = $null
     $ArchiveVersion = Get-Version -SourceDir $InstallationDir
-    Write-Host $ArchiveVersion
+    # Write-Host $ArchiveVersion
     if ($ArchiveVersion -eq "0.0.0") {
         $fileList = $env:SCRIPTS_DIR
     }
@@ -28,10 +28,12 @@ function Backup-ArchiveOldVersion {
         $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
     }
 
-    Write-Host $fileList
+    Write-Host "File list: $fileList"
     if ($fileList) {
         $archiveDir = Join-Path -Path $InstallationDir -ChildPath "Archive"
+        Write-Host "ArchiveDir: $archiveDir"
         $destination = Join-Path -Path $archiveDir -Child ("Version_$ArchiveVersion" + "_" + "$TimeStamp.zip")
+        Write-Host "Destination: $destination"
         if (-not(Test-Path $archiveDir)) {
             New-Item -Path $archiveDir -ItemType Directory | Out-Null
         }
