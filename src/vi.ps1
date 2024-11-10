@@ -112,7 +112,6 @@ Prior to starting the PowerShell script, ensure these environment variables are 
 3. VENV_SECRETS_USER_DIR: Directory for storing user secrets related to the project (e.g., g:\Google Drive\Secrets).
 4. VENVIT_DIR:            Directory where this script resides.
 "@ | Write-Host
-
 }
 
 # Script execution starts here

@@ -7,14 +7,14 @@ Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
 if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
 Import-Module $PSScriptRoot\..\src\Utils.psm1
 
-Describe "Function testing" {
+Describe "Function Testing" {
 
     Context "Backup-SessionEnvironmentVariables" {
         # TODO
         # Test to be implemented
         BeforeEach {}
         It "TODO Backup-SessionEnvironmentVariables" {}
-        AfterEach  {}
+        AfterEach {}
     }
 
     Context "Backup-SystemEnvironmentVariables" {
@@ -46,7 +46,7 @@ Describe "Function testing" {
             [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $defEnvVarSet["VENV_CONFIG_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $defEnvVarSet["VENV_CONFIG_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_ORGANIZATION_NAME", $mockInstalVal.Organization,[System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_ORGANIZATION_NAME", $mockInstalVal.Organization, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $defEnvVarSet["VENV_PYTHON_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
@@ -300,7 +300,7 @@ Describe "Function testing" {
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $defEnvVarSet["VENVIT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-       }
+        }
         It "Should restore the backedup environment variable values" {
             $origValues = @{
                 PROJECT_NAME             = $mockInstalVal.ProjectName

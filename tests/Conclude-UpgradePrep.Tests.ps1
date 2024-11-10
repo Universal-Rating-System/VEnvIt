@@ -3,7 +3,7 @@
 if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
 Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 
-Describe "Function testing" {
+Describe "Function Testing" {
     BeforeAll {
         if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
         Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
@@ -106,7 +106,7 @@ Describe "Function testing" {
     Context "Invoke-PrepForUpgrade_6_0_0" {
         BeforeAll {
             # This test must be run with administrator rights.
-            if (-not (Test-Admin)) {Throw "Tests must be run as an Administrator. Aborting..."}
+            if (-not (Test-Admin)) { Throw "Tests must be run as an Administrator. Aborting..." }
             if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
             Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
         }

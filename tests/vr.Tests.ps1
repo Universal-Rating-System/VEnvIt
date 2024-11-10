@@ -44,7 +44,7 @@ Describe "Top level script execution" {
     }
 }
 
-Describe "Function testing" {
+Describe "Function Testing" {
     BeforeAll {
         . $PSScriptRoot\..\src\vr.ps1 -Pester
         $OriginalValues = Backup-SessionEnvironmentVariables
