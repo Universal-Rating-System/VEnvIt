@@ -107,7 +107,8 @@ Describe "Function Tests" {
             Copy-Item -Path "$PSScriptRoot\..\src\vi.ps1" -Destination "$upgradeScriptDir\src"
             Copy-Item -Path "$PSScriptRoot\..\src\vn.ps1" -Destination "$upgradeScriptDir\src"
             Copy-Item -Path "$PSScriptRoot\..\src\vr.ps1" -Destination "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\src\utils.psm1" -Destination "$upgradeScriptDir\src"
+            Copy-Item -Path "$PSScriptRoot\..\src\Uninstall.ps1" -Destination "$upgradeScriptDir\src"
+            Copy-Item -Path "$PSScriptRoot\..\src\Utils.psm1" -Destination "$upgradeScriptDir\src"
             $manifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
             New-ManifestPsd1 -DestinationPath $manifestPath -data $ManifestData700
         }
@@ -122,7 +123,7 @@ Describe "Function Tests" {
             (Test-Path -Path "$env:VENVIT_DIR\vi.ps1") | Should -Be $true
             (Test-Path -Path "$env:VENVIT_DIR\vn.ps1") | Should -Be $true
             (Test-Path -Path "$env:VENVIT_DIR\vr.ps1") | Should -Be $true
-            (Test-Path -Path "$env:VENVIT_DIR\Uninstall.psm1") | Should -Be $true
+            (Test-Path -Path "$env:VENVIT_DIR\Uninstall.ps1") | Should -Be $true
             (Test-Path -Path "$env:VENVIT_DIR\Utils.psm1") | Should -Be $true
         }
 
