@@ -92,7 +92,7 @@ if (-not $Pester) {
     Write-Host ''
     Write-Host ''
     $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
+    Write-Host "=[ START $dateTime ]=================================================[ vr.ps1 ]=" -ForegroundColor Blue
     Write-Host "Remove the $project_name virtual environment" -ForegroundColor Blue
     if ($ProjectName -eq "" -or $Help) {
         Show-Help

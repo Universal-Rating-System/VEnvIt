@@ -5,7 +5,7 @@ Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 
 Describe "Top level script execution" {
     BeforeAll {
-        . $PSScriptRoot\..\src\vn.ps1 -Pester
+        . $PSScriptRoot\..\src\vr.ps1 -Pester
     }
     BeforeEach {
         Mock -CommandName "Show-Help" -MockWith { Write-Host "Mock: Show-Help called" }
@@ -19,11 +19,11 @@ Describe "Top level script execution" {
 
     Context "When ProjectName is passed and Help is not passed" {
         BeforeEach {
-            Mock -CommandName "Invoke-CreateNewVirtualEnvironment" -MockWith { Write-Host "Mock: Invoke-Vn called" }
+            Mock -CommandName "Unregister-VirtualEnvironment" -MockWith { Write-Host "Mock: Unregister-VirtualEnvironment called" }
         }
-        It "Should call Invoke-CreateNewVirtualEnvironment function with ProjectName" {
+        It "Should call Unregister-VirtualEnvironment function with ProjectName" {
             . $PSScriptRoot\..\src\vr.ps1 -ProjectName "Tes01"
-            Assert-MockCalled -CommandName "Invoke-CreateNewVirtualEnvironment" -Exactly 1
+            Assert-MockCalled -CommandName "Unregister-VirtualEnvironment" -Exactly 1
         }
     }
 

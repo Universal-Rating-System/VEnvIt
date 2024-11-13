@@ -163,6 +163,8 @@ Describe "Function Tests" {
 
     Context "Get-Version" {
         BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
             if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
             Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
             if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
@@ -170,6 +172,8 @@ Describe "Function Tests" {
         }
 
         BeforeEach {
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
             $OriginalValues = Backup-SessionEnvironmentVariables
         }
 
