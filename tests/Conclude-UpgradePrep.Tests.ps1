@@ -1,12 +1,19 @@
 ﻿# Upgrade.Tests.ps1
+BeforeAll {
+    if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
+    Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
 
-if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+    if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+    Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+
+    if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+    Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+}
 
 Describe "Function Tests" {
     BeforeAll {
-        if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
-        Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
+        $originalSessionValues = Backup-SessionEnvironmentVariables
+        $originalSystemValues = Backup-SystemEnvironmentVariables
     }
 
     Context "Get-ManifestFileName" {
@@ -25,12 +32,9 @@ Describe "Function Tests" {
         BeforeAll {
             # This test must be run with administrator rights.
             if (-not (Test-Admin)) { Throw "Tests must be run as an Administrator. Aborting..." }
-            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
-            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
         }
 
         BeforeEach {
-            $OriginalValues = Backup-SessionEnvironmentVariables
             $mockInstalVal = Set-TestSetup_0_0_0
             [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $env:SECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
@@ -65,12 +69,9 @@ Describe "Function Tests" {
             if (-not (Test-Admin)) {
                 Throw "Tests must be run as an Administrator. Aborting..."
             }
-            if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
-            Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
         }
 
         BeforeEach {
-            $OriginalValues = Backup-SessionEnvironmentVariables
             $mockInstalVal = Set-TestSetup_6_0_0
         }
 
@@ -90,7 +91,6 @@ Describe "Function Tests" {
 
         AfterEach {
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
-            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
         }
 
         AfterAll {
@@ -189,5 +189,7 @@ Describe "Function Tests" {
     }
 
     AfterAll {
+        Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+        Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
     }
 }

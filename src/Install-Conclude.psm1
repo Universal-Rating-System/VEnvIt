@@ -76,7 +76,7 @@ function Publish-LatestVersion {
     # Write-Host "Downloading installation files from $url..."
     # Invoke-WebRequest -Uri $url -OutFile $zipFilePath
     # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
-    Write-Host "Copy source files to to $env:VENVIT_DIR..."
+    # Write-Host "Copy source files to $env:VENVIT_DIR..."
     # Expand-Archive -Path $zipFilePath -DestinationPath $env:VENVIT_DIR -Force
     Copy-Item -Path "$UpgradeScriptDir\LICENSE" -Destination $env:VENVIT_DIR | Out-Null
     Copy-Item -Path "$UpgradeScriptDir\Manifest.psd1" -Destination $env:VENVIT_DIR | Out-Null

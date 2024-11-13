@@ -1,8 +1,10 @@
 ﻿# Uninstall.Tests.ps1
-if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
-# if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-# Import-Module $PSScriptRoot\..\src\Utils.psm1
+BeforeAll {
+    if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+    Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+    # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+    # Import-Module $PSScriptRoot\..\src\Utils.psm1
+}
 
 Describe "Top level script execution" {
     BeforeAll {
