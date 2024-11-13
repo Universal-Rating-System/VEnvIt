@@ -1,16 +1,23 @@
 ﻿# Publish-TestResources.Tests.ps1
 
-# if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-# Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
-if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
-Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
+BeforeAll {
+    if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
+    Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
 
-Describe "Function Testing" {
+    if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+    Import-Module $PSScriptRoot\Publish-TestResources.psm1
 
+    if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+    Import-Module $PSScriptRoot\..\src\Utils.psm1
+}
+
+Describe "Function Tests" {
     BeforeAll {
-        if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-        Import-Module $PSScriptRoot\Publish-TestResources.psm1
-        }
+        # if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+        # Import-Module $PSScriptRoot\Publish-TestResources.psm1
+        $originalSessionValues = Backup-SessionEnvironmentVariables
+        $originalSystemValues = Backup-SystemEnvironmentVariables
+    }
 
     Context "Backup-SessionEnvironmentVariables" {
         # TODO
@@ -22,8 +29,8 @@ Describe "Function Testing" {
 
     Context "Backup-SystemEnvironmentVariables" {
         BeforeEach {
-            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            Import-Module $PSScriptRoot\..\src\Utils.psm1
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
 
             $origPROJECT_NAME = [System.Environment]::GetEnvironmentVariable("PROJECT_NAME", [System.EnvironmentVariableTarget]::Machine)
             $origPROJECTS_BASE_DIR = [System.Environment]::GetEnvironmentVariable("PROJECTS_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
@@ -89,13 +96,13 @@ Describe "Function Testing" {
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $origVENV_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $origVENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $origVENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
-        }
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force }
     }
 
     Context "ConvertFrom-ProdToTestEnvVar" {
         BeforeEach {
-            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            Import-Module $PSScriptRoot\..\src\Utils.psm1
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
 
             $tempDir = New-CustomTempDir -Prefix "VenvIt"
             $envVarSet = @{
@@ -128,7 +135,6 @@ Describe "Function Testing" {
 
     Context "Set-TestSetup_New" {
         BeforeEach {
-            $OriginalValues = Backup-SessionEnvironmentVariables
         }
         It "Should create mock app scripts" {
             $mockInstalVal = Set-TestSetup_New
@@ -152,14 +158,13 @@ Describe "Function Testing" {
         }
 
         AfterEach {
-            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
 
     Context "Set-TestSetup_0_0_0" {
         BeforeEach {
-            $OriginalValues = Backup-SessionEnvironmentVariables
+            # $OriginalValues = Backup-SessionEnvironmentVariables
         }
         It "Should create mock app scripts" {
             $mockInstalVal = Set-TestSetup_0_0_0
@@ -186,14 +191,14 @@ Describe "Function Testing" {
             Test-Path ( Join-Path -Path $env:SCRIPTS_DIR -ChildPath "env_var_loc_dev.bat" ) | Should -Be $true
         }
         AfterEach {
-            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+            # Restore-SessionEnvironmentVariables -OriginalValues $originalValues
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
 
     Context "Set-TestSetup_6_0_0" {
         BeforeEach {
-            $OriginalValues = Backup-SessionEnvironmentVariables
+            # $OriginalValues = Backup-SessionEnvironmentVariables
         }
         It "Should create mock app scripts" {
             $mockInstalVal = Set-TestSetup_6_0_0
@@ -226,18 +231,18 @@ Describe "Function Testing" {
             Test-Path ( Join-Path -Path $env:VENV_SECRETS_DIR -ChildPath "dev_env_var.ps1" ) | Should -Be $true
         }
         AfterEach {
-            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+            # Restore-SessionEnvironmentVariables -OriginalValues $originalValues
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
 
     Context "Set-TestSetup_7_0_0" {
         BeforeEach {
-            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            Import-Module $PSScriptRoot\..\src\Utils.psm1
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
 
-            $originalSessionValues = Backup-SessionEnvironmentVariables
-            $originalSystemValues = Backup-SystemEnvironmentVariables
+            # $originalSessionValues = Backup-SessionEnvironmentVariables
+            # $originalSystemValues = Backup-SystemEnvironmentVariables
         }
         It "Should create mock app scripts" {
             $mockInstalVal = Set-TestSetup_7_0_0
@@ -285,16 +290,16 @@ Describe "Function Testing" {
             $newEnvVar["VIRTUAL_ENV"]["DefVal"] = ($newEnvVar["VENV_BASE_DIR"]["DefVal"] + "\" + $mockInstalVal.ProjectName)
             Unpublish-EnvironmentVariables -EnvVarSet $newEnvVar
 
-            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
-            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
-            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+            # Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            # Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+            # Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
 
     Context "New-CreateAppScripts" {
         BeforeEach {
-            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            Import-Module $PSScriptRoot\..\src\Utils.psm1
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
 
             $TempDir = New-CustomTempDir -Prefix "VenvIt"
         }
@@ -319,11 +324,9 @@ Describe "Function Testing" {
     }
 
     Context "Restore-SystemEnvironmentVariables" {
-        # TODO
-        # Test to be implemented
         BeforeEach {
-            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            Import-Module $PSScriptRoot\..\src\Utils.psm1
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
 
             $origPROJECT_NAME = [System.Environment]::GetEnvironmentVariable("PROJECT_NAME", [System.EnvironmentVariableTarget]::Machine)
             $origPROJECTS_BASE_DIR = [System.Environment]::GetEnvironmentVariable("PROJECTS_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
@@ -404,7 +407,11 @@ Describe "Function Testing" {
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $origVENV_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $origVENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $origVENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
-
+    AfterAll{
+        Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+        Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+    }
 }

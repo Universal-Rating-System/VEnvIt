@@ -43,7 +43,7 @@ Describe "Top level script execution" {
     }
 }
 
-Describe "Function Testing" {
+Describe "Function Tests" {
     BeforeAll {
         $originalSessionValues = Backup-SessionEnvironmentVariables
         $originalSystemValues = Backup-SystemEnvironmentVariables

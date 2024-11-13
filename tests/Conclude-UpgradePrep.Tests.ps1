@@ -3,7 +3,7 @@
 if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
 Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 
-Describe "Function Testing" {
+Describe "Function Tests" {
     BeforeAll {
         if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
         Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
