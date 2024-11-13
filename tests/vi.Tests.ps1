@@ -1,4 +1,4 @@
-# vn.Tests.ps1
+# vi.Tests.ps1
 
 Describe "Top level script execution" {
     BeforeAll {
@@ -6,7 +6,7 @@ Describe "Top level script execution" {
     }
 
     BeforeEach {
-        Mock -CommandName "Show-Help" -MockWith { Write-Host "Mock: Show-Help called" }
+        Mock -CommandName "Show-Help" -MockWith { return "Mock: Show-Help called" }
     }
 
     Context "When Help parameter is passed" {
@@ -18,8 +18,8 @@ Describe "Top level script execution" {
 
     Context "When ProjectName is passed and Help is not passed" {
         BeforeEach {
-            Mock -CommandName "Invoke-VirtualEnvironment" -MockWith { Write-Host "Mock: Invoke-VirtualEnvironment called" }
-            Mock -CommandName "Show-EnvironmentVariables" -MockWith { Write-Host "Mock: Show-EnvironmentVariables called" }
+            Mock -CommandName "Invoke-VirtualEnvironment" -MockWith { return "Mock: Invoke-VirtualEnvironment called" }
+            Mock -CommandName "Show-EnvironmentVariables" -MockWith { return "Mock: Show-EnvironmentVariables called" }
         }
         It "Should call Invoke-VirtualEnvironment function with ProjectName" {
             & $PSScriptRoot\..\src\vi.ps1 "Tes01"

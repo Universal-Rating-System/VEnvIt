@@ -71,7 +71,7 @@ function Invoke-UpdateManifest {
         if ($pyprojectData.Version -and $pyprojectData.Authors -and $pyprojectData.Description) {
             # Create the manifest.psd1
             New-ManifestPsd1 -DestinationPath $manifestPath -data $pyprojectData
-            Write-Host "Manifest.psd1 created successfully at $manifestPath"
+            # Write-Host "Manifest.psd1 created successfully at $manifestPath"
         }
         else {
             Write-Host "Failed to extract required fields from pyproject.toml"

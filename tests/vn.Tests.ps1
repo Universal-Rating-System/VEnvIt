@@ -5,7 +5,7 @@ Describe "Top level script execution" {
         . $PSScriptRoot\..\src\vn.ps1 -Pester
     }
     BeforeEach {
-        Mock -CommandName "Show-Help" -MockWith { Write-Host "Mock: Show-Help called" }
+        Mock -CommandName "Show-Help" -MockWith { return "Mock: Show-Help called" }
     }
     Context "When Help parameter is passed" {
         It "Should call Show-Help function" {

@@ -45,7 +45,7 @@ authors = [
         }
     }
 
-    Describe "Invoke-UpdateManifest function" {
+    Describe "Invoke-UpdateManifest" {
         It "Should create manifest.psd1 if pyproject.toml exists and is valid" {
             Invoke-UpdateManifest -ConfigBaseDir $tempDir.FullName
 

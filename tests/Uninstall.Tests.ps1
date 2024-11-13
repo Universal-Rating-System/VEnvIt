@@ -13,7 +13,7 @@ Describe "Top level script execution" {
     }
 
     BeforeEach {
-        Mock -CommandName "Show-Help" -MockWith { Write-Host "Mock: Show-Help called" }
+        Mock -CommandName "Show-Help" -MockWith { return "Mock: Show-Help called" }
     }
 
     Context "When Help parameter is passed" {
@@ -27,7 +27,7 @@ Describe "Top level script execution" {
         BeforeAll {
         }
         BeforeEach {
-            Mock "Invoke-Uninstall" -MockWith { Write-Host "Mock: Invoke-Uninstall called with BackupDir = $BackupDir" }
+            Mock "Invoke-Uninstall" -MockWith { return "Mock: Invoke-Uninstall called with BackupDir = $BackupDir" }
         }
         It "Should call Invoke-BackupDir function with BackupDir" {
             & $PSScriptRoot\..\src\Uninstall.ps1 "c:\VEnvIt Backup"
