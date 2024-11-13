@@ -9,45 +9,6 @@ $VersionChanges = @{
 $PreVersion600EnvVars = @( "RTE_ENVIRONMENT", "SCRIPTS_DIR", "SECRETS_DIR" )
 $PreVersion700EnvVars = @( "VENV_CONFIG_DIR", "VENV_SECRETS_DIR" )
 
-function Backup-ArchiveOldVersion {
-    param(
-        [string]$InstallationDir,
-        [string]$TimeStamp
-    )
-    $fileList = $null
-    $destination = $null
-    $ArchiveVersion = Get-Version -SourceDir $InstallationDir
-    # Write-Host $ArchiveVersion
-    if ($ArchiveVersion -eq "0.0.0") {
-        $fileList = $env:SCRIPTS_DIR
-    }
-    elseif ($ArchiveVersion -eq "6.0.0") {
-        $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DIR, $env:VENV_SECRETS_DIR
-    }
-    elseif ($ArchiveVersion -eq "7.0.0") {
-        $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
-    }
-
-    Write-Host "File list: $fileList"
-    if ($fileList) {
-        $archiveDir = Join-Path -Path $InstallationDir -ChildPath "Archive"
-        Write-Host "ArchiveDir: $archiveDir"
-        $destination = Join-Path -Path $archiveDir -Child ("Version_$ArchiveVersion" + "_" + "$TimeStamp.zip")
-        Write-Host "Destination: $destination"
-        if (-not(Test-Path $archiveDir)) {
-            New-Item -Path $archiveDir -ItemType Directory | Out-Null
-        }
-        $compress = @{
-            Path             = $fileList
-            CompressionLevel = "Fastest"
-            DestinationPath  = $destination
-        }
-        Compress-Archive @compress | Out-Null
-    }
-
-    return $destination
-}
-
 function Invoke-PrepForUpgrade_6_0_0 {
     # Apply necessary changes and cleanup to prepare and implement v6.0.0
     # The current installed version is pre v6.0.0
@@ -147,6 +108,6 @@ function Update-PackagePrep {
     return $CurrentVersion
 }
 
-Export-ModuleMember -Function Backup-ArchiveOldVersion, Get-ManifestFileName, Get-Version, Update-PackagePrep, Invoke-PrepForUpgrade_6_0_0
+Export-ModuleMember -Function Get-ManifestFileName, Get-Version, Update-PackagePrep, Invoke-PrepForUpgrade_6_0_0
 Export-ModuleMember -Function Invoke-PrepForUpgrade_7_0_0, Remove-EnvVarIfExists
 Export-ModuleMember -Variable PreVersion600EnvVars

@@ -192,7 +192,7 @@ Describe "Function Testing" {
         }
 
         It "VenvIt not in path" {
-            [System.Environment]::SetEnvironmentVariable("Path", "C:\;D:\", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("Path", "C:\;D:\;", [System.EnvironmentVariableTarget]::Machine)
             Set-Path
             $newPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
             $newPath | Should -Be "C:\;D:\;$env:VENVIT_DIR"

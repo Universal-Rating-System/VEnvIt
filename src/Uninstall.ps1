@@ -17,16 +17,17 @@ Import-Module $PSScriptRoot\Utils.psm1
 
 function Invoke-Uninstall {
     param (
-    [string]$BackupDir
+        [string]$BackupDir
     )
     if (-not $BackupDir) {
         $BackupDir = "~.\VEnvIt Backup"
     }
-    $version = Get-Version
-    Backup-ScriptToArchiveIfExists -ScriptPath $ScriptPath
-            [string]$ArchiveDir,
-            [string]$TimeStamp
-    return "Hello"
+    if ( -not (Test-Path $BackupDir )) {
+        New-Item -ItemType Directory -Path $BackupDir | Out-Null
+    }
+
+    $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+    Backup-ArchiveOldVersion -InstallationDir $env:VENVIT_DIR -TimeStamp $timeStamp -DestinationDir $BackupDir
 }
 
 function Show-Help {

@@ -30,7 +30,7 @@ function Invoke-ConcludeInstall {
 
     Update-PackagePrep $UpgradeScriptDir
     Write-Host $separator -ForegroundColor Cyan
-    Set-EnvironmentVariables -EnvVarSet $defEnvVarSet
+    Get-ReadAndSetEnvironmentVariables -EnvVarSet $defEnvVarSet
     Set-Path
     Write-Host "Environment variables have been set successfully." -ForegroundColor Green
     New-Directories
@@ -129,5 +129,5 @@ function Test-Admin {
 
 Export-ModuleMember -Function Clear-InstallationFiles, Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories
 Export-ModuleMember -Function Publish-LatestVersion, Publish-Secrets, Set-Path, Test-Admin
-Export-ModuleMember -Variable envVarSet
-Export-ModuleMember -Variable envVarSet
+# Export-ModuleMember -Variable envVarSet
+# Export-ModuleMember -Variable envVarSet

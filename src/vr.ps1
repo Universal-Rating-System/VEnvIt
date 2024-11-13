@@ -31,7 +31,7 @@ function New-ProjectArchive {
     foreach ($postfix in $filePostfixToArchive) {
         $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath (Get-ConfigFileName -ProjectName $ProjectName -Postfix $postfix)
         if (Test-Path -Path $scriptPath) {
-            $archivePath = Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $archiveDir -TimeStamp $TimeStamp
+            $archivePath = Backup-ScriptToArchiveIfExists -SourcePath $scriptPath -ArchiveDir $archiveDir -TimeStamp $TimeStamp
             Remove-Item -Path $scriptPath -Recurse -Force
         }
     }

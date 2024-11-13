@@ -1,10 +1,5 @@
 # vn.Tests.ps1
 
-if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
-if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-Import-Module $PSScriptRoot\..\src\Utils.psm1
-
 Describe "Top level script execution" {
     BeforeAll {
         . $PSScriptRoot\..\src\vn.ps1 -Pester
@@ -46,11 +41,20 @@ Describe "Top level script execution" {
 
 Describe "Function Testing" {
     BeforeAll {
-        . $PSScriptRoot\..\src\vn.ps1 -Pester
-        $OriginalValues = Backup-SessionEnvironmentVariables
+        # . $PSScriptRoot\..\src\vn.ps1 -Pester
+        $originalSessionValues = Backup-SessionEnvironmentVariables
+        $originalSystemValues = Backup-SystemEnvironmentVariables
+    }
+
+    BeforeEach {
+        if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+        Import-Module $PSScriptRoot\..\src\Utils.psm1
     }
 
     Context "Get-InstallationValues" {
+        BeforeAll {
+            . $PSScriptRoot\..\src\vn.ps1 -Pester
+        }
         It "All parameters set" {
             $InstallValues = Get-InstallationValues -ProjectName "MyProject" -PythonVer "311" -Organization "MyOrg" -DevMode "Y" -ResetScripts "Y"
             $InstallValues.PythonVer | Should -Be "311"
@@ -61,6 +65,9 @@ Describe "Function Testing" {
     }
 
     Context "Get-Value" {
+        BeforeAll {
+            . $PSScriptRoot\..\src\vn.ps1 -Pester
+        }
         It "With set values" {
             $Value = Get-Value -CurrValue "311" -Prompt "Python version" -DefValue "312"
             $Value | Should -Be "311"
@@ -78,11 +85,13 @@ Describe "Function Testing" {
     }
 
     Context "Invoke-VirtualEnvironment" {
-        BeforeEach {
+        BeforeAll {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
 
         It "Should install Python virtual environment" {
@@ -164,9 +173,11 @@ Describe "Function Testing" {
     Context "New-ProjectInstallScript" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
 
             Mock CreatePreCommitConfigYaml { return $true }
         }
@@ -190,6 +201,9 @@ Describe "Function Testing" {
     Context "New-VEnvCustomSetupScripts" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         }
@@ -215,10 +229,11 @@ Describe "Function Testing" {
     Context "New-VEnvEnvVarScripts" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
-
         }
 
         It "Should chreate zip archives" {
@@ -243,9 +258,11 @@ Describe "Function Testing" {
     Context "New-VEnvInstallScripts" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
         It "Should chreate zip archives" {
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
@@ -274,9 +291,11 @@ Describe "Function Testing" {
     Context "Set-Environment" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
 
             # Reset necessary values that are populated in Set-TestSetup_7_0_0
             $env:PROJECT_NAME = $null
@@ -309,7 +328,8 @@ Describe "Function Testing" {
     }
 
     AfterAll {
-        Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+        Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+        Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
     }
 }
 

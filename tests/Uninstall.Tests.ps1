@@ -1,4 +1,8 @@
 ﻿# Uninstall.Tests.ps1
+if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+# if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+# Import-Module $PSScriptRoot\..\src\Utils.psm1
 
 Describe "Top level script execution" {
     BeforeAll {
@@ -57,14 +61,15 @@ Describe "Function Testing" {
     Context "Uninstall" {
         BeforeEach {
             $mockInstalVal = Set-TestSetup_7_0_0
-            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+            # $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         }
 
         It "Should archive v7.0.0. to default" {
-            Invoke-Uninstall
+            Invoke-Uninstall -BackupDir (Join-Path -Path $mockInstalVal.TempDir -ChildPath "VEnvIt Backup")
         }
 
         AfterEach {
+            Unpublish-EnvironmentVariables -EnvVarSet $defEnvVarSet_7_0_0
             Set-Location -Path $env:TEMP
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }

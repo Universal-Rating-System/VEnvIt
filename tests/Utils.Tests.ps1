@@ -5,8 +5,63 @@ Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 
 Describe "Function Tests" {
     BeforeAll {
-        if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-        Import-Module "$PSScriptRoot\..\src\Utils.psm1"
+        # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+        # Import-Module "$PSScriptRoot\..\src\Utils.psm1"
+    }
+
+    Context "Backup-ArchiveOldVersion" {
+        BeforeEach {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $OriginalValues = Backup-SessionEnvironmentVariables
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
+            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+        }
+
+        It "Should archive version 0.0.0" {
+            $mockInstalVal = Set-TestSetup_0_0_0
+            $installationDir = "$env:SCRIPTS_DIR"
+            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -TimeStamp $timeStamp
+
+            (Test-Path -Path $archive) | Should -Be $true
+        }
+
+        It "Should archive version 6.0.0" {
+            $mockInstalVal = Set-TestSetup_6_0_0
+            $installationDir = "$env:VENVIT_DIR"
+            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -TimeStamp $timeStamp
+
+            (Test-Path -Path $archive) | Should -Be $true
+        }
+
+        It "Should archive version 7.0.0" {
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $mockInstalVal = Set-TestSetup_7_0_0
+            $installationDir = "$env:VENVIT_DIR"
+            # $FileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
+            $archive = Backup-ArchiveOldVersion -InstallationDir $installationDir -TimeStamp $timeStamp
+
+            (Test-Path -Path $archive) | Should -Be $true
+        }
+
+        It "Should archive version 7.0.0 to BackupDir" {
+            $mockInstalVal = Set-TestSetup_7_0_0
+            $installationDir = "$env:VENVIT_DIR"
+            $backupDir = (Join-Path -Path $mockInstalVal.TempDir -ChildPath "VEnvIt Backup")
+            # $FileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
+            $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -TimeStamp $timeStamp -DestinationDir $backupDir
+
+            (Test-Path -Path $archive) | Should -Be $true
+        }
+
+        AfterEach {
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+        }
     }
 
     Context "Backup-ScriptToArchiveIfExists" {
@@ -17,34 +72,65 @@ Describe "Function Tests" {
         AfterAll {}
     }
 
-    Context "Confirm-EnvironmentVariables" {
+    Context "Copy-Deep" {
         BeforeEach {
-            $env:PROJECTS_BASE_DIR = "projects_base_dir"
-            $env:VENV_BASE_DIR = "venv_base_dir"
-            $env:VENV_ENVIRONMENT = "venv_environment"
-            $env:VENV_CONFIG_DEFAULT_DIR = "venv_config_dir"
-            $env:VENV_CONFIG_USER_DIR = "venv_config_dir"
-            $env:VENV_PYTHON_BASE_DIR = "venv_python_base_dir"
-            $env:VENV_SECRETS_DEFAULT_DIR = "venv_secrets_org_dir"
-            $env:VENV_SECRETS_USER_DIR = "venv_secrets_user_dir"
-            $env:VENVIT_DIR = "venvit_dir"
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $originalObject = [PSCustomObject]@{ Name = "Alice"; Details = @{ Age = 30; City = "New York" } }
         }
 
-        It "Should be true" {
-            Confirm-EnvironmentVariables | Should -Be $true
+        It "Create deep copy" {
+            $copyObject = Copy-Deep $originalObject
+            $copyObject.Details["City"] = "Los Angeles"
+
+            $($originalObject.Details["City"]) | Should -Be "New York"
+            $($copyObject.Details["City"]) | Should -Be "Los Angeles"
+        }
+    }
+
+    Context "Confirm-SystemEnvironmentVariablesExist" {
+        BeforeEach {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $OriginalValues = Backup-SessionEnvironmentVariables
+
+            $envVarSet = @{
+                TEST_ONE = @{DefVal = "Test one"; IsDir = $true; SystemMandatory = $true }
+                TEST_TWO = @{DefVal = "Test two"; IsDir = $true; SystemMandatory = $false }
+            }
+            Publish-EnvironmentVariables -EnvVarSet $envVarSet
         }
 
-        It "Should be false" {
-            $env:VENV_ENVIRONMENT = ""
-            Confirm-EnvironmentVariables | Should -Be $false
+        It "Should all exist" {
+            $result = Confirm-SystemEnvironmentVariablesExist $envVarSet
+            $result | Should -Be @()
+        }
+
+        It "Non-mandatory is null" {
+            $env:TEST_TWO = $null
+            $result = Confirm-SystemEnvironmentVariablesExist $envVarSet
+            $result | Should -Be @()
+        }
+
+        It "Should not find TEST_ONE" {
+            $env:TEST_ONE = $null
+            $result = Confirm-SystemEnvironmentVariablesExist $envVarSet
+            $result | Should -Be @("TEST_ONE")
         }
 
         AfterEach {
+            Unpublish-EnvironmentVariables $envVarSet
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
         }
     }
 
     Context "Get-ConfigFileName" {
-        BeforeAll {}
+        BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+        }
         It "Should return secrets filename" {
             Get-ConfigFileName -ProjectName "MyProject" -Postfix "Postfix" | Should -Be "VEnvMyProjectPostfix.ps1"
         }
@@ -52,7 +138,11 @@ Describe "Function Tests" {
     }
 
     Context "Get-ManifestFileName" {
-        BeforeAll {}
+        BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+        }
         It "Should return manifest filename" {
             Get-ManifestFileName | Should -Be "Manifest.psd1"
         }
@@ -60,7 +150,11 @@ Describe "Function Tests" {
     }
 
     Context "Get-SecretsFileName" {
-        BeforeAll {}
+        BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+        }
         It "Should return secrets filename" {
             Get-SecretsFileName | Should -Be "Secrets.ps1"
         }
@@ -111,6 +205,10 @@ Describe "Function Tests" {
     }
 
     Context "New-CustomTempDir Test" {
+        BeforeEach {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+        }
         It "Temporary dir with prefix" {
             $Prefix = "VenvIt"
             $TempDir = New-CustomTempDir -Prefix $Prefix
@@ -124,66 +222,40 @@ Describe "Function Tests" {
         }
     }
 
-    Context "Set-EnvironmentVariables" {
+    Context "Get-ReadAndSetEnvironmentVariables" {
         BeforeAll {
-            $originalSessionValues = Backup-SessionEnvironmentVariables
-            $originalSystemValues = Backup-SystemEnvironmentVariables
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+            $envVarTestSet = @{
+                TEST_ONE = @{DefVal = "Test one"; IsDir = $true; SystemMandatory = $true }
+                TEST_TWO = @{DefVal = "Test two"; IsDir = $true; SystemMandatory = $true }
+                TEST_THREE = @{DefVal = "Default value"; IsDir = $true; SystemMandatory = $true }
+            }
 
-            $mockInstalVal = Set-TestSetup_7_0_0
-            [System.Environment]::SetEnvironmentVariable("PROJECT_NAME", $mockInstalVal.ProjectName, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $defEnvVarSet["PROJECTS_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $defEnvVarSet["VENVIT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $defEnvVarSet["VENV_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $defEnvVarSet["VENV_CONFIG_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $defEnvVarSet["VENV_CONFIG_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_ORGANIZATION_NAME", $mockInstalVal.Organization, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $defEnvVarSet["VENV_PYTHON_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $defEnvVarSet["VENVIT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-
-            Mock -ModuleName Utils Read-Host { return "~\Projects" } -ParameterFilter { $Prompt -eq "PROJECTS_BASE_DIR (~\Projects)" }
-            Mock -ModuleName Utils Read-Host { return "~\venv" } -ParameterFilter { $Prompt -eq "VENV_BASE_DIR (~\venv)" }
-            Mock -ModuleName Utils Read-Host { return "C:\Program Files\VenvIt\Config" } -ParameterFilter { $Prompt -eq "VENV_CONFIG_DEFAULT_DIR (C:\Program Files\VenvIt\Config)" }
-            Mock -ModuleName Utils Read-Host { return "~\VenvIt\Config" } -ParameterFilter { $Prompt -eq "VENV_CONFIG_USER_DIR (~\VenvIt\Config)" }
-            Mock -ModuleName Utils Read-Host { return "loc_dev" } -ParameterFilter { $Prompt -eq "VENV_ENVIRONMENT (loc_dev)" }
-            Mock -ModuleName Utils Read-Host { return "c:\Python" } -ParameterFilter { $Prompt -eq "VENV_PYTHON_BASE_DIR (c:\Python)" }
-            Mock -ModuleName Utils Read-Host { return "C:\Program Files\VenvIt\Secrets" } -ParameterFilter { $Prompt -eq "VENV_SECRETS_DEFAULT_DIR (C:\Program Files\VenvIt\Secrets)" }
-            Mock -ModuleName Utils Read-Host { return "~\VenvIt\Secrets" } -ParameterFilter { $Prompt -eq "VENV_SECRETS_USER_DIR (~\VenvIt\Secrets)" }
-            Mock -ModuleName Utils Read-Host { return "C:\Program Files\VenvIt" } -ParameterFilter { $Prompt -eq "VENVIT_DIR (C:\Program Files\VenvIt)" }
+            Mock -ModuleName Utils Read-Host { return "Mock: Has existing value" } -ParameterFilter { $Prompt -eq "TEST_ONE (Has existing value)" }
+            Mock -ModuleName Utils Read-Host { return "Mock: Read from prompt" } -ParameterFilter { $Prompt -eq "TEST_TWO (Test two)" }
+            Mock -ModuleName Utils Read-Host { return "" } -ParameterFilter { $Prompt -eq "TEST_THREE (Default value)" }
         }
-        It "Should read and set environment variables" {
-            Set-EnvironmentVariables -EnvVarSet $defEnvVarSet
-            [System.Environment]::GetEnvironmentVariable("PROJECT_NAME", [System.EnvironmentVariableTarget]::Machine) | Should -Be $mockInstalVal.ProjectName
-            [System.Environment]::GetEnvironmentVariable("PROJECTS_BASE_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["PROJECTS_BASE_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("SCRIPTS_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENVIT_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_BASE_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_BASE_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_CONFIG_DEFAULT_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_USER_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_CONFIG_USER_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_ORGANIZATION_NAME", [System.EnvironmentVariableTarget]::Machine) | Should -Be $mockInstalVal.Organization
-            [System.Environment]::GetEnvironmentVariable("VENV_PYTHON_BASE_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_PYTHON_BASE_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_USER_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENVIT_DIR"]["DefVal"]
+        It "Should read existing value" {
+            [System.Environment]::SetEnvironmentVariable("TEST_ONE", "Has existing value", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_TWO", $null, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_THREE", $null, [System.EnvironmentVariableTarget]::Machine)
+            Get-ReadAndSetEnvironmentVariables -EnvVarSet $envVarTestSet
 
-            $env:PROJECTS_BASE_DIR | Should -Be $defEnvVarSet["PROJECTS_BASE_DIR"]["DefVal"]
-            $env:VENV_BASE_DIR | Should -Be $defEnvVarSet["VENV_BASE_DIR"]["DefVal"]
-            $env:VENV_CONFIG_DEFAULT_DIR | Should -Be $defEnvVarSet["VENV_CONFIG_DEFAULT_DIR"]["DefVal"]
-            $env:VENV_CONFIG_USER_DIR | Should -Be $defEnvVarSet["VENV_CONFIG_USER_DIR"]["DefVal"]
-            $env:VENV_ENVIRONMENT | Should -Be $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"]
-            $env:VENV_PYTHON_BASE_DIR | Should -Be $defEnvVarSet["VENV_PYTHON_BASE_DIR"]["DefVal"]
-            $env:VENV_SECRETS_DEFAULT_DIR | Should -Be $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"]
-            $env:VENV_SECRETS_USER_DIR | Should -Be $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("TEST_ONE", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock: Has existing value"
+            $env:TEST_ONE | Should -Be "Mock: Has existing value"
+            [System.Environment]::GetEnvironmentVariable("TEST_TWO", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock: Read from prompt"
+            $env:TEST_TWO | Should -Be "Mock: Read from prompt"
+            [System.Environment]::GetEnvironmentVariable("TEST_THREE", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Default value"
+            $env:TEST_THREE | Should -Be "Default value"
         }
         AfterAll {
-            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
-            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+            [System.Environment]::SetEnvironmentVariable("TEST_ONE", $null, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_TWO", $null, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_THREE", $null, [System.EnvironmentVariableTarget]::Machine)
+            $env:TEST_ONE = $null
+            $env:TEST_TWO = $null
+            $env:TEST_THREE = $null
         }
     }
 
@@ -196,6 +268,10 @@ Describe "Function Tests" {
     }
 
     Context "Read-YesOrNo" {
+        BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+        }
         It "Input is Y" {
             Mock -ModuleName "Utils" Read-Host {
                 return "Y"
@@ -239,13 +315,76 @@ Describe "Function Tests" {
         It "Input is invalid" {
             Mock -ModuleName "Utils" Read-Host {
                 return "x"
-            } -ParameterFilter { $Prompt -eq "d as response (Y/n)"}
+            } -ParameterFilter { $Prompt -eq "d as response (Y/n)" }
             Mock -ModuleName "Utils" Read-Host {
                 return "Y"
             } -ParameterFilter { $Prompt -eq "Only Y or N (Y/n)" }
 
             $Result = Read-YesOrNo "d as response"
             $Result  | Should -Be $true
+        }
+    }
+
+    Context "Publish-EnvironmentVariables" {
+        BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
+
+            $testEnvVarSet = @{
+                TEST_VAL = @{DefVal = "Test value"; IsDir = $false }
+                TEST_DIR = @{DefVal = "$env:TEMP\Test_Dir"; IsDir = $True }
+            }
+        }
+        It "Should set the system and environment variables" {
+            Publish-EnvironmentVariables -EnvVarSet $testEnvVarSet
+
+            foreach ($envVar in $testEnvVarSet.Keys) {
+                [System.Environment]::GetEnvironmentVariable($envVar, [System.EnvironmentVariableTarget]::Machine) | Should -Be $testEnvVarSet[$envVar]["DefVal"]
+                (Get-Item -Path env:$envVar).Value | Should -Be $testEnvVarSet[$envVar]["DefVal"]
+            }
+        }
+
+        AfterEach {
+            Unpublish-EnvironmentVariables -EnvVarSet $testEnvVarSet
+        }
+        AfterAll {
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+        }
+    }
+
+    Context "Unpublish-EnvironmentVariables" {
+        BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
+
+            $testEnvVarSet = @{
+                TEST_VAL = @{DefVal = "Test value"; IsDir = $false }
+                TEST_DIR = @{DefVal = "$env:TEMP\Test_Dir"; IsDir = $True }
+            }
+        }
+        BeforeEach {
+            Publish-EnvironmentVariables -EnvVarSet $testEnvVarSet
+        }
+        It "Should remove the system and environment variables" {
+            Unpublish-EnvironmentVariables -EnvVarSet $testEnvVarSet
+
+            foreach ($envVar in $testEnvVarSet.Keys) {
+                [System.Environment]::GetEnvironmentVariable($envVar, [System.EnvironmentVariableTarget]::Machine) | Should -Be $null
+                (Get-Item -Path env:$envVar -ErrorAction SilentlyContinue).Value | Should -Be $null
+            }
+            AfterEach {
+            }
+        }
+        AfterAll {
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
         }
     }
 }

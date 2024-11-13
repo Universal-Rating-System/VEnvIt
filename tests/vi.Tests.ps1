@@ -1,10 +1,5 @@
 # vn.Tests.ps1
 
-if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
-if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-Import-Module $PSScriptRoot\..\src\Utils.psm1
-
 Describe "Top level script execution" {
     BeforeAll {
         . $PSScriptRoot\..\src\vi.ps1 -Pester
@@ -50,21 +45,30 @@ Describe "Top level script execution" {
 
 Describe "Function Testing" {
     BeforeAll {
-        . $PSScriptRoot\..\src\vi.ps1 -Pester
-        $OriginalValues = Backup-SessionEnvironmentVariables
-        Mock -CommandName "Show-Help" -MockWith { Write-Host "Mock: Show-Help called" }
+        $originalSessionValues = Backup-SessionEnvironmentVariables
+        $originalSystemValues = Backup-SystemEnvironmentVariables
     }
 
     Context "Invoke-VirtualEnvironment" {
         BeforeEach {
-            . $PSScriptRoot\..\src\vn.ps1 -Pester
-            $mockInstalVal = Set-TestSetup_7_0_0
-            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
         }
 
         Context "With virtual environment activated" {
+            BeforeAll {
+                . $PSScriptRoot\..\src\vi.ps1 -Pester
+
+                if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+                Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
+                $mockInstalVal = Set-TestSetup_7_0_0
+                $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+                # New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
+            }
             It "Should invoke the virtual environment" {
+                # . $PSScriptRoot\..\src\vi.ps1 -Pester
+
                 Mock Invoke-Script { return "Mock: Deactivated current VEnv"
                 } -ParameterFilter { $Script -eq "deactivate" }
                 Mock Invoke-Script { return "Mock: Activated VEnv"
