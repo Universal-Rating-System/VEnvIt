@@ -1,3 +1,5 @@
+# vn.ps1
+
 param (
     [Parameter(Mandatory = $false, Position = 0)]
     [string]$ProjectName,
@@ -166,10 +168,12 @@ function New-SupportScript {
         [string]$TimeStamp
     )
 
+    Import-Module $PSScriptRoot\Utils.psm1
+
     $archiveDir = Join-Path -Path $BaseDir -ChildPath "Archive"
     $scriptPath = Join-Path -Path $BaseDir -ChildPath $FileName
     if (Test-Path -Path $scriptPath) {
-        Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $archiveDir -TimeStamp $TimeStamp
+        Backup-ScriptToArchiveIfExists -SourcePath $scriptPath -ArchiveDir $archiveDir -TimeStamp $TimeStamp
         Remove-Item -Path $scriptPath -Recurse -Force
     }
     Set-Content -Path $scriptPath -Value $content
@@ -336,6 +340,8 @@ function Set-Environment {
         [PSCustomObject]$InstallationValues
     )
     # Configure the environment settings for local development environment
+    Import-Module $PSScriptRoot\Utils.psm1
+
     $env:PROJECT_NAME = $InstallationValues.ProjectName
     $env:VENV_ORGANIZATION_NAME = $InstallationValues.Organization
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {

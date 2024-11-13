@@ -9,71 +9,9 @@ $VersionChanges = @{
 $PreVersion600EnvVars = @( "RTE_ENVIRONMENT", "SCRIPTS_DIR", "SECRETS_DIR" )
 $PreVersion700EnvVars = @( "VENV_CONFIG_DIR", "VENV_SECRETS_DIR" )
 
-function Backup-ArchiveOldVersion {
-    param(
-        [string]$InstallationDir,
-        [string]$TimeStamp
-    )
-    $fileList = $null
-    $destination = $null
-    $ArchiveVersion = Get-Version -SourceDir $InstallationDir
-    # Write-Host $ArchiveVersion
-    if ($ArchiveVersion -eq "0.0.0") {
-        $fileList = $env:SCRIPTS_DIR
-    }
-    elseif ($ArchiveVersion -eq "6.0.0") {
-        $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DIR, $env:VENV_SECRETS_DIR
-    }
-    elseif ($ArchiveVersion -eq "7.0.0") {
-        $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
-    }
-
-    Write-Host "File list: $fileList"
-    if ($fileList) {
-        $archiveDir = Join-Path -Path $InstallationDir -ChildPath "Archive"
-        Write-Host "ArchiveDir: $archiveDir"
-        $destination = Join-Path -Path $archiveDir -Child ("Version_$ArchiveVersion" + "_" + "$TimeStamp.zip")
-        Write-Host "Destination: $destination"
-        if (-not(Test-Path $archiveDir)) {
-            New-Item -Path $archiveDir -ItemType Directory | Out-Null
-        }
-        $compress = @{
-            Path             = $fileList
-            CompressionLevel = "Fastest"
-            DestinationPath  = $destination
-        }
-        Compress-Archive @compress | Out-Null
-    }
-
-    return $destination
-}
-
-function Get-Version {
-    param (
-        [Parameter(Mandatory = $true)]
-        [String]$SourceDir
-    )
-    $version = $null
-    if (Test-Path $SourceDir) {
-        $manifestPath = Join-Path -Path $SourceDir -ChildPath (Get-ManifestFileName)
-        if (Test-Path $manifestPath) {
-            $Manifest = Import-PowerShellDataFile -Path $manifestPath
-            $version = [version]$Manifest.ModuleVersion
-        }
-        elseif (Test-Path "env:VENVIT_DIR") {
-            $version = "6.0.0"
-        }
-        elseif (Test-Path "env:SCRIPTS_DIR") {
-            $version = "0.0.0"
-        }
-    }
-    return $version
-}
-
 function Invoke-PrepForUpgrade_6_0_0 {
     # Apply necessary changes and cleanup to prepare and implement v6.0.0
     # The current installed version is pre v6.0.0
-    Write-Host "Applying upgrade for version 6.0.0"
     if ((Get-Item "env:RTE_ENVIRONMENT").Value) {
         $env:VENV_ENVIRONMENT = $env:RTE_ENVIRONMENT
     }
@@ -93,10 +31,8 @@ function Invoke-PrepForUpgrade_6_0_0 {
 function Invoke-PrepForUpgrade_7_0_0 {
     # Apply necessary changes and cleanup to prepare and implement v7.0.0
     # The current installed version is pre v7.0.0
-    Write-Host "Applying upgrade for version 7.0.0"
-
-    $env:VENV_CONFIG_USER_DIR = $env:VENV_CONFIG_DIR
-    $env:VENV_SECRETS_USER_DIR = $env:VENV_SECRETS_DIR
+    $env:VENV_CONFIG_USER_DIR = $env:VENV_CONFIG_DIR | Out-Null
+    $env:VENV_SECRETS_USER_DIR = $env:VENV_SECRETS_DIR | Out-Null
 
     [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $env:VENV_CONFIG_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
     [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $env:VENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
@@ -112,7 +48,7 @@ function Invoke-PrepForUpgrade_7_0_0 {
                 $projectName = $matches[1]
                 $newFileName = "VEnv$ProjectName" + $postFix[1] + ".ps1"
                 Rename-Item -Path $file.FullName -NewName $newFileName
-                Write-Host "Renamed '$($file.Name)' to '$newFileName'"
+                # Write-Host "Renamed '$($file.Name)' to '$newFileName'"
             }
         }
     }
@@ -133,7 +69,7 @@ function Remove-EnvVarIfExists {
     if ((Get-Item "Env:$EnvVarName" -ErrorAction Ignore).Value) {
         Remove-Item -Path "Env:$EnvVarName"
     }
-    Write-Host "$EnvVarName has been removed."
+    # Write-Host "$EnvVarName has been removed."
 }
 
 function Update-PackagePrep {
@@ -169,6 +105,6 @@ function Update-PackagePrep {
     return $CurrentVersion
 }
 
-Export-ModuleMember -Function Backup-ArchiveOldVersion, Get-ManifestFileName, Get-Version, Update-PackagePrep, Invoke-PrepForUpgrade_6_0_0
+Export-ModuleMember -Function Get-ManifestFileName, Get-Version, Update-PackagePrep, Invoke-PrepForUpgrade_6_0_0
 Export-ModuleMember -Function Invoke-PrepForUpgrade_7_0_0, Remove-EnvVarIfExists
 Export-ModuleMember -Variable PreVersion600EnvVars

@@ -1,8 +1,8 @@
-﻿# Pester test for Install-Conclude.Tests.ps1
+﻿# Install-Conclude.Tests.ps1
 if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
 Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 
-Describe "Function testing" {
+Describe "Function Tests" {
     BeforeAll {
         # if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
         if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
@@ -107,7 +107,8 @@ Describe "Function testing" {
             Copy-Item -Path "$PSScriptRoot\..\src\vi.ps1" -Destination "$upgradeScriptDir\src"
             Copy-Item -Path "$PSScriptRoot\..\src\vn.ps1" -Destination "$upgradeScriptDir\src"
             Copy-Item -Path "$PSScriptRoot\..\src\vr.ps1" -Destination "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\src\utils.psm1" -Destination "$upgradeScriptDir\src"
+            Copy-Item -Path "$PSScriptRoot\..\src\Uninstall.ps1" -Destination "$upgradeScriptDir\src"
+            Copy-Item -Path "$PSScriptRoot\..\src\Utils.psm1" -Destination "$upgradeScriptDir\src"
             $manifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
             New-ManifestPsd1 -DestinationPath $manifestPath -data $ManifestData700
         }
@@ -122,6 +123,7 @@ Describe "Function testing" {
             (Test-Path -Path "$env:VENVIT_DIR\vi.ps1") | Should -Be $true
             (Test-Path -Path "$env:VENVIT_DIR\vn.ps1") | Should -Be $true
             (Test-Path -Path "$env:VENVIT_DIR\vr.ps1") | Should -Be $true
+            (Test-Path -Path "$env:VENVIT_DIR\Uninstall.ps1") | Should -Be $true
             (Test-Path -Path "$env:VENVIT_DIR\Utils.psm1") | Should -Be $true
         }
 
@@ -192,7 +194,7 @@ Describe "Function testing" {
         }
 
         It "VenvIt not in path" {
-            [System.Environment]::SetEnvironmentVariable("Path", "C:\;D:\", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("Path", "C:\;D:\;", [System.EnvironmentVariableTarget]::Machine)
             Set-Path
             $newPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
             $newPath | Should -Be "C:\;D:\;$env:VENVIT_DIR"

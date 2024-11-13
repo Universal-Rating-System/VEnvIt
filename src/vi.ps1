@@ -1,3 +1,5 @@
+# vi.ps1
+
 param (
     [Parameter(Mandatory = $false, Position = 0)]
     [string]$ProjectName,
@@ -10,13 +12,12 @@ param (
     [Switch]$Pester
 )
 
-if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-Import-Module $PSScriptRoot\Utils.psm1
-
 function Invoke-VirtualEnvironment {
     param (
         [string]$ProjectName
     )
+
+    Import-Module $PSScriptRoot\Utils.psm1
 
     Invoke-Script ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar"))
     Invoke-Script ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar"))
@@ -110,7 +111,6 @@ Prior to starting the PowerShell script, ensure these environment variables are 
 3. VENV_SECRETS_USER_DIR: Directory for storing user secrets related to the project (e.g., g:\Google Drive\Secrets).
 4. VENVIT_DIR:            Directory where this script resides.
 "@ | Write-Host
-
 }
 
 # Script execution starts here
@@ -120,7 +120,7 @@ if (-not $Pester) {
     Write-Host ''
     Write-Host ''
     $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
+    Write-Host "=[ START $dateTime ]=================================================[ vi.ps1 ]=" -ForegroundColor Blue
     Write-Host "Initialize the $project_name virtual environment" -ForegroundColor Blue
     if ($ProjectName -eq "" -or $Help) {
         Show-Help

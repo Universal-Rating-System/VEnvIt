@@ -1,24 +1,37 @@
-﻿if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
-if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
-Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
-if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-Import-Module $PSScriptRoot\..\src\Utils.psm1
+﻿# Publish-TestResources.Tests.ps1
 
-Describe "Function testing" {
+BeforeAll {
+    if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
+    Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
+
+    if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+    Import-Module $PSScriptRoot\Publish-TestResources.psm1
+
+    if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+    Import-Module $PSScriptRoot\..\src\Utils.psm1
+}
+
+Describe "Function Tests" {
+    BeforeAll {
+        # if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+        # Import-Module $PSScriptRoot\Publish-TestResources.psm1
+        $originalSessionValues = Backup-SessionEnvironmentVariables
+        $originalSystemValues = Backup-SystemEnvironmentVariables
+    }
 
     Context "Backup-SessionEnvironmentVariables" {
         # TODO
         # Test to be implemented
         BeforeEach {}
         It "TODO Backup-SessionEnvironmentVariables" {}
-        AfterEach  {}
+        AfterEach {}
     }
 
     Context "Backup-SystemEnvironmentVariables" {
-        # TODO
-        # Test to be implemented
         BeforeEach {
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
+
             $origPROJECT_NAME = [System.Environment]::GetEnvironmentVariable("PROJECT_NAME", [System.EnvironmentVariableTarget]::Machine)
             $origPROJECTS_BASE_DIR = [System.Environment]::GetEnvironmentVariable("PROJECTS_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
             $origRTE_ENVIRONMENT = [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
@@ -36,36 +49,36 @@ Describe "Function testing" {
 
             $mockInstalVal = Set-TestSetup_7_0_0
             [System.Environment]::SetEnvironmentVariable("PROJECT_NAME", $mockInstalVal.ProjectName, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $defEnvVarSet["PROJECTS_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $defEnvVarSet["VENVIT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $defEnvVarSet["VENV_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $defEnvVarSet["VENV_CONFIG_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $defEnvVarSet["VENV_CONFIG_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_ORGANIZATION_NAME", $mockInstalVal.Organization,[System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $defEnvVarSet["VENV_PYTHON_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $defEnvVarSet["VENVIT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $defEnvVarSet_7_0_0["PROJECTS_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $defEnvVarSet_7_0_0["VENV_ENVIRONMENT"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $defEnvVarSet_7_0_0["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $defEnvVarSet_7_0_0["VENVIT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $defEnvVarSet_7_0_0["VENV_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $defEnvVarSet_7_0_0["VENV_CONFIG_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $defEnvVarSet_7_0_0["VENV_CONFIG_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $defEnvVarSet_7_0_0["VENV_ENVIRONMENT"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_ORGANIZATION_NAME", $mockInstalVal.Organization, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $defEnvVarSet_7_0_0["VENV_PYTHON_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $defEnvVarSet_7_0_0["VENV_SECRETS_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $defEnvVarSet_7_0_0["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $defEnvVarSet_7_0_0["VENVIT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
         }
         It "Should backup environment values" {
             $origValues = Backup-SystemEnvironmentVariables
             $origValues.PROJECT_NAME | Should -Be $mockInstalVal.ProjectName
-            $origValues.PROJECTS_BASE_DIR | Should -Be $defEnvVarSet["PROJECTS_BASE_DIR"]["DefVal"]
-            $origValues.RTE_ENVIRONMENT | Should -Be $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"]
-            $origValues.SECRETS_DIR | Should -Be $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"]
-            $origValues.SCRIPTS_DIR | Should -Be $defEnvVarSet["VENVIT_DIR"]["DefVal"]
-            $origValues.VENV_BASE_DIR | Should -Be $defEnvVarSet["VENV_BASE_DIR"]["DefVal"]
-            $origValues.VENV_CONFIG_USER_DIR | Should -Be $defEnvVarSet["VENV_CONFIG_USER_DIR"]["DefVal"]
-            $origValues.VENV_CONFIG_DEFAULT_DIR = $defEnvVarSet["VENV_CONFIG_DEFAULT_DIR"]["DefVal"]
-            $origValues.VENV_ENVIRONMENT | Should -Be $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"]
+            $origValues.PROJECTS_BASE_DIR | Should -Be $defEnvVarSet_7_0_0["PROJECTS_BASE_DIR"]["DefVal"]
+            $origValues.RTE_ENVIRONMENT | Should -Be $defEnvVarSet_7_0_0["VENV_ENVIRONMENT"]["DefVal"]
+            $origValues.SECRETS_DIR | Should -Be $defEnvVarSet_7_0_0["VENV_SECRETS_USER_DIR"]["DefVal"]
+            $origValues.SCRIPTS_DIR | Should -Be $defEnvVarSet_7_0_0["VENVIT_DIR"]["DefVal"]
+            $origValues.VENV_BASE_DIR | Should -Be $defEnvVarSet_7_0_0["VENV_BASE_DIR"]["DefVal"]
+            $origValues.VENV_CONFIG_USER_DIR | Should -Be $defEnvVarSet_7_0_0["VENV_CONFIG_USER_DIR"]["DefVal"]
+            $origValues.VENV_CONFIG_DEFAULT_DIR = $defEnvVarSet_7_0_0["VENV_CONFIG_DEFAULT_DIR"]["DefVal"]
+            $origValues.VENV_ENVIRONMENT | Should -Be $defEnvVarSet_7_0_0["VENV_ENVIRONMENT"]["DefVal"]
             $origValues.VENV_ORGANIZATION_NAME | Should -Be $mockInstalVal.Organization
-            $origValues.VENV_PYTHON_BASE_DIR | Should -Be $defEnvVarSet["VENV_PYTHON_BASE_DIR"]["DefVal"]
-            $origValues.VENV_SECRETS_DEFAULT_DIR | Should -Be $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"]
-            $origValues.VENV_SECRETS_USER_DIR | Should -Be $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"]
-            $origValues.VENVIT_DIR | Should -Be $defEnvVarSet["VENVIT_DIR"]["DefVal"]
+            $origValues.VENV_PYTHON_BASE_DIR | Should -Be $defEnvVarSet_7_0_0["VENV_PYTHON_BASE_DIR"]["DefVal"]
+            $origValues.VENV_SECRETS_DEFAULT_DIR | Should -Be $defEnvVarSet_7_0_0["VENV_SECRETS_DEFAULT_DIR"]["DefVal"]
+            $origValues.VENV_SECRETS_USER_DIR | Should -Be $defEnvVarSet_7_0_0["VENV_SECRETS_USER_DIR"]["DefVal"]
+            $origValues.VENVIT_DIR | Should -Be $defEnvVarSet_7_0_0["VENVIT_DIR"]["DefVal"]
         }
 
         AfterEach {
@@ -83,12 +96,45 @@ Describe "Function testing" {
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $origVENV_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $origVENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $origVENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force }
+    }
+
+    Context "ConvertFrom-ProdToTestEnvVar" {
+        BeforeEach {
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $tempDir = New-CustomTempDir -Prefix "VenvIt"
+            $envVarSet = @{
+                TEST_NULL         = @{DefVal = $null; IsDir = $true }
+                TEST_TILDE        = @{DefVal = "~\Projects"; IsDir = $true }
+                TEST_PROGRAMFILES = @{DefVal = "$env:ProgramFiles\VenvIt\Config"; IsDir = $true }
+                TEST_DIR          = @{DefVal = "c:\Python"; IsDir = $true }
+            }
+            $compareVarSet = @{
+                TEST_NULL         = @{DefVal = $tempDir; IsDir = $true }
+                TEST_TILDE        = @{DefVal = "$tempDir\Projects"; IsDir = $true }
+                TEST_PROGRAMFILES = @{DefVal = "$tempDir\Program Files\VenvIt\Config"; IsDir = $true }
+                TEST_DIR          = @{DefVal = "$tempDir\Python"; IsDir = $true }
+            }
+        }
+        It "Should convert to test values" {
+            $newEnvVar = ConvertFrom-ProdToTestEnvVar -EnvVarSet $envVarSet -TempDir $tempDir
+
+            $newEnvVar.Keys.Count | Should -Be $compareVarSet.Keys.Count
+            foreach ($key in $newEnvVar.Keys) {
+                $newEnvVar[$key].DefVal | Should -Be $compareVarSet[$key].DefVal
+                $newEnvVar[$key].IsDir | Should -Be $compareVarSet[$key].IsDir
+            }
+        }
+        AfterEach {
+            Remove-Item -Path $tempDir -Recurse -Force
+            Unpublish-EnvironmentVariables -EnvVarSet $envVarSet
         }
     }
 
     Context "Set-TestSetup_New" {
         BeforeEach {
-            $OriginalValues = Backup-SessionEnvironmentVariables
         }
         It "Should create mock app scripts" {
             $mockInstalVal = Set-TestSetup_New
@@ -112,14 +158,13 @@ Describe "Function testing" {
         }
 
         AfterEach {
-            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
 
     Context "Set-TestSetup_0_0_0" {
         BeforeEach {
-            $OriginalValues = Backup-SessionEnvironmentVariables
+            # $OriginalValues = Backup-SessionEnvironmentVariables
         }
         It "Should create mock app scripts" {
             $mockInstalVal = Set-TestSetup_0_0_0
@@ -146,14 +191,14 @@ Describe "Function testing" {
             Test-Path ( Join-Path -Path $env:SCRIPTS_DIR -ChildPath "env_var_loc_dev.bat" ) | Should -Be $true
         }
         AfterEach {
-            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+            # Restore-SessionEnvironmentVariables -OriginalValues $originalValues
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
 
     Context "Set-TestSetup_6_0_0" {
         BeforeEach {
-            $OriginalValues = Backup-SessionEnvironmentVariables
+            # $OriginalValues = Backup-SessionEnvironmentVariables
         }
         It "Should create mock app scripts" {
             $mockInstalVal = Set-TestSetup_6_0_0
@@ -186,14 +231,18 @@ Describe "Function testing" {
             Test-Path ( Join-Path -Path $env:VENV_SECRETS_DIR -ChildPath "dev_env_var.ps1" ) | Should -Be $true
         }
         AfterEach {
-            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+            # Restore-SessionEnvironmentVariables -OriginalValues $originalValues
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
 
     Context "Set-TestSetup_7_0_0" {
         BeforeEach {
-            $OriginalValues = Backup-SessionEnvironmentVariables
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            # $originalSessionValues = Backup-SessionEnvironmentVariables
+            # $originalSystemValues = Backup-SystemEnvironmentVariables
         }
         It "Should create mock app scripts" {
             $mockInstalVal = Set-TestSetup_7_0_0
@@ -201,13 +250,13 @@ Describe "Function testing" {
             $env:PROJECT_NAME | Should -Be $mockInstalVal.ProjectName
             $env:PROJECTS_BASE_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Projects")
             $env:VENV_BASE_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "VEnv")
-            $env:VENV_CONFIG_DEFAULT_DIR | Should -Be (Join-Path -Path $env:VENVIT_DIR -ChildPath "VENV_CONFIG_DEFAULT_DIR")
-            $env:VENV_CONFIG_USER_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "User\VENV_CONFIG_USER_DIR")
+            $env:VENV_CONFIG_DEFAULT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Program Files\VenvIt\Config")
+            $env:VENV_CONFIG_USER_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "VenvIt\Config")
             $env:VENV_ENVIRONMENT | Should -Be "loc_dev"
             $env:VENV_PYTHON_BASE_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Python")
-            $env:VENV_SECRETS_DEFAULT_DIR | Should -Be (Join-Path -Path $env:VENVIT_DIR -ChildPath "VENV_SECRETS_DEFAULT_DIR")
-            $env:VENV_SECRETS_USER_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "User\VENV_SECRETS_USER_DIR")
-            $env:VENVIT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "VEnvIt")
+            $env:VENV_SECRETS_DEFAULT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Program Files\VenvIt\Secrets")
+            $env:VENV_SECRETS_USER_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "VenvIt\Secrets")
+            $env:VENVIT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Program Files\VenvIt")
             $env:PROJECT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Projects\MyOrg\MyProject")
             $env:VIRTUAL_ENV | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "VEnv\MyProject")
 
@@ -235,13 +284,23 @@ Describe "Function testing" {
             Test-Path ( Join-Path -Path $env:VENV_SECRETS_USER_DIR -ChildPath "secrets.ps1" ) | Should -Be $true
         }
         AfterEach {
-            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
-            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+            $newEnvVar = ConvertFrom-ProdToTestEnvVar -EnvVarSet $defEnvVarSet_7_0_0 -TempDir $mockInstalVal.TempDir
+            $newEnvVar["PROJECT_NAME"]["DefVal"] = $mockInstalVal.ProjectName
+            $newEnvVar["VENV_ORGANIZATION_NAME"]["DefVal"] = $mockInstalVal.Organization
+            $newEnvVar["VIRTUAL_ENV"]["DefVal"] = ($newEnvVar["VENV_BASE_DIR"]["DefVal"] + "\" + $mockInstalVal.ProjectName)
+            Unpublish-EnvironmentVariables -EnvVarSet $newEnvVar
+
+            # Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            # Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+            # Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
 
     Context "New-CreateAppScripts" {
         BeforeEach {
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
+
             $TempDir = New-CustomTempDir -Prefix "VenvIt"
         }
         It "Should create mock app scripts" {
@@ -265,9 +324,10 @@ Describe "Function testing" {
     }
 
     Context "Restore-SystemEnvironmentVariables" {
-        # TODO
-        # Test to be implemented
         BeforeEach {
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
+
             $origPROJECT_NAME = [System.Environment]::GetEnvironmentVariable("PROJECT_NAME", [System.EnvironmentVariableTarget]::Machine)
             $origPROJECTS_BASE_DIR = [System.Environment]::GetEnvironmentVariable("PROJECTS_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
             $origRTE_ENVIRONMENT = [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
@@ -285,52 +345,52 @@ Describe "Function testing" {
 
             $mockInstalVal = Set-TestSetup_7_0_0
             [System.Environment]::SetEnvironmentVariable("PROJECT_NAME", $mockInstalVal.ProjectName, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $defEnvVarSet["PROJECTS_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $defEnvVarSet["VENVIT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $defEnvVarSet["VENV_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $defEnvVarSet["VENV_CONFIG_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $defEnvVarSet["VENV_CONFIG_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $defEnvVarSet_7_0_0["PROJECTS_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $defEnvVarSet_7_0_0["VENV_ENVIRONMENT"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("SECRETS_DIR", $defEnvVarSet_7_0_0["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $defEnvVarSet_7_0_0["VENVIT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $defEnvVarSet_7_0_0["VENV_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $defEnvVarSet_7_0_0["VENV_CONFIG_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $defEnvVarSet_7_0_0["VENV_CONFIG_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $defEnvVarSet_7_0_0["VENV_ENVIRONMENT"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_ORGANIZATION_NAME", $mockInstalVal.Organization, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $defEnvVarSet["VENV_PYTHON_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $defEnvVarSet["VENVIT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
-       }
+            [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $defEnvVarSet_7_0_0["VENV_PYTHON_BASE_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $defEnvVarSet_7_0_0["VENV_SECRETS_DEFAULT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $defEnvVarSet_7_0_0["VENV_SECRETS_USER_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $defEnvVarSet_7_0_0["VENVIT_DIR"]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+        }
         It "Should restore the backedup environment variable values" {
             $origValues = @{
                 PROJECT_NAME             = $mockInstalVal.ProjectName
-                PROJECTS_BASE_DIR        = $defEnvVarSet["PROJECTS_BASE_DIR"]["DefVal"]
-                RTE_ENVIRONMENT          = $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"]
-                SECRETS_DIR              = $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"]
-                SCRIPTS_DIR              = $defEnvVarSet["VENVIT_DIR"]["DefVal"]
-                VENV_BASE_DIR            = $defEnvVarSet["VENV_BASE_DIR"]["DefVal"]
-                VENV_CONFIG_USER_DIR     = $defEnvVarSet["VENV_CONFIG_USER_DIR"]["DefVal"]
-                VENV_CONFIG_DEFAULT_DIR  = $defEnvVarSet["VENV_CONFIG_DEFAULT_DIR"]["DefVal"]
-                VENV_ENVIRONMENT         = $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"]
+                PROJECTS_BASE_DIR        = $defEnvVarSet_7_0_0["PROJECTS_BASE_DIR"]["DefVal"]
+                RTE_ENVIRONMENT          = $defEnvVarSet_7_0_0["VENV_ENVIRONMENT"]["DefVal"]
+                SECRETS_DIR              = $defEnvVarSet_7_0_0["VENV_SECRETS_USER_DIR"]["DefVal"]
+                SCRIPTS_DIR              = $defEnvVarSet_7_0_0["VENVIT_DIR"]["DefVal"]
+                VENV_BASE_DIR            = $defEnvVarSet_7_0_0["VENV_BASE_DIR"]["DefVal"]
+                VENV_CONFIG_USER_DIR     = $defEnvVarSet_7_0_0["VENV_CONFIG_USER_DIR"]["DefVal"]
+                VENV_CONFIG_DEFAULT_DIR  = $defEnvVarSet_7_0_0["VENV_CONFIG_DEFAULT_DIR"]["DefVal"]
+                VENV_ENVIRONMENT         = $defEnvVarSet_7_0_0["VENV_ENVIRONMENT"]["DefVal"]
                 VENV_ORGANIZATION_NAME   = $mockInstalVal.Organization
-                VENV_PYTHON_BASE_DIR     = $defEnvVarSet["VENV_PYTHON_BASE_DIR"]["DefVal"]
-                VENV_SECRETS_DEFAULT_DIR = $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"]
-                VENV_SECRETS_USER_DIR    = $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"]
-                VENVIT_DIR               = $defEnvVarSet["VENVIT_DIR"]["DefVal"]
+                VENV_PYTHON_BASE_DIR     = $defEnvVarSet_7_0_0["VENV_PYTHON_BASE_DIR"]["DefVal"]
+                VENV_SECRETS_DEFAULT_DIR = $defEnvVarSet_7_0_0["VENV_SECRETS_DEFAULT_DIR"]["DefVal"]
+                VENV_SECRETS_USER_DIR    = $defEnvVarSet_7_0_0["VENV_SECRETS_USER_DIR"]["DefVal"]
+                VENVIT_DIR               = $defEnvVarSet_7_0_0["VENVIT_DIR"]["DefVal"]
             }
             Restore-SystemEnvironmentVariables -OriginalValues $origValues
             [System.Environment]::GetEnvironmentVariable("PROJECT_NAME", [System.EnvironmentVariableTarget]::Machine) | Should -Be $mockInstalVal.ProjectName
-            [System.Environment]::GetEnvironmentVariable("PROJECTS_BASE_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["PROJECTS_BASE_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("SCRIPTS_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENVIT_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_BASE_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_BASE_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_CONFIG_DEFAULT_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_USER_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_CONFIG_USER_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_ENVIRONMENT"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("PROJECTS_BASE_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["PROJECTS_BASE_DIR"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["VENV_ENVIRONMENT"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("SECRETS_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["VENV_SECRETS_USER_DIR"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("SCRIPTS_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["VENVIT_DIR"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("VENV_BASE_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["VENV_BASE_DIR"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["VENV_CONFIG_DEFAULT_DIR"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("VENV_CONFIG_USER_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["VENV_CONFIG_USER_DIR"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("VENV_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["VENV_ENVIRONMENT"]["DefVal"]
             [System.Environment]::GetEnvironmentVariable("VENV_ORGANIZATION_NAME", [System.EnvironmentVariableTarget]::Machine) | Should -Be $mockInstalVal.Organization
-            [System.Environment]::GetEnvironmentVariable("VENV_PYTHON_BASE_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_PYTHON_BASE_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_SECRETS_DEFAULT_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_USER_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENV_SECRETS_USER_DIR"]["DefVal"]
-            [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet["VENVIT_DIR"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("VENV_PYTHON_BASE_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["VENV_PYTHON_BASE_DIR"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["VENV_SECRETS_DEFAULT_DIR"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_USER_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["VENV_SECRETS_USER_DIR"]["DefVal"]
+            [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $defEnvVarSet_7_0_0["VENVIT_DIR"]["DefVal"]
         }
         AfterEach {
             [System.Environment]::SetEnvironmentVariable("PROJECT_NAME", $origPROJECT_NAME, [System.EnvironmentVariableTarget]::Machine)
@@ -347,7 +407,11 @@ Describe "Function testing" {
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $origVENV_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $origVENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $origVENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
-
+    AfterAll{
+        Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+        Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+    }
 }

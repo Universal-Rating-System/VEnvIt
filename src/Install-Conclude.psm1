@@ -1,3 +1,5 @@
+# Install-Conclude.psm1
+
 if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
 Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
@@ -28,7 +30,7 @@ function Invoke-ConcludeInstall {
 
     Update-PackagePrep $UpgradeScriptDir
     Write-Host $separator -ForegroundColor Cyan
-    Set-EnvironmentVariables -EnvVarSet $defEnvVarSet
+    Get-ReadAndSetEnvironmentVariables -EnvVarSet $defEnvVarSet
     Set-Path
     Write-Host "Environment variables have been set successfully." -ForegroundColor Green
     New-Directories
@@ -74,7 +76,7 @@ function Publish-LatestVersion {
     # Write-Host "Downloading installation files from $url..."
     # Invoke-WebRequest -Uri $url -OutFile $zipFilePath
     # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
-    Write-Host "Copy source files to to $env:VENVIT_DIR..."
+    # Write-Host "Copy source files to $env:VENVIT_DIR..."
     # Expand-Archive -Path $zipFilePath -DestinationPath $env:VENVIT_DIR -Force
     Copy-Item -Path "$UpgradeScriptDir\LICENSE" -Destination $env:VENVIT_DIR | Out-Null
     Copy-Item -Path "$UpgradeScriptDir\Manifest.psd1" -Destination $env:VENVIT_DIR | Out-Null
@@ -83,8 +85,8 @@ function Publish-LatestVersion {
     Copy-Item -Path "$UpgradeScriptDir\src\vi.ps1" -Destination $env:VENVIT_DIR | Out-Null
     Copy-Item -Path "$UpgradeScriptDir\src\vn.ps1" -Destination $env:VENVIT_DIR | Out-Null
     Copy-Item -Path "$UpgradeScriptDir\src\vr.ps1" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\src\utils.psm1" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\src\utils.psm1" -Destination $env:VENVIT_DIR | Out-Null
+    Copy-Item -Path "$UpgradeScriptDir\src\Uninstall.ps1" -Destination $env:VENVIT_DIR | Out-Null
+    Copy-Item -Path "$UpgradeScriptDir\src\Utils.psm1" -Destination $env:VENVIT_DIR | Out-Null
 }
 
 function Publish-Secrets {
@@ -127,5 +129,5 @@ function Test-Admin {
 
 Export-ModuleMember -Function Clear-InstallationFiles, Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories
 Export-ModuleMember -Function Publish-LatestVersion, Publish-Secrets, Set-Path, Test-Admin
-Export-ModuleMember -Variable envVarSet
-Export-ModuleMember -Variable envVarSet
+# Export-ModuleMember -Variable envVarSet
+# Export-ModuleMember -Variable envVarSet

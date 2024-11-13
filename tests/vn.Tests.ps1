@@ -1,16 +1,11 @@
-# Pester test for vn.Tests.ps1
-
-if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
-if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-Import-Module $PSScriptRoot\..\src\Utils.psm1
+# vn.Tests.ps1
 
 Describe "Top level script execution" {
     BeforeAll {
         . $PSScriptRoot\..\src\vn.ps1 -Pester
     }
     BeforeEach {
-        Mock -CommandName "Show-Help" -MockWith { Write-Host "Mock: Show-Help called" }
+        Mock -CommandName "Show-Help" -MockWith { return "Mock: Show-Help called" }
     }
     Context "When Help parameter is passed" {
         It "Should call Show-Help function" {
@@ -44,13 +39,22 @@ Describe "Top level script execution" {
     }
 }
 
-Describe "Function testing" {
+Describe "Function Tests" {
     BeforeAll {
-        . $PSScriptRoot\..\src\vn.ps1 -Pester
-        $OriginalValues = Backup-SessionEnvironmentVariables
+        # . $PSScriptRoot\..\src\vn.ps1 -Pester
+        $originalSessionValues = Backup-SessionEnvironmentVariables
+        $originalSystemValues = Backup-SystemEnvironmentVariables
+    }
+
+    BeforeEach {
+        if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+        Import-Module $PSScriptRoot\..\src\Utils.psm1
     }
 
     Context "Get-InstallationValues" {
+        BeforeAll {
+            . $PSScriptRoot\..\src\vn.ps1 -Pester
+        }
         It "All parameters set" {
             $InstallValues = Get-InstallationValues -ProjectName "MyProject" -PythonVer "311" -Organization "MyOrg" -DevMode "Y" -ResetScripts "Y"
             $InstallValues.PythonVer | Should -Be "311"
@@ -61,6 +65,9 @@ Describe "Function testing" {
     }
 
     Context "Get-Value" {
+        BeforeAll {
+            . $PSScriptRoot\..\src\vn.ps1 -Pester
+        }
         It "With set values" {
             $Value = Get-Value -CurrValue "311" -Prompt "Python version" -DefValue "312"
             $Value | Should -Be "311"
@@ -78,11 +85,13 @@ Describe "Function testing" {
     }
 
     Context "Invoke-VirtualEnvironment" {
-        BeforeEach {
+        BeforeAll {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
 
         It "Should install Python virtual environment" {
@@ -98,43 +107,43 @@ Describe "Function testing" {
             Mock Invoke-Script {
                 return "Mock: Default VEnvMyProjectInstall.ps1"
             } -ParameterFilter {
-                Write-Host $Script
-                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectInstall.ps1")).FullName
+                # Write-Host $Script
+                # Write-Host (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectInstall.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectInstall.ps1")).FullName
             }
             Mock Invoke-Script {
                 return "Mock: User VEnvMyProjectInstall.ps1"
             } -ParameterFilter {
-                Write-Host $Script
-                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectInstall.ps1")).FullName
+                # Write-Host $Script
+                # Write-Host (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectInstall.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectInstall.ps1")).FullName
             }
             Mock Invoke-Script {
                 return "Mock: Default VEnvMyProjectEnvVar.ps1"
             } -ParameterFilter {
-                Write-Host $Script
-                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectEnvVar.ps1")).FullName
+                # Write-Host $Script
+                # Write-Host (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectEnvVar.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectEnvVar.ps1")).FullName
             }
             Mock Invoke-Script {
                 return "Mock: User VEnvMyProjectEnvVar.ps1"
             } -ParameterFilter {
-                Write-Host $Script
-                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectEnvVar.ps1")).FullName
+                # Write-Host $Script
+                # Write-Host (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectEnvVar.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectEnvVar.ps1")).FullName
             }
             Mock Invoke-Script {
                 return "Mock: Default VEnvMyProjectEnvVar.ps1"
             } -ParameterFilter {
-                Write-Host $Script
-                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectCustomSetup.ps1")).FullName
+                # Write-Host $Script
+                # Write-Host (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectCustomSetup.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_DEFAULT_DIR\VEnvMyProjectCustomSetup.ps1")).FullName
             }
             Mock Invoke-Script {
                 return "Mock: Default VEnvMyProjectEnvVar.ps1"
             } -ParameterFilter {
-                Write-Host $Script
-                Write-Host (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectCustomSetup.ps1")).FullName
+                # Write-Host $Script
+                # Write-Host (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectCustomSetup.ps1")).FullName
                 $Script -eq (Get-Item -Path ("$env:VENV_CONFIG_USER_DIR\VEnvMyProjectCustomSetup.ps1")).FullName
             }
 
@@ -164,9 +173,11 @@ Describe "Function testing" {
     Context "New-ProjectInstallScript" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
 
             Mock CreatePreCommitConfigYaml { return $true }
         }
@@ -190,6 +201,9 @@ Describe "Function testing" {
     Context "New-VEnvCustomSetupScripts" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         }
@@ -215,10 +229,11 @@ Describe "Function testing" {
     Context "New-VEnvEnvVarScripts" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
-
         }
 
         It "Should chreate zip archives" {
@@ -243,9 +258,11 @@ Describe "Function testing" {
     Context "New-VEnvInstallScripts" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
         }
         It "Should chreate zip archives" {
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
@@ -274,9 +291,11 @@ Describe "Function testing" {
     Context "Set-Environment" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
+            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
 
             # Reset necessary values that are populated in Set-TestSetup_7_0_0
             $env:PROJECT_NAME = $null
@@ -309,7 +328,8 @@ Describe "Function testing" {
     }
 
     AfterAll {
-        Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+        Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+        Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
     }
 }
 

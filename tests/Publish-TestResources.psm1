@@ -1,4 +1,6 @@
-﻿if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
+﻿# Publish-TestResources.psm1
+
+if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
 Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
 if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
 Import-Module $PSScriptRoot\..\src\Utils.psm1
@@ -55,6 +57,32 @@ function Backup-SystemEnvironmentVariables {
         VENV_SECRETS_USER_DIR    = [System.Environment]::GetEnvironmentVariable("VENV_SECRETS_USER_DIR", [System.EnvironmentVariableTarget]::Machine)
         VENVIT_DIR               = [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine)
     }
+}
+
+function ConvertFrom-ProdToTestEnvVar {
+    param(
+        $EnvVarSet,
+        [String]$TempDir
+    )
+
+    $newEnvVarSet = Copy-Deep $EnvVarSet
+
+    foreach ($envVar in $newEnvVarSet.Keys) {
+        if ($newEnvVarSet[$envVar]["IsDir"]) {
+            if ($newEnvVarSet[$envVar]["DefVal"] -like "~*") {
+                $newEnvVarSet[$envVar]["DefVal"] = $newEnvVarSet[$envVar]["DefVal"] -replace "^~", $tempDir
+            } elseif ($newEnvVarSet[$envVar]["DefVal"] -like "$env:ProgramFiles*") {
+                $escapedProgramFiles = [Regex]::Escape($env:ProgramFiles)
+                $newEnvVarSet[$envVar]["DefVal"] = $newEnvVarSet[$envVar]["DefVal"] -replace $escapedProgramFiles, "$tempDir\Program Files"
+            } elseif (-not $newEnvVarSet[$envVar]["DefVal"]){
+                $newEnvVarSet[$envVar]["DefVal"] = $tempDir
+            } else {
+                $lastChild = Split-Path -Path $newEnvVarSet[$envVar]["DefVal"] -Leaf
+                $newEnvVarSet[$envVar]["DefVal"] = Join-Path -Path $tempDir -ChildPath $lastChild
+            }
+        }
+    }
+    return $newEnvVarSet
 }
 
 function Set-TestSetup_New {
@@ -150,8 +178,6 @@ function Set-TestSetup_6_0_0 {
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "OrganizationDir" -Value $organizationDir
     $env:PROJECT_DIR = (Join-Path -Path $mockInstalVal.OrganizationDir -ChildPath $env:PROJECT_NAME)
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value $env:PROJECT_DIR
-    Write-Host $mockInstalVal.OrganizationDir
-    Write-Host $env:PROJECT_DIR
 
     #Create the directory structure
     $directories = @(
@@ -188,19 +214,11 @@ function Set-TestSetup_7_0_0 {
     $tempDir = New-CustomTempDir -Prefix "VenvIt"
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
 
-    $env:VENVIT_DIR = "$tempDir\VEnvIt"
-    $env:PROJECTS_BASE_DIR = "$tempDir\Projects"
-
-    $env:PROJECT_NAME = $mockInstalVal.ProjectName
-    $env:VENV_BASE_DIR = "$tempDir\VEnv"
-    $env:VENV_CONFIG_DEFAULT_DIR = "$env:VENVIT_DIR\VENV_CONFIG_DEFAULT_DIR"
-    $env:VENV_CONFIG_USER_DIR = "$tempDir\User\VENV_CONFIG_USER_DIR"
-    $env:VENV_ENVIRONMENT = "loc_dev"
-    $env:VENV_ORGANIZATION_NAME = $mockInstalVal.Organization
-    $env:VENV_PYTHON_BASE_DIR = "$tempDir\Python"
-    $env:VENV_SECRETS_DEFAULT_DIR = "$env:VENVIT_DIR\VENV_SECRETS_DEFAULT_DIR"
-    $env:VENV_SECRETS_USER_DIR = "$tempDir\User\VENV_SECRETS_USER_DIR"
-    $env:VIRTUAL_ENV = ("$env:VENV_BASE_DIR\" + $mockInstalVal.ProjectName)
+    $newEnvVar = ConvertFrom-ProdToTestEnvVar -EnvVarSet $defEnvVarSet_7_0_0 -TempDir $mockInstalVal.TempDir
+    $newEnvVar["PROJECT_NAME"]["DefVal"] = $mockInstalVal.ProjectName
+    $newEnvVar["VENV_ORGANIZATION_NAME"]["DefVal"] = $mockInstalVal.Organization
+    $newEnvVar["VIRTUAL_ENV"]["DefVal"] = ($newEnvVar["VENV_BASE_DIR"]["DefVal"] + "\" + $mockInstalVal.ProjectName)
+    Publish-EnvironmentVariables -EnvVarSet $newEnvVar
 
     $organizationDir = (Join-Path -Path $env:PROJECTS_BASE_DIR -ChildPath $env:VENV_ORGANIZATION_NAME)
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "OrganizationDir" -Value $organizationDir
@@ -300,7 +318,7 @@ function Restore-SystemEnvironmentVariables {
     [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $OriginalValues.VENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
 }
 
-Export-ModuleMember -Function Backup-SessionEnvironmentVariables, Backup-SystemEnvironmentVariables, Set-TestSetup_New
-Export-ModuleMember -Function Set-TestSetup_0_0_0, Set-TestSetup_6_0_0, Set-TestSetup_7_0_0, New-CreateAppScripts
+Export-ModuleMember -Function Backup-SessionEnvironmentVariables, Backup-SystemEnvironmentVariables, ConvertFrom-ProdToTestEnvVar
+Export-ModuleMember -Function Set-TestSetup_New, Set-TestSetup_0_0_0, Set-TestSetup_6_0_0, Set-TestSetup_7_0_0, New-CreateAppScripts
 Export-ModuleMember -Function New-TestEnvironment, Restore-SessionEnvironmentVariables, Restore-SystemEnvironmentVariables
 Export-ModuleMember -Variable ManifestData000, ManifestData600, ManifestData700

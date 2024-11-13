@@ -1,5 +1,10 @@
-﻿if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-Import-Module $PSScriptRoot\..\src\Utils.psm1
+﻿# Update-Manifest.psm1
+
+BeforeAll {
+    if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+    Import-Module $PSScriptRoot\..\src\Utils.psm1
+}
+
 function Convert-PyprojectToml {
     param (
         [string]$filePath
@@ -66,7 +71,7 @@ function Invoke-UpdateManifest {
         if ($pyprojectData.Version -and $pyprojectData.Authors -and $pyprojectData.Description) {
             # Create the manifest.psd1
             New-ManifestPsd1 -DestinationPath $manifestPath -data $pyprojectData
-            Write-Host "Manifest.psd1 created successfully at $manifestPath"
+            # Write-Host "Manifest.psd1 created successfully at $manifestPath"
         }
         else {
             Write-Host "Failed to extract required fields from pyproject.toml"

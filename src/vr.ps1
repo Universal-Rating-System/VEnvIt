@@ -1,3 +1,5 @@
+# vr.ps1
+
 param (
     [Parameter(Mandatory = $false, Position = 0)]
     [string]$ProjectName,
@@ -29,7 +31,7 @@ function New-ProjectArchive {
     foreach ($postfix in $filePostfixToArchive) {
         $scriptPath = Join-Path -Path $env:VENV_CONFIG_USER_DIR -ChildPath (Get-ConfigFileName -ProjectName $ProjectName -Postfix $postfix)
         if (Test-Path -Path $scriptPath) {
-            $archivePath = Backup-ScriptToArchiveIfExists -ScriptPath $scriptPath -ArchiveDir $archiveDir -TimeStamp $TimeStamp
+            $archivePath = Backup-ScriptToArchiveIfExists -SourcePath $scriptPath -ArchiveDir $archiveDir -TimeStamp $TimeStamp
             Remove-Item -Path $scriptPath -Recurse -Force
         }
     }
@@ -90,7 +92,7 @@ if (-not $Pester) {
     Write-Host ''
     Write-Host ''
     $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
+    Write-Host "=[ START $dateTime ]=================================================[ vr.ps1 ]=" -ForegroundColor Blue
     Write-Host "Remove the $project_name virtual environment" -ForegroundColor Blue
     if ($ProjectName -eq "" -or $Help) {
         Show-Help
