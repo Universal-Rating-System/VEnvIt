@@ -12,13 +12,42 @@ param (
     [Switch]$Pester
 )
 
-if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-Import-Module $PSScriptRoot\Utils.psm1
+function Backup-EnvironmentVariables {
+    param (
+        [String]$DestinationPath
+    )
+
+    $BackupFileName = "EnvironmentVariables" + "_" + "$TimeStamp.txt"
+    $BackupPath = Join-Path -Path (Split-Path $DestinationPath) -ChildPath $BackupFileName
+
+    $backupEnvVars = Get-ChildItem Env: | Where-Object { $_.Name -like "VENV*" }
+    # Open the file for writing
+    try {
+        $fileStream = [System.IO.StreamWriter]::new($BackupPath, $false)
+        foreach ($envVar in $backupEnvVars) {
+            $fileStream.WriteLine("$($envVar.Name)=$($envVar.Value)")
+        }
+    }
+    finally {
+        $fileStream.Close()
+    }
+
+    $compress = @{
+        Path             = $BackupPath
+        CompressionLevel = "Fastest"
+        DestinationPath  = $DestinationPath
+        Update           = $true
+    }
+    Compress-Archive @compress | Out-Null
+    Remove-Item $BackupPath -Force
+}
 
 function Invoke-Uninstall {
     param (
         [string]$BackupDir
     )
+    Import-Module $PSScriptRoot\Utils.psm1
+
     if (-not $BackupDir) {
         $BackupDir = "~.\VEnvIt Backup"
     }
@@ -27,7 +56,39 @@ function Invoke-Uninstall {
     }
 
     $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-    Backup-ArchiveOldVersion -InstallationDir $env:VENVIT_DIR -TimeStamp $timeStamp -DestinationDir $BackupDir
+    $InstallationDir = [System.Environment]::GetEnvironmentVariable($env:VENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
+    $archivePath = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -TimeStamp $timeStamp -DestinationDir $BackupDir
+    Backup-EnvironmentVariables -DestinationPath $archivePath
+    Remove-SourceFiles -InstallationDir $env:VENVIT_DIR
+    Unpublish-EnvironmentVariables -EnvVarSet $defEnvVarSet_7_0_0
+
+    return $archivePath
+}
+
+function  Remove-SourceFiles {
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [String]$InstallationDir
+    )
+
+    Import-Module $PSScriptRoot\Utils.psm1
+    $archiveVersion = Get-Version -SourceDir $InstallationDir
+
+    if ($archiveVersion -eq "0.0.0") {
+        $fileList = $env:SCRIPTS_DIR
+    }
+    elseif ($archiveVersion -eq "6.0.0") {
+        $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DIR, $env:VENV_SECRETS_DIR
+    }
+    elseif ($archiveVersion -eq "7.0.0") {
+        $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
+    }
+
+    foreach ( $dir in $fileList) {
+        if (Test-Path $dir) {
+            Remove-Item -Path $dir -Force -Recurse
+        }
+    }
 }
 
 function Show-Help {

@@ -85,8 +85,8 @@ function Publish-LatestVersion {
     Copy-Item -Path "$UpgradeScriptDir\src\vi.ps1" -Destination $env:VENVIT_DIR | Out-Null
     Copy-Item -Path "$UpgradeScriptDir\src\vn.ps1" -Destination $env:VENVIT_DIR | Out-Null
     Copy-Item -Path "$UpgradeScriptDir\src\vr.ps1" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\src\utils.psm1" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\src\utils.psm1" -Destination $env:VENVIT_DIR | Out-Null
+    Copy-Item -Path "$UpgradeScriptDir\src\Uninstall.ps1" -Destination $env:VENVIT_DIR | Out-Null
+    Copy-Item -Path "$UpgradeScriptDir\src\Utils.psm1" -Destination $env:VENVIT_DIR | Out-Null
 }
 
 function Publish-Secrets {

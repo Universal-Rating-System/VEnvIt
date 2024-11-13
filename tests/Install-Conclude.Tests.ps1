@@ -122,6 +122,7 @@ Describe "Function Tests" {
             (Test-Path -Path "$env:VENVIT_DIR\vi.ps1") | Should -Be $true
             (Test-Path -Path "$env:VENVIT_DIR\vn.ps1") | Should -Be $true
             (Test-Path -Path "$env:VENVIT_DIR\vr.ps1") | Should -Be $true
+            (Test-Path -Path "$env:VENVIT_DIR\Uninstall.psm1") | Should -Be $true
             (Test-Path -Path "$env:VENVIT_DIR\Utils.psm1") | Should -Be $true
         }
 

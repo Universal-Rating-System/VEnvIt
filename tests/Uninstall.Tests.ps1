@@ -1,9 +1,10 @@
 ﻿# Uninstall.Tests.ps1
 BeforeAll {
-    if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-    Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
-    # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-    # Import-Module $PSScriptRoot\..\src\Utils.psm1
+    # if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+    # Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
+    if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+    Import-Module $PSScriptRoot\..\src\Utils.psm1
 }
 
 Describe "Top level script execution" {
@@ -55,19 +56,74 @@ Describe "Top level script execution" {
 
 Describe "Function Tests" {
     BeforeAll {
+        . $PSScriptRoot\..\src\Uninstall.ps1 -Pester
+        if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+        Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
+        if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+        Import-Module $PSScriptRoot\..\src\Utils.psm1
+
         $originalSessionValues = Backup-SessionEnvironmentVariables
         $originalSystemValues = Backup-SystemEnvironmentVariables
-        . $PSScriptRoot\..\src\Uninstall.ps1 -Pester
+
+    }
+
+    Context "Backup-EnvironmentVariables" {
+        BeforeEach {
+            $mockInstalVal = Set-TestSetup_7_0_0
+            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+        }
+
+        It "Should backup environment variables to file" {
+            $BackupFileName = "VEnvIt_7.0.0" + "_" + "$TimeStamp.zip"
+            $BackupDir = Join-Path -Path $mockInstalVal.TempDir -ChildPath "VEnvIt Backup"
+            $BackupPath = Join-Path -Path $BackupDir -ChildPath $BackupFileName
+
+            if ( -not( Test-Path $BackupDir)) {
+                New-Item -Path $BackupDir -ItemType Directory -Force
+            }
+            Backup-EnvironmentVariables -DestinationPath $BackupPath
+
+            Test-Path $BackupPath | Should -Be $true
+        }
+
+        AfterEach {
+            Set-Location -Path $env:TEMP
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+        }
+    }
+
+    Context "Remove-SourceFiles" {
+        BeforeEach {
+            $mockInstalVal = Set-TestSetup_7_0_0
+        }
+
+        It "Should remove all source files" {
+            Remove-SourceFiles -InstallationDir $env:VENVIT_DIR
+
+            $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
+            foreach ( $dir in $fileList) {
+                Test-Path $dir | Should -Be $false
+            }
+        }
+
+        AfterEach {
+            Set-Location -Path $env:TEMP
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+        }
     }
 
     Context "Uninstall" {
         BeforeEach {
             $mockInstalVal = Set-TestSetup_7_0_0
-            # $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         }
 
         It "Should archive v7.0.0. to default" {
-            Invoke-Uninstall -BackupDir (Join-Path -Path $mockInstalVal.TempDir -ChildPath "VEnvIt Backup")
+            $BackupDir = Join-Path -Path $mockInstalVal.TempDir -ChildPath "VEnvIt Backup"
+            $BackupPath = Invoke-Uninstall -BackupDir $BackupDir
+
+            Test-Path $BackupPath | Should -Be $true
         }
 
         AfterEach {
