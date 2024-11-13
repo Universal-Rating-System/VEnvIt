@@ -196,7 +196,7 @@ function Invoke-Script {
     param (
         [string]$Script
     )
-    Write-Host $Script
+    # Write-Host $Script
     & $Script
 }
 
