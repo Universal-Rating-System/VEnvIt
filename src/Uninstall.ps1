@@ -56,7 +56,7 @@ function Invoke-Uninstall {
     }
 
     $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-    $InstallationDir = [System.Environment]::GetEnvironmentVariable($env:VENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
+    $InstallationDir = [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine)
     $archivePath = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -TimeStamp $timeStamp -DestinationDir $BackupDir
     Backup-EnvironmentVariables -DestinationPath $archivePath
     Remove-SourceFiles -InstallationDir $env:VENVIT_DIR

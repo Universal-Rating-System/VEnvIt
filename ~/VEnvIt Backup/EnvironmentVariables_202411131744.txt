@@ -1,9 +1,0 @@
-VENV_BASE_DIR=C:\Users\hendr\AppData\Local\Temp\VenvIt_e99b27d7-bc37-4771-99d3-9d361aa713a3\venv
-VENV_CONFIG_DEFAULT_DIR=C:\Users\hendr\AppData\Local\Temp\VenvIt_e99b27d7-bc37-4771-99d3-9d361aa713a3\Program Files\VenvIt\Config
-VENV_CONFIG_USER_DIR=C:\Users\hendr\AppData\Local\Temp\VenvIt_e99b27d7-bc37-4771-99d3-9d361aa713a3\VenvIt\Config
-VENV_ENVIRONMENT=loc_dev
-VENV_ORGANIZATION_NAME=MyOrg
-VENV_PYTHON_BASE_DIR=C:\Users\hendr\AppData\Local\Temp\VenvIt_e99b27d7-bc37-4771-99d3-9d361aa713a3\Python
-VENV_SECRETS_DEFAULT_DIR=C:\Users\hendr\AppData\Local\Temp\VenvIt_e99b27d7-bc37-4771-99d3-9d361aa713a3\Program Files\VenvIt\Secrets
-VENV_SECRETS_USER_DIR=C:\Users\hendr\AppData\Local\Temp\VenvIt_e99b27d7-bc37-4771-99d3-9d361aa713a3\VenvIt\Secrets
-VENVIT_DIR=C:\Users\hendr\AppData\Local\Temp\VenvIt_e99b27d7-bc37-4771-99d3-9d361aa713a3\Program Files\VenvIt
