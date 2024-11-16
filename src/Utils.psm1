@@ -48,7 +48,6 @@ $defEnvVarSet_7_0_0 = @{
     VENVIT_DIR               = @{DefVal = "$env:ProgramFiles\VenvIt"; IsDir = $true; SystemMandatory = $true; ReadOrder = 1; Prefix = $false }
     VIRTUAL_ENV              = @{DefVal = $null; IsDir = $false; SystemMandatory = $false; ReadOrder = 12; Prefix = $false }
 }
-$separator = "-" * 80
 $installationFileList = @(
     "README.md",
     "LICENSE",
@@ -59,6 +58,17 @@ $installationFileList = @(
     "vr.ps1",
     "Uninstall.ps1",
     "Utils.psm1"
+)
+$separator = "-" * 80
+$sourceFileCopyList = @(
+    "README.md",
+    "LICENSE",
+    "ReleaseNotes.md",
+    "src\vi.ps1",
+    "src\vn.ps1",
+    "src\vr.ps1",
+    "src\Uninstall.ps1",
+    "src\Utils.psm1"
 )
 
 
@@ -314,7 +324,7 @@ function Unpublish-EnvironmentVariables {
     }
 }
 
-Export-ModuleMember -Variable defEnvVarSet_7_0_0, separator, installationFileList
+Export-ModuleMember -Variable defEnvVarSet_7_0_0, installationFileList, sourceFileCopyList, separator
 Export-ModuleMember -Function Backup-ArchiveOldVersion, Backup-ScriptToArchiveIfExists, Confirm-SystemEnvironmentVariablesExist, Copy-Deep
 Export-ModuleMember -Function Get-ReadAndSetEnvironmentVariables, Get-ConfigFileName, Get-ManifestFileName, Get-SecretsFileName
 Export-ModuleMember -Function Get-Version, Invoke-Script, New-CustomTempDir, Publish-EnvironmentVariables, Read-YesOrNo

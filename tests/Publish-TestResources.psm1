@@ -25,16 +25,6 @@ $ManifestData700 = @{
     Authors     = "Ann Other <ann@other.com>"
     Description = "Description of 7.0.0"
 }
-$sourceFileCopyList = @(
-    "README.md",
-    "LICENSE",
-    "ReleaseNotes.md",
-    "src\vi.ps1",
-    "src\vn.ps1",
-    "src\vr.ps1",
-    "src\Uninstall.ps1",
-    "src\Utils.psm1"
-)
 
 function Backup-SessionEnvironmentVariables {
     return [PSCustomObject]@{
