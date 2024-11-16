@@ -57,19 +57,15 @@ function Invoke-Uninstall {
 
     $timeStamp = Get-Date -Format "yyyyMMddHHmm"
     $InstallationDir = [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine)
-    if ($InstallationDir) {
-        $archivePath = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -TimeStamp $timeStamp -DestinationDir $BackupDir
-        Backup-EnvironmentVariables -DestinationPath $archivePath
-        Remove-InstallationFiles -InstallationDir $env:VENVIT_DIR
-        Unpublish-EnvironmentVariables -EnvVarSet $defEnvVarSet_7_0_0
-    } else {
-        $archivePath = $false
-    }
+    $archivePath = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -TimeStamp $timeStamp -DestinationDir $BackupDir
+    Backup-EnvironmentVariables -DestinationPath $archivePath
+    Remove-SourceFiles -InstallationDir $env:VENVIT_DIR
+    Unpublish-EnvironmentVariables -EnvVarSet $defEnvVarSet_7_0_0
 
     return $archivePath
 }
 
-function  Remove-InstallationFiles {
+function  Remove-SourceFiles {
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [String]$InstallationDir
@@ -93,7 +89,6 @@ function  Remove-InstallationFiles {
             Remove-Item -Path $dir -Force -Recurse
         }
     }
-    Remove-Item -Path $env:VENV_BASE_DIR -Force -Recurse
 }
 
 function Show-Help {
@@ -134,7 +129,7 @@ if (-not $Pester) {
     Write-Host ''
     Write-Host ''
     $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Write-Host "=[ START $dateTime ]==========================================[ Uninstall.ps1 ]=" -ForegroundColor Blue
+    Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
     Write-Host "Initialize the $project_name virtual environment" -ForegroundColor Blue
     if ($BackupDir -eq "" -or $Help) {
         Show-Help

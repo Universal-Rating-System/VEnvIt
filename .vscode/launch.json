@@ -61,6 +61,15 @@
       "type": "PowerShell",
       "request": "launch",
       "script": ".\\src\\Update-Manifest.ps1"
+    },
+    {
+      "name": "Uninstall",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Uninstall.ps1",
+      "args": [
+        "D:\\GoogleDrive\\Download"
+      ]
     }
   ]
 }

@@ -35,32 +35,22 @@ $defEnvVarSet_6_0_0 = @{
     VIRTUAL_ENV            = @{DefVal = $null; IsDir = $false }
 }
 $defEnvVarSet_7_0_0 = @{
-    PROJECT_NAME             = @{DefVal = $null; IsDir = $false; SystemMandatory = $false; ReadOrder = 10; Prefix = $false }
-    PROJECTS_BASE_DIR        = @{DefVal = "~\Projects"; IsDir = $true; SystemMandatory = $true; ReadOrder = 6; Prefix = $false }
-    VENV_BASE_DIR            = @{DefVal = "~\venv"; IsDir = $true; SystemMandatory = $true; ReadOrder = 7; Prefix = $false }
-    VENV_CONFIG_DEFAULT_DIR  = @{DefVal = "Config"; IsDir = $true; SystemMandatory = $true; ReadOrder = 2; Prefix = "VENVIT_DIR" }
-    VENV_CONFIG_USER_DIR     = @{DefVal = "~\VenvIt\Config"; IsDir = $true; SystemMandatory = $true; ReadOrder = 5; Prefix = $false }
-    VENV_ENVIRONMENT         = @{DefVal = "loc_dev"; IsDir = $false; SystemMandatory = $true; ReadOrder = 9; Prefix = $false }
-    VENV_ORGANIZATION_NAME   = @{DefVal = $null; IsDir = $false; SystemMandatory = $false; ReadOrder = 11; Prefix = $false }
-    VENV_PYTHON_BASE_DIR     = @{DefVal = "c:\Python"; IsDir = $true; SystemMandatory = $true; ReadOrder = 8; Prefix = $false }
-    VENV_SECRETS_DEFAULT_DIR = @{DefVal = "Secrets"; IsDir = $true; SystemMandatory = $true; ReadOrder = 3; Prefix = "VENVIT_DIR" }
-    VENV_SECRETS_USER_DIR    = @{DefVal = "~\VenvIt\Secrets"; IsDir = $true; SystemMandatory = $true; ReadOrder = 4; Prefix = $false }
-    VENVIT_DIR               = @{DefVal = "$env:ProgramFiles\VenvIt"; IsDir = $true; SystemMandatory = $true; ReadOrder = 1; Prefix = $false }
-    VIRTUAL_ENV              = @{DefVal = $null; IsDir = $false; SystemMandatory = $false; ReadOrder = 12; Prefix = $false }
+    PROJECT_NAME             = @{DefVal = $null; IsDir = $false; SystemMandatory = $false }
+    PROJECTS_BASE_DIR        = @{DefVal = "~\Projects"; IsDir = $true; SystemMandatory = $true }
+    VENV_BASE_DIR            = @{DefVal = "~\venv"; IsDir = $true; SystemMandatory = $true }
+    VENV_CONFIG_DEFAULT_DIR  = @{DefVal = "$env:ProgramFiles\VenvIt\Config"; IsDir = $true; SystemMandatory = $true }
+    VENV_CONFIG_USER_DIR     = @{DefVal = "~\VenvIt\Config"; IsDir = $true; SystemMandatory = $true }
+    VENV_ENVIRONMENT         = @{DefVal = "loc_dev"; IsDir = $false; SystemMandatory = $true }
+    VENV_ORGANIZATION_NAME   = @{DefVal = $null; IsDir = $false; SystemMandatory = $false }
+    VENV_PYTHON_BASE_DIR     = @{DefVal = "c:\Python"; IsDir = $true; SystemMandatory = $true }
+    VENV_SECRETS_DEFAULT_DIR = @{DefVal = "$env:ProgramFiles\VenvIt\Secrets"; IsDir = $true; SystemMandatory = $true }
+    VENV_SECRETS_USER_DIR    = @{DefVal = "~\VenvIt\Secrets"; IsDir = $true; SystemMandatory = $true }
+    VENVIT_DIR               = @{DefVal = "$env:ProgramFiles\VenvIt"; IsDir = $true; SystemMandatory = $true }
+    VIRTUAL_ENV              = @{DefVal = $null; IsDir = $false; SystemMandatory = $false }
 }
-$separator = "-" * 80
-$installationFileList = @(
-    "README.md",
-    "LICENSE",
-    "ReleaseNotes.md",
-    "Manifest.psd1",
-    "vi.ps1",
-    "vn.ps1",
-    "vr.ps1",
-    "Uninstall.ps1",
-    "Utils.psm1"
-)
+$x = @{ a = @{aa = "11" }; b = @{bb = "22" } }
 
+$separator = "-" * 80
 
 function Backup-ArchiveOldVersion {
     param (
@@ -167,39 +157,6 @@ function Get-ManifestFileName {
     return "Manifest.psd1"
 }
 
-function Get-ReadAndSetEnvironmentVariables {
-    param(
-        $EnvVarSet
-    )
-
-    $sortedKeys = $EnvVarSet.GetEnumerator() | Sort-Object { $_.Value.ReadOrder }
-    foreach ($envVar in $sortedKeys) {
-        if ($EnvVarSet[$envVar.Key]["SystemMandatory"]) {
-            $existingValue = [System.Environment]::GetEnvironmentVariable($envVar.Key, [System.EnvironmentVariableTarget]::Machine)
-            if ($existingValue) {
-                $promptText = $envVar.Key + " ($existingValue)"
-                $defaultValue = $existingValue
-            }
-            else {
-                if ($EnvVarSet[$envVar.Key]["Prefix"]) {
-                    $prefix = Get-Item -Path ("env:" + $EnvVarSet[$envVar.Key]["Prefix"])
-                    $defaultValue = (Join-Path -Path $prefix.Value -ChildPath $EnvVarSet[$envVar.Key]["DefVal"])
-                    $promptText = $envVar.Key + " (" + $defaultValue + ")"
-                } else {
-                    $defaultValue = $EnvVarSet[$envVar.Key]["DefVal"]
-                    $promptText = $envVar.Key + " (" + $defaultValue + ")"
-                }
-            }
-            $newValue = Read-Host -Prompt $promptText
-            if ($newValue -eq "") {
-                $newValue = $defaultValue
-            }
-            Set-Item -Path ("env:" + $envVar.Key) -Value $newValue
-            [System.Environment]::SetEnvironmentVariable($envVar.Key, $newValue, [System.EnvironmentVariableTarget]::Machine)
-        }
-    }
-}
-
 function Get-SecretsFileName {
     return "Secrets.ps1"
 }
@@ -241,6 +198,30 @@ function Invoke-Script {
     )
     # Write-Host $Script
     & $Script
+}
+
+function Get-ReadAndSetEnvironmentVariables {
+    param(
+        $EnvVarSet
+    )
+
+    foreach ($envVar in $EnvVarSet.Keys) {
+        $existingValue = [System.Environment]::GetEnvironmentVariable($envVar, [System.EnvironmentVariableTarget]::Machine)
+        if ($existingValue) {
+            $promptText = $envVar + " ($existingValue)"
+            $defaultValue = $existingValue
+        }
+        else {
+            $promptText = $envVar + " (" + $EnvVarSet[$envVar]["DefVal"] + ")"
+            $defaultValue = $EnvVarSet[$envVar]["DefVal"]
+        }
+        $newValue = Read-Host -Prompt $promptText
+        if ($newValue -eq "") {
+            $newValue = $defaultValue
+        }
+        Set-Item -Path env:$envVar -Value $newValue
+        [System.Environment]::SetEnvironmentVariable($envVar, $newValue, [System.EnvironmentVariableTarget]::Machine)
+    }
 }
 
 function Show-EnvironmentVariables {
@@ -314,7 +295,7 @@ function Unpublish-EnvironmentVariables {
     }
 }
 
-Export-ModuleMember -Variable defEnvVarSet_7_0_0, separator, installationFileList
+Export-ModuleMember -Variable defEnvVarSet_7_0_0, separator, x
 Export-ModuleMember -Function Backup-ArchiveOldVersion, Backup-ScriptToArchiveIfExists, Confirm-SystemEnvironmentVariablesExist, Copy-Deep
 Export-ModuleMember -Function Get-ReadAndSetEnvironmentVariables, Get-ConfigFileName, Get-ManifestFileName, Get-SecretsFileName
 Export-ModuleMember -Function Get-Version, Invoke-Script, New-CustomTempDir, Publish-EnvironmentVariables, Read-YesOrNo

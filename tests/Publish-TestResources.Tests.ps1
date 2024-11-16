@@ -133,35 +133,6 @@ Describe "Function Tests" {
         }
     }
 
-    Context "Set-TestSetup_New" {
-        BeforeEach {
-        }
-        It "Should create mock app scripts" {
-            $mockInstalVal = Set-TestSetup_New
-
-            $env:PROJECT_NAME | Should -Be $null
-            $env:PROJECTS_BASE_DIR | Should -Be $null
-            $env:VENV_BASE_DIR | Should -Be $null
-            $env:VENV_CONFIG_DEFAULT_DIR | Should -Be $null
-            $env:VENV_CONFIG_DIR | Should -Be $null
-            $env:VENV_CONFIG_USER_DIR | Should -Be $null
-            $env:VENV_ENVIRONMENT | Should -Be $null
-            $env:VENV_ORGANIZATION_NAME | Should -Be $null
-            $env:VENV_SECRETS_DEFAULT_DIR | Should -Be $null
-            $env:VENV_PYTHON_BASE_DIR | Should -Be $null
-            $env:VENV_SECRETS_USER_DIR | Should -Be $null
-            $env:VENV_SECRETS_DIR | Should -Be $null
-            $env:VENVIT_DIR | Should -Be $null
-            $env:VIRTUAL_ENV | Should -Be $null
-
-            Test-Path -Path $mockInstalVal.TempDir | Should -Be $true
-        }
-
-        AfterEach {
-            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
-        }
-    }
-
     Context "Set-TestSetup_0_0_0" {
         BeforeEach {
             # $OriginalValues = Backup-SessionEnvironmentVariables
@@ -250,19 +221,17 @@ Describe "Function Tests" {
             $env:PROJECT_NAME | Should -Be $mockInstalVal.ProjectName
             $env:PROJECTS_BASE_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Projects")
             $env:VENV_BASE_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "VEnv")
-            $env:VENV_CONFIG_DEFAULT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Program Files\VenvIt\Config")
+            $env:VENV_CONFIG_DEFAULT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Config")
             $env:VENV_CONFIG_USER_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "VenvIt\Config")
             $env:VENV_ENVIRONMENT | Should -Be "loc_dev"
             $env:VENV_PYTHON_BASE_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Python")
-            $env:VENV_SECRETS_DEFAULT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Program Files\VenvIt\Secrets")
+            $env:VENV_SECRETS_DEFAULT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Secrets")
             $env:VENV_SECRETS_USER_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "VenvIt\Secrets")
             $env:VENVIT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Program Files\VenvIt")
             $env:PROJECT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Projects\MyOrg\MyProject")
             $env:VIRTUAL_ENV | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "VEnv\MyProject")
 
-            Test-Path -Path $env:PROJECT_DIR | Should -Be $true
-            Test-Path -Path $env:PROJECT_DIR | Should -Be $true
-            Test-Path -Path "$env:VENV_BASE_DIR\${env:PROJECT_NAME}_env\Scripts"  | Should -Be $true
+            Test-Path -Path "$env:VENV_BASE_DIR"  | Should -Be $true
             Test-Path -Path $env:VENV_CONFIG_DEFAULT_DIR | Should -Be $true
             Test-Path -Path $env:VENV_CONFIG_USER_DIR | Should -Be $true
             Test-Path -Path $env:VENV_PYTHON_BASE_DIR  | Should -Be $true
@@ -293,6 +262,46 @@ Describe "Function Tests" {
             # Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
             # Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
             # Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+        }
+    }
+
+    Context "Set-TestSetup_New" {
+        BeforeEach {
+        }
+        It "Should create mock app scripts" {
+            $mockInstalVal = Set-TestSetup_New
+
+            $env:PROJECT_NAME | Should -Be $null
+            $env:PROJECTS_BASE_DIR | Should -Be $null
+            $env:VENV_BASE_DIR | Should -Be $null
+            $env:VENV_CONFIG_DEFAULT_DIR | Should -Be $null
+            $env:VENV_CONFIG_DIR | Should -Be $null
+            $env:VENV_CONFIG_USER_DIR | Should -Be $null
+            $env:VENV_ENVIRONMENT | Should -Be $null
+            $env:VENV_ORGANIZATION_NAME | Should -Be $null
+            $env:VENV_SECRETS_DEFAULT_DIR | Should -Be $null
+            $env:VENV_PYTHON_BASE_DIR | Should -Be $null
+            $env:VENV_SECRETS_USER_DIR | Should -Be $null
+            $env:VENV_SECRETS_DIR | Should -Be $null
+            $env:VENVIT_DIR | Should -Be $null
+            $env:VIRTUAL_ENV | Should -Be $null
+
+            Test-Path -Path $mockInstalVal.TempDir | Should -Be $true
+        }
+
+        AfterEach {
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+        }
+    }
+
+    Context "Set-TestSetup_InstallationFiles" {
+        It "Should create instlaation source structure" {
+            $upgradeDetail = Set-TestSetup_InstallationFiles
+
+            foreach ( $fileName in $upgradeDetail["FileList"] ) {
+                $filePath = Join-Path -Path $upgradeDetail["Dir"] -ChildPath $fileName
+                Test-Path -Path $filePath
+            }
         }
     }
 
@@ -410,7 +419,7 @@ Describe "Function Tests" {
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
     }
-    AfterAll{
+    AfterAll {
         Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
         Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
     }

@@ -1,9 +1,14 @@
 ﻿# Publish-TestResources.psm1
 
+
 if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
 Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
+
 if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
 Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
+Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
 
 $ManifestData000 = @{
     Version     = "0.0.0"
@@ -20,6 +25,16 @@ $ManifestData700 = @{
     Authors     = "Ann Other <ann@other.com>"
     Description = "Description of 7.0.0"
 }
+$sourceFileCopyList = @(
+    "README.md",
+    "LICENSE",
+    "ReleaseNotes.md",
+    "src\vi.ps1",
+    "src\vn.ps1",
+    "src\vr.ps1",
+    "src\Uninstall.ps1",
+    "src\Utils.psm1"
+)
 
 function Backup-SessionEnvironmentVariables {
     return [PSCustomObject]@{
@@ -71,41 +86,21 @@ function ConvertFrom-ProdToTestEnvVar {
         if ($newEnvVarSet[$envVar]["IsDir"]) {
             if ($newEnvVarSet[$envVar]["DefVal"] -like "~*") {
                 $newEnvVarSet[$envVar]["DefVal"] = $newEnvVarSet[$envVar]["DefVal"] -replace "^~", $tempDir
-            } elseif ($newEnvVarSet[$envVar]["DefVal"] -like "$env:ProgramFiles*") {
+            }
+            elseif ($newEnvVarSet[$envVar]["DefVal"] -like "$env:ProgramFiles*") {
                 $escapedProgramFiles = [Regex]::Escape($env:ProgramFiles)
                 $newEnvVarSet[$envVar]["DefVal"] = $newEnvVarSet[$envVar]["DefVal"] -replace $escapedProgramFiles, "$tempDir\Program Files"
-            } elseif (-not $newEnvVarSet[$envVar]["DefVal"]){
+            }
+            elseif (-not $newEnvVarSet[$envVar]["DefVal"]) {
                 $newEnvVarSet[$envVar]["DefVal"] = $tempDir
-            } else {
+            }
+            else {
                 $lastChild = Split-Path -Path $newEnvVarSet[$envVar]["DefVal"] -Leaf
                 $newEnvVarSet[$envVar]["DefVal"] = Join-Path -Path $tempDir -ChildPath $lastChild
             }
         }
     }
     return $newEnvVarSet
-}
-
-function Set-TestSetup_New {
-    $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
-    $tempDir = New-CustomTempDir -Prefix "VenvIt"
-    $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
-
-    $env:PROJECT_NAME = $null
-    $env:PROJECTS_BASE_DIR = $null
-    $env:VENV_BASE_DIR = $null
-    $env:VENV_CONFIG_DEFAULT_DIR = $null
-    $env:VENV_CONFIG_DIR = $null
-    $env:VENV_CONFIG_USER_DIR = $null
-    $env:VENV_ENVIRONMENT = $null
-    $env:VENV_ORGANIZATION_NAME = $null
-    $env:VENV_PYTHON_BASE_DIR = $null
-    $env:VENV_SECRETS_DEFAULT_DIR = $null
-    $env:VENV_SECRETS_USER_DIR = $null
-    $env:VENV_SECRETS_DIR = $null
-    $env:VENVIT_DIR = $null
-    $env:VIRTUAL_ENV = $null
-
-    return $mockInstalVal
 }
 
 function Set-TestSetup_0_0_0 {
@@ -226,19 +221,21 @@ function Set-TestSetup_7_0_0 {
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value $env:PROJECT_DIR
 
     #Create the directory structure
-    $directories = @(
-        $env:PROJECTS_BASE_DIR,
-        $env:PROJECT_DIR,
-        "$env:VENV_BASE_DIR\${env:PROJECT_NAME}_env\Scripts",
-        $env:VENV_CONFIG_DEFAULT_DIR,
-        $env:VENV_CONFIG_USER_DIR,
-        $env:VENV_PYTHON_BASE_DIR,
-        $env:VENV_SECRETS_DEFAULT_DIR,
-        $env:VENV_SECRETS_USER_DIR
-    )
-    foreach ($directory in $directories) {
-        New-Item -ItemType Directory -Path $directory | Out-Null
-    }
+    # $directories = @(
+    #     $env:PROJECTS_BASE_DIR,
+    #     $env:PROJECT_DIR,
+    #     "$env:VENV_BASE_DIR\${env:PROJECT_NAME}_env\Scripts",
+    #     $env:VENV_CONFIG_DEFAULT_DIR,
+    #     $env:VENV_CONFIG_USER_DIR,
+    #     $env:VENV_PYTHON_BASE_DIR,
+    #     $env:VENV_SECRETS_DEFAULT_DIR,
+    #     $env:VENV_SECRETS_USER_DIR
+    # )
+    # foreach ($directory in $directories) {
+    #     New-Item -ItemType Directory -Path $directory | Out-Null
+    # }
+    New-Directories -EnvVarSet $newEnvVar
+    New-Item -ItemType Directory -Path $env:PROJECT_DIR | Out-Null
 
     # Create the configuration scripts
     $postfixes = @( "EnvVar", "Install", "CustomSetup" )
@@ -262,6 +259,51 @@ function Set-TestSetup_7_0_0 {
 
     # Create a manifest
     New-ManifestPsd1 -DestinationPath (Join-Path -Path $env:VENVIT_DIR -ChildPath (Get-ManifestFileName)) -Data $ManifestData700
+
+    return $mockInstalVal
+}
+
+function Set-TestSetup_InstallationFiles {
+    $installationFileList = @()
+    $TempDir = New-CustomTempDir -Prefix "VenvIt"
+    $upgradeScriptDir = Join-Path -Path $TempDir -ChildPath "TempUpgradeDir"
+    New-Item -ItemType Directory -Path "$upgradeScriptDir" | Out-Null
+    foreach ($fileName in $sourceFileCopyList) {
+        # $x = "$PSScriptRoot\..\$fileName"
+        Copy-Item -Path "$PSScriptRoot\..\$fileName" -Destination $upgradeScriptDir
+        $installationFileList += Split-Path $fileName -Leaf
+    }
+    $manifestFileName = Get-ManifestFileName
+    $manifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath $manifestFileName
+    New-ManifestPsd1 -DestinationPath $manifestPath -data $ManifestData700
+    $installationFileList += $manifestFileName
+    $installationDetail = @{
+        Dir      = "$upgradeScriptDir"
+        FileList = $installationFileList.Clone()
+    }
+
+    return $installationDetail
+}
+
+function Set-TestSetup_New {
+    $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
+    $tempDir = New-CustomTempDir -Prefix "VenvIt"
+    $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
+
+    $env:PROJECT_NAME = $null
+    $env:PROJECTS_BASE_DIR = $null
+    $env:VENV_BASE_DIR = $null
+    $env:VENV_CONFIG_DEFAULT_DIR = $null
+    $env:VENV_CONFIG_DIR = $null
+    $env:VENV_CONFIG_USER_DIR = $null
+    $env:VENV_ENVIRONMENT = $null
+    $env:VENV_ORGANIZATION_NAME = $null
+    $env:VENV_PYTHON_BASE_DIR = $null
+    $env:VENV_SECRETS_DEFAULT_DIR = $null
+    $env:VENV_SECRETS_USER_DIR = $null
+    $env:VENV_SECRETS_DIR = $null
+    $env:VENVIT_DIR = $null
+    $env:VIRTUAL_ENV = $null
 
     return $mockInstalVal
 }
@@ -319,6 +361,6 @@ function Restore-SystemEnvironmentVariables {
 }
 
 Export-ModuleMember -Function Backup-SessionEnvironmentVariables, Backup-SystemEnvironmentVariables, ConvertFrom-ProdToTestEnvVar
-Export-ModuleMember -Function Set-TestSetup_New, Set-TestSetup_0_0_0, Set-TestSetup_6_0_0, Set-TestSetup_7_0_0, New-CreateAppScripts
-Export-ModuleMember -Function New-TestEnvironment, Restore-SessionEnvironmentVariables, Restore-SystemEnvironmentVariables
-Export-ModuleMember -Variable ManifestData000, ManifestData600, ManifestData700
+Export-ModuleMember -Function Set-TestSetup_0_0_0, Set-TestSetup_6_0_0, Set-TestSetup_7_0_0, Set-TestSetup_InstallationFiles, Set-TestSetup_New
+Export-ModuleMember -Function New-CreateAppScripts, New-TestEnvironment, Restore-SessionEnvironmentVariables, Restore-SystemEnvironmentVariables
+Export-ModuleMember -Variable ManifestData000, ManifestData600, ManifestData700, sourceFileCopyList
