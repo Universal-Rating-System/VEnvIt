@@ -195,6 +195,8 @@ function Set-TestSetup_6_0_0 {
 }
 
 function Set-TestSetup_7_0_0 {
+    Import-Module $PSScriptRoot\..\src\Utils.psm1 -Variable defEnvVarSet_7_0_0
+
     $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
     $tempDir = New-CustomTempDir -Prefix "VenvIt"
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "TempDir" -Value $tempDir
@@ -254,14 +256,16 @@ function Set-TestSetup_7_0_0 {
 }
 
 function Set-TestSetup_InstallationFiles {
+    Import-Module $PSScriptRoot\..\src\Utils.psm1
+
     $installationFileList = @()
     $TempDir = New-CustomTempDir -Prefix "VenvIt"
     $upgradeScriptDir = Join-Path -Path $TempDir -ChildPath "TempUpgradeDir"
-    New-Item -ItemType Directory -Path "$upgradeScriptDir" | Out-Null
+    New-Item -ItemType Directory -Path "$upgradeScriptDir\src" | Out-Null
     foreach ($fileName in $sourceFileCopyList) {
         # $x = "$PSScriptRoot\..\$fileName"
-        Copy-Item -Path "$PSScriptRoot\..\$fileName" -Destination $upgradeScriptDir
-        $installationFileList += Split-Path $fileName -Leaf
+        Copy-Item -Path "$PSScriptRoot\..\$fileName" -Destination ("$upgradeScriptDir\$filename")
+        $installationFileList += $fileName
     }
     $manifestFileName = Get-ManifestFileName
     $manifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath $manifestFileName

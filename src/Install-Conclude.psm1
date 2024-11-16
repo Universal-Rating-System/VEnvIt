@@ -75,8 +75,9 @@ function Publish-LatestVersion {
     if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
     Import-Module $PSScriptRoot\..\src\Utils.psm1
 
-    foreach ($filename in $installationFileList) {
-        Copy-Item -Path (Join-Path -Path $UpgradeSourceDir -ChildPath $filename) -Destination $env:VENVIT_DIR | Out-Null
+    foreach ($filename in $sourceFileCompleteList) {
+        $barefilename = Split-Path -Path $filename -Leaf
+        Copy-Item -Path (Join-Path -Path $UpgradeSourceDir -ChildPath $filename) -Destination ("$env:VENVIT_DIR\$barefilename") | Out-Null
     }
 }
 

@@ -143,7 +143,9 @@ Describe "Function Tests" {
             Publish-LatestVersion -UpgradeSourceDir $upgradeDetail.Dir
 
             foreach ($fileName in $upgradeDetail.FileList) {
-                (Test-Path -Path "$env:VENVIT_DIR\$filename") | Should -Be $true
+                $barefilename = Split-Path -Path $filename -Leaf
+                # Write-Host $barefilename
+                (Test-Path -Path "$env:VENVIT_DIR\$barefilename") | Should -Be $true
             }
         }
 
@@ -160,6 +162,7 @@ Describe "Function Tests" {
         BeforeAll {
             if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
             Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
+
             if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
             Import-Module $PSScriptRoot\..\src\Utils.psm1
         }
@@ -167,19 +170,20 @@ Describe "Function Tests" {
             $originalSessionValues = Backup-SessionEnvironmentVariables
             $mockInstalVal = Set-TestSetup_7_0_0
 
-            $TempDir = New-CustomTempDir -Prefix "VenvIt"
-            $upgradeScriptDir = Join-Path -Path $TempDir -ChildPath "TempUpgradeDir"
-            New-Item -ItemType Directory -Path "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\README.md" -Destination $upgradeScriptDir
-            Copy-Item -Path "$PSScriptRoot\..\LICENSE" -Destination $upgradeScriptDir
-            Copy-Item -Path "$PSScriptRoot\..\ReleaseNotes.md" -Destination $upgradeScriptDir
-            Copy-Item -Path "$PSScriptRoot\..\src\vi.ps1" -Destination "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\src\vn.ps1" -Destination "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\src\vr.ps1" -Destination "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\src\utils.psm1" -Destination "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\src\secrets.ps1" -Destination "$upgradeScriptDir\src"
-            $manifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
-            New-ManifestPsd1 -DestinationPath $manifestPath -data $ManifestData700
+            $upgradeDetail = Set-TestSetup_InstallationFiles
+            # $TempDir = New-CustomTempDir -Prefix "VenvIt"
+            # $upgradeScriptDir = Join-Path -Path $TempDir -ChildPath "TempUpgradeDir"
+            # New-Item -ItemType Directory -Path "$upgradeScriptDir\src"
+            # Copy-Item -Path "$PSScriptRoot\..\README.md" -Destination $upgradeScriptDir
+            # Copy-Item -Path "$PSScriptRoot\..\LICENSE" -Destination $upgradeScriptDir
+            # Copy-Item -Path "$PSScriptRoot\..\ReleaseNotes.md" -Destination $upgradeScriptDir
+            # Copy-Item -Path "$PSScriptRoot\..\src\vi.ps1" -Destination "$upgradeScriptDir\src"
+            # Copy-Item -Path "$PSScriptRoot\..\src\vn.ps1" -Destination "$upgradeScriptDir\src"
+            # Copy-Item -Path "$PSScriptRoot\..\src\vr.ps1" -Destination "$upgradeScriptDir\src"
+            # Copy-Item -Path "$PSScriptRoot\..\src\utils.psm1" -Destination "$upgradeScriptDir\src"
+            # Copy-Item -Path "$PSScriptRoot\..\src\secrets.ps1" -Destination "$upgradeScriptDir\src"
+            # $manifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
+            # New-ManifestPsd1 -DestinationPath $manifestPath -data $ManifestData700
 
         }
 
@@ -188,23 +192,24 @@ Describe "Function Tests" {
             Remove-Item -Path $secretsPath -Recurse -Force
             $secretsPath = Join-Path -Path $env:VENV_SECRETS_USER_DIR -ChildPath (Get-SecretsFileName)
             Remove-Item -Path $secretsPath -Recurse -Force
-            $secretsDirList = Publish-Secrets -UpgradeScriptDir $upgradeScriptDir
+            $secretsDirList = Publish-Secrets -UpgradeScriptDir $upgradeDetail.Dir
 
             $secretsDirList | Should -Be @("$env:VENV_SECRETS_DEFAULT_DIR\Secrets.ps1", "$env:VENV_SECRETS_USER_DIR\Secrets.ps1")
         }
 
         It "Should only copy VENV_SECRETS_DEFAULT_DIR secrets files" {
             $secretsPath = Join-Path -Path $env:VENV_SECRETS_DEFAULT_DIR -ChildPath (Get-SecretsFileName)
-            Remove-Item -Path $secretsPath -Recurse -Force
-            $secretsDirList = Publish-Secrets -UpgradeScriptDir $upgradeScriptDir
+            Remove-Item -Path $secretsPath -Recurse -Force | Out-Null
+
+            $secretsDirList = Publish-Secrets -UpgradeScriptDir $upgradeDetail.Dir
 
             $secretsDirList | Should -Be @("$env:VENV_SECRETS_DEFAULT_DIR\Secrets.ps1")
         }
 
         AfterEach {
             Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
-            Remove-Item -Path $TempDir -Recurse -Force
-            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+            Remove-Item -Path $upgradeDetail.Dir -Recurse -Force | Out-Null
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force | Out-Null
         }
     }
 
