@@ -1,17 +1,25 @@
 ﻿# Upgrade.Tests.ps1
 BeforeAll {
+
     if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
     Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
 
-    if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
-    Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
-
     if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
     Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
 }
 
 Describe "Function Tests" {
     BeforeAll {
+        if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+        Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+        if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
+        Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
+
+        if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
+        Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
+
         $originalSessionValues = Backup-SessionEnvironmentVariables
         $originalSystemValues = Backup-SystemEnvironmentVariables
     }

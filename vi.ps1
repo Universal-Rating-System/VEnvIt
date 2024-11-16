@@ -46,8 +46,8 @@ function Invoke-VirtualEnvironment {
         Set-Location -Path $env:PROJECT_DIR
     }
     else {
-        Set-Location -Path (Split-Path $env:PROJECTS_BASE_DIR -Qualifier)
-        Set-Location -Path $env:PROJECTS_BASE_DIR
+        Set-Location -Path Split-Path $env:PROJECT_BASE_DIR -Qualifier
+        Set-Location -Path $env:PROJECT_BASE_DIR
     }
 
     Invoke-Script ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup"))

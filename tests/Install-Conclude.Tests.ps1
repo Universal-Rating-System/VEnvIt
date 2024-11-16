@@ -1,13 +1,14 @@
 ﻿# Install-Conclude.Tests.ps1
-if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+BeforeAll {
+    if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+    Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
+    if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
+    Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
+}
 
 Describe "Function Tests" {
     BeforeAll {
-        # if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
-        if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
-        Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
-
         # This test must be run with administrator rights.
         if (-not (Test-Admin)) {
             Throw "Tests must be run as an Administrator. Aborting..."
@@ -27,7 +28,7 @@ Describe "Function Tests" {
             New-Item -ItemType Directory -Path $upgradeScriptDir | Out-Null
         }
 
-        It "Unsure instqallation files removed" {
+        It "Ensure installation files removed" {
             Clear-InstallationFiles -upgradeScriptDir $upgradeScriptDir
             (Test-Path -Path $upgradeScriptDir) | Should -Be $false
         }
@@ -39,8 +40,48 @@ Describe "Function Tests" {
     }
 
     Context "Invoke-ConcludeInstall" {
-        # TODO
-        # Test to be implemented
+        BeforeEach {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $upgradeDetail = Set-TestSetup_InstallationFiles
+            $TempDir = Join-Path -Path $env:TEMP -ChildPath ($Prefix + "_" + [Guid]::NewGuid().ToString())
+            Unpublish-EnvironmentVariables -EnvVarSet $defEnvVarSet_7_0_0
+
+            Mock Read-Host { return "" } -ParameterFilter { $Prompt -eq "VENVIT_DIR (C:\Program Files\VenvIt)" }
+            Mock -ModuleName Install-Conclude Get-ReadAndSetEnvironmentVariables {
+                $env:VENVIT_DIR = "$TempDir\VEnvIt"
+                [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $env:VENVIT_DIR,[System.EnvironmentVariableTarget]::Machine)
+                $env:PROJECTS_BASE_DIR = "$TempDir\Projects"
+                [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $env:PROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
+                $env:VENV_BASE_DIR = "$TempDir\VEnv"
+                [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $env:VENV_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
+                $env:VENV_CONFIG_DEFAULT_DIR = "$env:VENVIT_DIR\Config"
+                [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $env:VENV_CONFIG_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
+                $env:VENV_CONFIG_USER_DIR = "$TempDir\User\VEnvIt\Config"
+                [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $env:VENV_CONFIG_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
+                $env:VENV_ENVIRONMENT = "loc_dev"
+                [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $env:VENV_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
+                $env:VENV_PYTHON_BASE_DIR = "$TempDir\Python"
+                [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $env:VENV_PYTHON_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
+                $env:VENV_SECRETS_DEFAULT_DIR = "$env:VENVIT_DIR\Secrets"
+                [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $env:VENV_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
+                $env:VENV_SECRETS_USER_DIR = "$TempDir\User\VEnvIt\Secrets"
+                [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $env:VENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
+            }
+        }
+        It "Should do new installation" {
+            Invoke-ConcludeInstall -UpgradeScriptDir $upgradeDetail.Dir
+
+            Test-Path -Path $env:VENVIT_DIR | Should -Be $true
+            Get-Item -Path $env:VENVIT_DIR | Should -Be "$TempDir\VEnvIt"
+            [System.Environment]::GetEnvironmentVariable("VENVIT_DIR", [System.EnvironmentVariableTarget]::Machine) | Should -Be "$TempDir\VEnvIt"
+
+        }
+        AfterEach {
+            Remove-Item -Path $TempDir -Recurse -Force
+            Remove-Item -Path ($upgradeDetail.Dir + "\..") -Recurse -Force
+        }
     }
 
     Context "Invoke-IsInRole" {
@@ -56,30 +97,26 @@ Describe "Function Tests" {
             Import-Module $PSScriptRoot\..\src\Utils.psm1
         }
         BeforeEach {
-            $tempDir = New-CustomTempDir -Prefix "VenvIt"
-            foreach ($envVar in $defEnvVarSet) {
-                if ($envVar.IsDir) {
-                    if ($envVar.DefVal -like "~*") {
-                        $envVar.DefVal = $envVar.DefVal -replace "^~", $tempDir
-                    }
-                    else {
-                        $lastChild = Split-Path -Path $envVar.DefVal -Leaf
-                        $envVar.DefVal = Join-Path -Path $tempDir -ChildPath $lastChild
-                    }
-                    [System.Environment]::SetEnvironmentVariable($envVar.Name, $envVar.DefVal, [System.EnvironmentVariableTarget]::Machine)
-                }
+            $tempDir = "$env:TEMP\Test_Dir"
+            $testEnvVarSet = @{
+                TEST_VAL = @{DefVal = "Test value"; IsDir = $false }
+                TEST_DIR = @{DefVal = $tempDir; IsDir = $True }
+            }
+            foreach ($envVar in $testEnvVarSet.Keys) {
+                [System.Environment]::SetEnvironmentVariable($envVar, $testEnvVarSet[$envVar]["DefVal"], [System.EnvironmentVariableTarget]::Machine)
+                Set-Item -Path "env:$envVar" -Value $testEnvVarSet[$envVar]["DefVal"]
             }
         }
+
         It "Should create all the directories" {
-            New-Directories
-            foreach ($envVar in $envVarSet) {
-                if ( $envVar.IsDir ) {
-                    Test-Path -Path $envVar.DefVal | Should -Be $true
-                }
-            }
+            New-Directories -EnvVarSet $testEnvVarSet
+
+            Test-Path -Path $env:TEST_VAL | Should -Be $false
+            Test-Path -Path $env:TEST_DIR | Should -Be $true
         }
         AfterEach {
-            Remove-Item -Path $TempDir -Recurse -Force
+            Unpublish-EnvironmentVariables -EnvVarSet $testEnvVarSet
+            Remove-Item -Path $tempDir -Recurse -Force
         }
         AfterAll {
             Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
@@ -91,6 +128,7 @@ Describe "Function Tests" {
         BeforeAll {
             if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
             Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
+
             if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
             Import-Module $PSScriptRoot\..\src\Utils.psm1
         }
@@ -98,38 +136,20 @@ Describe "Function Tests" {
             $originalSessionValues = Backup-SessionEnvironmentVariables
             $mockInstalVal = Set-TestSetup_6_0_0
 
-            $TempDir = New-CustomTempDir -Prefix "VenvIt"
-            $upgradeScriptDir = Join-Path -Path $TempDir -ChildPath "TempUpgradeDir"
-            New-Item -ItemType Directory -Path "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\README.md" -Destination $upgradeScriptDir
-            Copy-Item -Path "$PSScriptRoot\..\LICENSE" -Destination $upgradeScriptDir
-            Copy-Item -Path "$PSScriptRoot\..\ReleaseNotes.md" -Destination $upgradeScriptDir
-            Copy-Item -Path "$PSScriptRoot\..\src\vi.ps1" -Destination "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\src\vn.ps1" -Destination "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\src\vr.ps1" -Destination "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\src\Uninstall.ps1" -Destination "$upgradeScriptDir\src"
-            Copy-Item -Path "$PSScriptRoot\..\src\Utils.psm1" -Destination "$upgradeScriptDir\src"
-            $manifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
-            New-ManifestPsd1 -DestinationPath $manifestPath -data $ManifestData700
+            $upgradeDetail = Set-TestSetup_InstallationFiles
         }
 
         It "Should copy all installation files" {
-            Publish-LatestVersion -UpgradeScriptDir $upgradeScriptDir
+            Publish-LatestVersion -UpgradeSourceDir $upgradeDetail.Dir
 
-            (Test-Path -Path "$env:VENVIT_DIR\README.md") | Should -Be $true
-            (Test-Path -Path "$env:VENVIT_DIR\LICENSE") | Should -Be $true
-            (Test-Path -Path "$env:VENVIT_DIR\Manifest.psd1") | Should -Be $true
-            (Test-Path -Path "$env:VENVIT_DIR\ReleaseNotes.md") | Should -Be $true
-            (Test-Path -Path "$env:VENVIT_DIR\vi.ps1") | Should -Be $true
-            (Test-Path -Path "$env:VENVIT_DIR\vn.ps1") | Should -Be $true
-            (Test-Path -Path "$env:VENVIT_DIR\vr.ps1") | Should -Be $true
-            (Test-Path -Path "$env:VENVIT_DIR\Uninstall.ps1") | Should -Be $true
-            (Test-Path -Path "$env:VENVIT_DIR\Utils.psm1") | Should -Be $true
+            foreach ($fileName in $upgradeDetail.FileList) {
+                (Test-Path -Path "$env:VENVIT_DIR\$filename") | Should -Be $true
+            }
         }
 
         AfterEach {
             Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
-            Remove-Item -Path $TempDir -Recurse -Force
+            Remove-Item -Path ($upgradeDetail.Dir + "\..") -Recurse -Force
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
         AfterAll {
@@ -194,7 +214,7 @@ Describe "Function Tests" {
         }
 
         It "VenvIt not in path" {
-            [System.Environment]::SetEnvironmentVariable("Path", "C:\;D:\;", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("Path", "C:\;D:\", [System.EnvironmentVariableTarget]::Machine)
             Set-Path
             $newPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
             $newPath | Should -Be "C:\;D:\;$env:VENVIT_DIR"

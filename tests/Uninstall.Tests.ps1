@@ -93,15 +93,15 @@ Describe "Function Tests" {
         }
     }
 
-    Context "Remove-SourceFiles" {
+    Context "Remove-InstallationFiles" {
         BeforeEach {
             $mockInstalVal = Set-TestSetup_7_0_0
         }
 
         It "Should remove all source files" {
-            Remove-SourceFiles -InstallationDir $env:VENVIT_DIR
+            Remove-InstallationFiles -InstallationDir $env:VENVIT_DIR
 
-            $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
+            $fileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR, $env:VENV_BASE_DIR
             foreach ( $dir in $fileList) {
                 Test-Path $dir | Should -Be $false
             }
@@ -113,23 +113,29 @@ Describe "Function Tests" {
         }
     }
 
-    Context "Uninstall" {
+    Context "Invoke-Uninstall" {
         BeforeEach {
-            $mockInstalVal = Set-TestSetup_7_0_0
-            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         }
 
         It "Should archive v7.0.0. to default" {
+            $mockInstalVal = Set-TestSetup_7_0_0
             $BackupDir = Join-Path -Path $mockInstalVal.TempDir -ChildPath "VEnvIt Backup"
             $BackupPath = Invoke-Uninstall -BackupDir $BackupDir
 
             Test-Path $BackupPath | Should -Be $true
-        }
 
-        AfterEach {
             Unpublish-EnvironmentVariables -EnvVarSet $defEnvVarSet_7_0_0
             Set-Location -Path $env:TEMP
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+        }
+
+        It "Installation does not exist" {
+            $BackupPath = Invoke-Uninstall -BackupDir $null
+
+            $BackupPath | Should -Be $false
+        }
+
+        AfterEach {
         }
     }
 

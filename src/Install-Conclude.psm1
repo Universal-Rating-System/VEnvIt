@@ -17,9 +17,10 @@ function Clear-InstallationFiles {
 
 function Invoke-ConcludeInstall {
     param (
-        [string]$Release,
         [string]$UpgradeScriptDir
     )
+    if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+    Import-Module $PSScriptRoot\..\src\Utils.psm1
 
     # Check for administrative privileges
     if (-not (Test-Admin)) {
@@ -30,11 +31,11 @@ function Invoke-ConcludeInstall {
 
     Update-PackagePrep $UpgradeScriptDir
     Write-Host $separator -ForegroundColor Cyan
-    Get-ReadAndSetEnvironmentVariables -EnvVarSet $defEnvVarSet
+    Get-ReadAndSetEnvironmentVariables -EnvVarSet $defEnvVarSet_7_0_0
     Set-Path
     Write-Host "Environment variables have been set successfully." -ForegroundColor Green
-    New-Directories
-    Publish-LatestVersion -Release $Release -UpgradeScriptDir $UpgradeScriptDir
+    New-Directories -EnvVarSet $defEnvVarSet_7_0_0
+    Publish-LatestVersion -UpgradeSourceDir $UpgradeScriptDir
     Publish-Secrets -UpgradeScriptDir $UpgradeScriptDir
     Write-Host $separator -ForegroundColor Cyan
     Get-Item "$env:VENVIT_DIR\*.ps1" | ForEach-Object { Unblock-File $_.FullName }
@@ -54,9 +55,12 @@ function Invoke-IsInRole {
 
 function New-Directories {
     # Ensure the directories exist
-    foreach ($envVar in $envVarSet) {
-        if ( $envVar.IsDir ) {
-            $dirName = [System.Environment]::GetEnvironmentVariable($envVar.Name, [System.EnvironmentVariableTarget]::Machine)
+    param(
+        $EnvVarSet
+    )
+    foreach ($envVar in $envVarSet.Keys) {
+        if ( $envVarSet[$envVar]["IsDir"]) {
+            $dirName = [System.Environment]::GetEnvironmentVariable($envVar, [System.EnvironmentVariableTarget]::Machine)
             if (-not (Test-Path -Path $dirName)) {
                 New-Item -ItemType Directory -Path $dirName | Out-Null
             }
@@ -66,27 +70,14 @@ function New-Directories {
 
 function Publish-LatestVersion {
     param (
-        # [string]$Release,
-        [string]$UpgradeScriptDir
+        $UpgradeSourceDir
     )
-    # $url = "https://github.com/BrightEdgeeServices/venvit/releases/download/$Release/Installation-Files.zip"
-    # $zipFilePath = Join-Path -Path $UpgradeScriptDir -ChildPath "Installation-Files.zip"
+    if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+    Import-Module $PSScriptRoot\..\src\Utils.psm1
 
-    # Download the zip file
-    # Write-Host "Downloading installation files from $url..."
-    # Invoke-WebRequest -Uri $url -OutFile $zipFilePath
-    # Unzip the file in the VENVIT_DIR directory, overwriting any existing files
-    # Write-Host "Copy source files to $env:VENVIT_DIR..."
-    # Expand-Archive -Path $zipFilePath -DestinationPath $env:VENVIT_DIR -Force
-    Copy-Item -Path "$UpgradeScriptDir\LICENSE" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\Manifest.psd1" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\README.md" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\ReleaseNotes.md" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\src\vi.ps1" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\src\vn.ps1" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\src\vr.ps1" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\src\Uninstall.ps1" -Destination $env:VENVIT_DIR | Out-Null
-    Copy-Item -Path "$UpgradeScriptDir\src\Utils.psm1" -Destination $env:VENVIT_DIR | Out-Null
+    foreach ($filename in $installationFileList) {
+        Copy-Item -Path (Join-Path -Path $UpgradeSourceDir -ChildPath $filename) -Destination $env:VENVIT_DIR | Out-Null
+    }
 }
 
 function Publish-Secrets {

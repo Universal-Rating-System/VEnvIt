@@ -240,32 +240,37 @@ Describe "Function Tests" {
             # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
             # Import-Module $PSScriptRoot\..\src\Utils.psm1
             $envVarTestSet = @{
-                TEST_ONE = @{DefVal = "Test one"; IsDir = $true; SystemMandatory = $true }
-                TEST_TWO = @{DefVal = "Test two"; IsDir = $true; SystemMandatory = $true }
-                TEST_THREE = @{DefVal = "Default value"; IsDir = $true; SystemMandatory = $true }
+                TEST_ONE   = @{DefVal = "Test one"; IsDir = $true; SystemMandatory = $true; ReadOrder = 2; Prefix = $false }
+                TEST_TWO   = @{DefVal = "Test two"; IsDir = $true; SystemMandatory = $true; ReadOrder = 1; Prefix = $false }
+                TEST_THREE = @{DefVal = "Default value"; IsDir = $true; SystemMandatory = $true; ReadOrder = 3; Prefix = "TEST_TWO" }
+                TEST_FOUR  = @{DefVal = "Test Four"; IsDir = $false; SystemMandatory = $False; ReadOrder = 4; Prefix = $false }
             }
 
             Mock -ModuleName Utils Read-Host { return "Mock: Has existing value" } -ParameterFilter { $Prompt -eq "TEST_ONE (Has existing value)" }
-            Mock -ModuleName Utils Read-Host { return "Mock: Read from prompt" } -ParameterFilter { $Prompt -eq "TEST_TWO (Test two)" }
-            Mock -ModuleName Utils Read-Host { return "" } -ParameterFilter { $Prompt -eq "TEST_THREE (Default value)" }
+            Mock -ModuleName Utils Read-Host { return "Mock\Read\from\prompt" } -ParameterFilter { $Prompt -eq "TEST_TWO (Test two)" }
+            Mock -ModuleName Utils Read-Host { return "" } -ParameterFilter { $Prompt -eq "TEST_THREE (Mock\Read\from\prompt\Default value)" }
         }
-        It "Should read existing value" {
+        It "Should read 3 different values" {
             [System.Environment]::SetEnvironmentVariable("TEST_ONE", "Has existing value", [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("TEST_TWO", $null, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("TEST_THREE", $null, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_FOUR", $null, [System.EnvironmentVariableTarget]::Machine)
             Get-ReadAndSetEnvironmentVariables -EnvVarSet $envVarTestSet
 
             [System.Environment]::GetEnvironmentVariable("TEST_ONE", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock: Has existing value"
             $env:TEST_ONE | Should -Be "Mock: Has existing value"
-            [System.Environment]::GetEnvironmentVariable("TEST_TWO", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock: Read from prompt"
-            $env:TEST_TWO | Should -Be "Mock: Read from prompt"
-            [System.Environment]::GetEnvironmentVariable("TEST_THREE", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Default value"
-            $env:TEST_THREE | Should -Be "Default value"
+            [System.Environment]::GetEnvironmentVariable("TEST_TWO", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock\Read\from\prompt"
+            $env:TEST_TWO | Should -Be "Mock\Read\from\prompt"
+            [System.Environment]::GetEnvironmentVariable("TEST_THREE", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock\Read\from\prompt\Default value"
+            $env:TEST_THREE | Should -Be "Mock\Read\from\prompt\Default value"
+            [System.Environment]::GetEnvironmentVariable("TEST_FOUR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $null
+            $env:TEST_FOUR | Should -Be $null
         }
         AfterAll {
             [System.Environment]::SetEnvironmentVariable("TEST_ONE", $null, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("TEST_TWO", $null, [System.EnvironmentVariableTarget]::Machine)
             [System.Environment]::SetEnvironmentVariable("TEST_THREE", $null, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_FOUR", $null, [System.EnvironmentVariableTarget]::Machine)
             $env:TEST_ONE = $null
             $env:TEST_TWO = $null
             $env:TEST_THREE = $null
@@ -395,9 +400,8 @@ Describe "Function Tests" {
             AfterEach {
             }
         }
-        AfterAll {
-            # Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
-            # Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+        AfterEach {
+            Unpublish-EnvironmentVariables -EnvVarSet $testEnvVarSet
         }
     }
     AfterAll {
