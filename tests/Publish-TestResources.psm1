@@ -212,20 +212,6 @@ function Set-TestSetup_7_0_0 {
     $env:PROJECT_DIR = (Join-Path -Path $mockInstalVal.OrganizationDir -ChildPath $env:PROJECT_NAME)
     $mockInstalVal | Add-Member -MemberType NoteProperty -Name "ProjectDir" -Value $env:PROJECT_DIR
 
-    #Create the directory structure
-    # $directories = @(
-    #     $env:PROJECTS_BASE_DIR,
-    #     $env:PROJECT_DIR,
-    #     "$env:VENV_BASE_DIR\${env:PROJECT_NAME}_env\Scripts",
-    #     $env:VENV_CONFIG_DEFAULT_DIR,
-    #     $env:VENV_CONFIG_USER_DIR,
-    #     $env:VENV_PYTHON_BASE_DIR,
-    #     $env:VENV_SECRETS_DEFAULT_DIR,
-    #     $env:VENV_SECRETS_USER_DIR
-    # )
-    # foreach ($directory in $directories) {
-    #     New-Item -ItemType Directory -Path $directory | Out-Null
-    # }
     New-Directories -EnvVarSet $newEnvVar
     New-Item -ItemType Directory -Path $env:PROJECT_DIR | Out-Null
 
@@ -263,7 +249,6 @@ function Set-TestSetup_InstallationFiles {
     $upgradeScriptDir = Join-Path -Path $TempDir -ChildPath "TempUpgradeDir"
     New-Item -ItemType Directory -Path "$upgradeScriptDir\src" | Out-Null
     foreach ($fileName in $sourceFileCopyList) {
-        # $x = "$PSScriptRoot\..\$fileName"
         Copy-Item -Path "$PSScriptRoot\..\$fileName" -Destination ("$upgradeScriptDir\$filename")
         $installationFileList += $fileName
     }

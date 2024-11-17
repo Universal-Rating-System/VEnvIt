@@ -16,6 +16,21 @@
       ]
     },
     {
+      "name": "vn t1 312 HdT -RS -DM",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\vn.ps1",
+      "args": [
+        "Test01",
+        "312",
+        "HdT",
+        "-ResetScripts",
+        "Y",
+        "-DevMode",
+        "Y"
+      ]
+    },
+    {
       "name": "vn t1 312 HdT -RS -MU",
       "type": "PowerShell",
       "request": "launch",
