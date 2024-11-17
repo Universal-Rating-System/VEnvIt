@@ -62,16 +62,10 @@ function Invoke-UpdateManifest {
     $pyprojectPath = Join-Path -Path $ConfigBaseDir -ChildPath "pyproject.toml"
     $manifestPath = Join-Path -Path $ConfigBaseDir -ChildPath (Get-ManifestFileName)
 
-    # Check if pyproject.toml exists
     if (Test-Path -Path $pyprojectPath) {
-        # Extract data from pyproject.toml
         $pyprojectData = Convert-PyprojectToml -filePath $pyprojectPath
-
-        # Check if all necessary data was extracted
         if ($pyprojectData.Version -and $pyprojectData.Authors -and $pyprojectData.Description) {
-            # Create the manifest.psd1
             New-ManifestPsd1 -DestinationPath $manifestPath -data $pyprojectData
-            # Write-Host "Manifest.psd1 created successfully at $manifestPath"
         }
         else {
             Write-Host "Failed to extract required fields from pyproject.toml"
