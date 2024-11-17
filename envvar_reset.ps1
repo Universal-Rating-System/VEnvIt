@@ -38,7 +38,7 @@ $env:VENV_PYTHON_BASE_DIR = "C:\Python"
 $env:VENV_SECRETS_DEFAULT_DIR = "G:\Shared drives\VenvIt\Secrets"
 # $env:VENV_SECRETS_DIR = "G:\Shared drives\VenvIt Secrets"
 $env:VENV_SECRETS_DIR = $null
-$env:VENV_SECRETS_USER_DIR = "D:\GoogleDrive\VenvIt\Config"
+$env:VENV_SECRETS_USER_DIR = "D:\GoogleDrive\VenvIt\Secrets"
 $env:VENVIT_DIR = "G:\Shared drives\VenvIt"
 
 $env:PROJECT_DIR = "D:\Dropbox\Projects\BEE\venvit"
