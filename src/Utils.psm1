@@ -273,6 +273,7 @@ function Show-EnvironmentVariables {
     Write-Host "Project Environment Variables" -ForegroundColor Green
     Write-Host "PROJECT_NAME:             $env:PROJECT_NAME"
     Write-Host "VENV_ORGANIZATION_NAME:   $env:VENV_ORGANIZATION_NAME"
+    Write-Host ""
     Write-Host "INSTALLER_PWD:            $env:INSTALLER_PWD"
     Write-Host "INSTALLER_USERID:         $env:INSTALLER_USERID"
     Write-Host "MYSQL_DATABASE:           $env:MYSQL_DATABASE"
