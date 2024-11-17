@@ -83,23 +83,6 @@ Describe "Function Tests" {
         AfterAll {}
     }
 
-    Context "Copy-Deep" {
-        BeforeEach {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
-
-            $originalObject = [PSCustomObject]@{ Name = "Alice"; Details = @{ Age = 30; City = "New York" } }
-        }
-
-        It "Create deep copy" {
-            $copyObject = Copy-Deep $originalObject
-            $copyObject.Details["City"] = "Los Angeles"
-
-            $($originalObject.Details["City"]) | Should -Be "New York"
-            $($copyObject.Details["City"]) | Should -Be "Los Angeles"
-        }
-    }
-
     Context "Confirm-SystemEnvironmentVariablesExist" {
         BeforeEach {
             # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
@@ -137,6 +120,23 @@ Describe "Function Tests" {
         }
     }
 
+    Context "Copy-Deep" {
+        BeforeEach {
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $originalObject = [PSCustomObject]@{ Name = "Alice"; Details = @{ Age = 30; City = "New York" } }
+        }
+
+        It "Create deep copy" {
+            $copyObject = Copy-Deep $originalObject
+            $copyObject.Details["City"] = "Los Angeles"
+
+            $($originalObject.Details["City"]) | Should -Be "New York"
+            $($copyObject.Details["City"]) | Should -Be "Los Angeles"
+        }
+    }
+
     Context "Get-ConfigFileName" {
         BeforeAll {
             # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
@@ -158,6 +158,49 @@ Describe "Function Tests" {
         }
         AfterAll {}
     }
+
+    Context "Get-ReadAndSetEnvironmentVariables" {
+        BeforeAll {
+            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            # Import-Module $PSScriptRoot\..\src\Utils.psm1
+            $envVarTestSet = @{
+                TEST_ONE   = @{DefVal = "Test one"; IsDir = $true; SystemMandatory = $true; ReadOrder = 2; Prefix = $false }
+                TEST_TWO   = @{DefVal = "Test two"; IsDir = $true; SystemMandatory = $true; ReadOrder = 1; Prefix = $false }
+                TEST_THREE = @{DefVal = "Default value"; IsDir = $true; SystemMandatory = $true; ReadOrder = 3; Prefix = "TEST_TWO" }
+                TEST_FOUR  = @{DefVal = "Test Four"; IsDir = $false; SystemMandatory = $False; ReadOrder = 4; Prefix = $false }
+            }
+
+            Mock -ModuleName Utils Read-Host { return "Mock: Has existing value" } -ParameterFilter { $Prompt -eq "TEST_ONE (Has existing value)" }
+            Mock -ModuleName Utils Read-Host { return "Mock\Read\from\prompt" } -ParameterFilter { $Prompt -eq "TEST_TWO (Test two)" }
+            Mock -ModuleName Utils Read-Host { return "" } -ParameterFilter { $Prompt -eq "TEST_THREE (Mock\Read\from\prompt\Default value)" }
+        }
+        It "Should read 3 different values" {
+            [System.Environment]::SetEnvironmentVariable("TEST_ONE", "Has existing value", [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_TWO", $null, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_THREE", $null, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_FOUR", $null, [System.EnvironmentVariableTarget]::Machine)
+            Get-ReadAndSetEnvironmentVariables -EnvVarSet $envVarTestSet
+
+            [System.Environment]::GetEnvironmentVariable("TEST_ONE", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock: Has existing value"
+            $env:TEST_ONE | Should -Be "Mock: Has existing value"
+            [System.Environment]::GetEnvironmentVariable("TEST_TWO", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock\Read\from\prompt"
+            $env:TEST_TWO | Should -Be "Mock\Read\from\prompt"
+            [System.Environment]::GetEnvironmentVariable("TEST_THREE", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock\Read\from\prompt\Default value"
+            $env:TEST_THREE | Should -Be "Mock\Read\from\prompt\Default value"
+            [System.Environment]::GetEnvironmentVariable("TEST_FOUR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $null
+            $env:TEST_FOUR | Should -Be $null
+        }
+        AfterAll {
+            [System.Environment]::SetEnvironmentVariable("TEST_ONE", $null, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_TWO", $null, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_THREE", $null, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable("TEST_FOUR", $null, [System.EnvironmentVariableTarget]::Machine)
+            $env:TEST_ONE = $null
+            $env:TEST_TWO = $null
+            $env:TEST_THREE = $null
+        }
+    }
+
 
     Context "Get-SecretsFileName" {
         BeforeAll {
@@ -218,6 +261,47 @@ Describe "Function Tests" {
         }
     }
 
+    # Context "Invoke-Executable" {
+    #     BeforeEach {
+    #     }
+
+    #     It "Script without arguments" {
+    #         (Invoke-Executable -ExecutablePath "dir") | Should -Be $true
+    #     }
+
+    #     It "With arguments" {
+    #         (Invoke-Executable -ScriptPath $destinationPath -Arguments "Some argument") | Should -Be $true
+    #     }
+
+    #     AfterEach {
+    #         Remove-Item -Path $tempDir -Recurse -Force
+    #     }
+
+    # }
+
+    Context "Invoke-Script" {
+        BeforeEach {
+            $tempDir = New-CustomTempDir -Prefix "VenvIt"
+            $content = @"
+Write-Host "This is a test."
+"@
+            $destinationPath = "$tempDir\TestScript.ps1"
+            Set-Content -Path "$destinationPath" -Value $content
+        }
+
+        It "Script without arguments" {
+            (Invoke-Script -ScriptPath $destinationPath) | Should -Be $true
+        }
+
+        It "With arguments" {
+            (Invoke-Script -ScriptPath $destinationPath -Arguments "Some argument") | Should -Be $true
+        }
+
+        AfterEach {
+            Remove-Item -Path $tempDir -Recurse -Force
+        }
+    }
+
     Context "New-CustomTempDir Test" {
         BeforeEach {
             # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
@@ -232,48 +316,6 @@ Describe "Function Tests" {
             if (Test-Path -Path $tempDir) {
                 Remove-Item -Path $tempDir -Recurse -Force
             }
-        }
-    }
-
-    Context "Get-ReadAndSetEnvironmentVariables" {
-        BeforeAll {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
-            $envVarTestSet = @{
-                TEST_ONE   = @{DefVal = "Test one"; IsDir = $true; SystemMandatory = $true; ReadOrder = 2; Prefix = $false }
-                TEST_TWO   = @{DefVal = "Test two"; IsDir = $true; SystemMandatory = $true; ReadOrder = 1; Prefix = $false }
-                TEST_THREE = @{DefVal = "Default value"; IsDir = $true; SystemMandatory = $true; ReadOrder = 3; Prefix = "TEST_TWO" }
-                TEST_FOUR  = @{DefVal = "Test Four"; IsDir = $false; SystemMandatory = $False; ReadOrder = 4; Prefix = $false }
-            }
-
-            Mock -ModuleName Utils Read-Host { return "Mock: Has existing value" } -ParameterFilter { $Prompt -eq "TEST_ONE (Has existing value)" }
-            Mock -ModuleName Utils Read-Host { return "Mock\Read\from\prompt" } -ParameterFilter { $Prompt -eq "TEST_TWO (Test two)" }
-            Mock -ModuleName Utils Read-Host { return "" } -ParameterFilter { $Prompt -eq "TEST_THREE (Mock\Read\from\prompt\Default value)" }
-        }
-        It "Should read 3 different values" {
-            [System.Environment]::SetEnvironmentVariable("TEST_ONE", "Has existing value", [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("TEST_TWO", $null, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("TEST_THREE", $null, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("TEST_FOUR", $null, [System.EnvironmentVariableTarget]::Machine)
-            Get-ReadAndSetEnvironmentVariables -EnvVarSet $envVarTestSet
-
-            [System.Environment]::GetEnvironmentVariable("TEST_ONE", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock: Has existing value"
-            $env:TEST_ONE | Should -Be "Mock: Has existing value"
-            [System.Environment]::GetEnvironmentVariable("TEST_TWO", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock\Read\from\prompt"
-            $env:TEST_TWO | Should -Be "Mock\Read\from\prompt"
-            [System.Environment]::GetEnvironmentVariable("TEST_THREE", [System.EnvironmentVariableTarget]::Machine) | Should -Be "Mock\Read\from\prompt\Default value"
-            $env:TEST_THREE | Should -Be "Mock\Read\from\prompt\Default value"
-            [System.Environment]::GetEnvironmentVariable("TEST_FOUR", [System.EnvironmentVariableTarget]::Machine) | Should -Be $null
-            $env:TEST_FOUR | Should -Be $null
-        }
-        AfterAll {
-            [System.Environment]::SetEnvironmentVariable("TEST_ONE", $null, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("TEST_TWO", $null, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("TEST_THREE", $null, [System.EnvironmentVariableTarget]::Machine)
-            [System.Environment]::SetEnvironmentVariable("TEST_FOUR", $null, [System.EnvironmentVariableTarget]::Machine)
-            $env:TEST_ONE = $null
-            $env:TEST_TWO = $null
-            $env:TEST_THREE = $null
         }
     }
 

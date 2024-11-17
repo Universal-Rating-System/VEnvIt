@@ -154,10 +154,10 @@ function New-VirtualEnvironment {
         # Invoke-Script -Script "deactivate"
     }
 
-    Invoke-Script -Script ("$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python -m venv --clear $env:VENV_BASE_DIR\$env:PROJECT_NAME" + "_env")
+    Invoke-Script -ScriptPath ("$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python") -Arguments ("-m venv --clear $env:VENV_BASE_DIR\$env:PROJECT_NAME" + "_env")
     Set-Location -Path $InstallationValues.ProjectDir
-    Invoke-Script -Script ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1")
-    Invoke-Script -Script ("python.exe -m pip install --upgrade pip")
+    Invoke-Script -ScriptPath ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1")
+    Invoke-Script -ScriptPath "python.exe" -Arguments ("-m pip install --upgrade pip")
 }
 
 function New-SupportScript {
@@ -320,17 +320,17 @@ function Invoke-CreateNewVirtualEnvironment {
         $venvCustonSetupScripts = New-VEnvCustomSetupScripts -InstallationValues $installationValues -TimeStamp $timeStamp
 
         Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -Script $venvInstallScripts[0]
+        Invoke-Script -ScriptPath $venvInstallScripts[0]
         Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -Script $venvInstallScripts[1]
+        Invoke-Script -ScriptPath $venvInstallScripts[1]
         Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -Script $venvEnvVarScripts[0]
+        Invoke-Script -ScriptPath $venvEnvVarScripts[0]
         Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -Script $venvEnvVarScripts[1]
+        Invoke-Script -ScriptPath $venvEnvVarScripts[1]
         Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -Script $venvCustonSetupScripts[0]
+        Invoke-Script -ScriptPath $venvCustonSetupScripts[0]
         Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -Script $venvCustonSetupScripts[1]
+        Invoke-Script -ScriptPath $venvCustonSetupScripts[1]
         Write-Host $separator -ForegroundColor Cyan
     }
 }

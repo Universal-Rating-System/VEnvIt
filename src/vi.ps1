@@ -19,19 +19,19 @@ function Invoke-VirtualEnvironment {
 
     Import-Module $PSScriptRoot\Utils.psm1
 
-    Invoke-Script ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar"))
-    Invoke-Script ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar"))
+    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar"))
+    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar"))
 
     if ($env:VIRTUAL_ENV) {
         "Deactivate VEnv $env:VIRTUAL_ENV."
-        Invoke-Script -Script "deactivate"
+        Invoke-Script -ScriptPath "deactivate"
     }
-    Invoke-Script -Script ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1")
+    Invoke-Script -ScriptPath ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1")
 
     # $env:PROJECT_NAME = $_project_name
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
-        Invoke-Script -Script ("$env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1")
-        Invoke-Script -Script ("$env:VENV_SECRETS_USER_DIR\secrets.ps1")
+        Invoke-Script -ScriptPath ("$env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1")
+        Invoke-Script -ScriptPath ("$env:VENV_SECRETS_USER_DIR\secrets.ps1")
     }
 
     # Remove temporary directories from previous sessions
@@ -50,8 +50,8 @@ function Invoke-VirtualEnvironment {
         Set-Location -Path $env:PROJECTS_BASE_DIR
     }
 
-    Invoke-Script ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup"))
-    Invoke-Script ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup"))
+    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup"))
+    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup"))
 }
 
 # function ShowEnvVarHelp {

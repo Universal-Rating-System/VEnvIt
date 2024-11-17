@@ -238,6 +238,25 @@ function Get-Version {
     return $version
 }
 
+# function Invoke-Executable {
+#     param (
+#         [string]$ExecutablePath,
+#         [string]$Arguments
+#     )
+#     # Call the executable with the arguments
+#     & $ExecutablePath $Arguments
+# }
+
+function Invoke-Script {
+    param (
+        [string]$ScriptPath,
+        [string]$Arguments = ""
+    )
+    & $ScriptPath $Arguments
+    # This should be improved
+    return $true
+}
+
 function New-CustomTempDir {
     param (
         [Parameter(Mandatory = $true)]
@@ -246,14 +265,6 @@ function New-CustomTempDir {
     $TempDir = Join-Path -Path $env:TEMP -ChildPath ($Prefix + "_" + [Guid]::NewGuid().ToString())
     New-Item -ItemType Directory -Path $TempDir | Out-Null
     return $TempDir
-}
-
-function Invoke-Script {
-    param (
-        $Script
-    )
-    # Write-Host $Script
-    & $Script
 }
 
 function Show-EnvironmentVariables {
@@ -330,7 +341,8 @@ function Unpublish-EnvironmentVariables {
 }
 
 Export-ModuleMember -Variable defEnvVarSet_7_0_0, separator, sourceFileCompleteList, sourceFileCopyList
-Export-ModuleMember -Function Backup-ArchiveOldVersion, Backup-ScriptToArchiveIfExists, Confirm-SystemEnvironmentVariablesExist, Copy-Deep
-Export-ModuleMember -Function Get-ReadAndSetEnvironmentVariables, Get-ConfigFileName, Get-ManifestFileName, Get-SecretsFileName
-Export-ModuleMember -Function Get-Version, Invoke-Script, New-CustomTempDir, Publish-EnvironmentVariables, Read-YesOrNo
+Export-ModuleMember -Function Backup-ArchiveOldVersion, Backup-ScriptToArchiveIfExists, Confirm-SystemEnvironmentVariablesExist
+Export-ModuleMember -Function Copy-Deep, Get-ReadAndSetEnvironmentVariables, Get-ConfigFileName, Get-ManifestFileName, Get-SecretsFileName
+Export-ModuleMember -Function Get-Version, Invoke-Executable, Invoke-Script, New-CustomTempDir, Publish-EnvironmentVariables
+Export-ModuleMember -Function Read-YesOrNo
 Export-ModuleMember -Function Show-EnvironmentVariables, Unpublish-EnvironmentVariables

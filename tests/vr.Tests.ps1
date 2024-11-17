@@ -97,7 +97,7 @@ Describe "Function Tests" {
 
         It "Should remove the virtual environment" {
             Mock Invoke-Script { return "Mock: Deactivated current VEnv"
-            } -ParameterFilter { $Script -eq "deactivate" }
+            } -ParameterFilter { $ScriptPath -eq "deactivate" }
 
             Unregister-VirtualEnvironment -ProjectName $mockInstalVal.ProjectName
 
