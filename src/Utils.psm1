@@ -49,26 +49,28 @@ $defEnvVarSet_7_0_0 = @{
     VIRTUAL_ENV              = @{DefVal = $null; IsDir = $false; SystemMandatory = $false; ReadOrder = 12; Prefix = $false }
 }
 $sourceFileCompleteList = @(
-    "README.md",
     "LICENSE",
-    "ReleaseNotes.md",
     "Manifest.psd1",
+    "README.md",
+    "ReleaseNotes.md",
+    "src\Secrets.ps1",
+    "src\Uninstall.ps1",
+    "src\Utils.psm1",
     "src\vi.ps1",
     "src\vn.ps1",
-    "src\vr.ps1",
-    "src\Uninstall.ps1",
-    "src\Utils.psm1"
+    "src\vr.ps1"
 )
 $separator = "-" * 80
 $sourceFileCopyList = @(
-    "README.md",
     "LICENSE",
+    "README.md",
     "ReleaseNotes.md",
+    "src\Secrets.ps1",
+    "src\Uninstall.ps1",
+    "src\Utils.psm1",
     "src\vi.ps1",
     "src\vn.ps1",
-    "src\vr.ps1",
-    "src\Uninstall.ps1",
-    "src\Utils.psm1"
+    "src\vr.ps1"
 )
 
 
@@ -111,7 +113,7 @@ function Backup-ArchiveOldVersion {
             CompressionLevel = "Fastest"
             DestinationPath  = $destinationPath
         }
-        Compress-Archive @compress | Out-Null
+        Compress-Archive @compress | Out-Null -ErrorAction SilentlyContinue
     }
 
     return $DestinationPath
@@ -195,7 +197,8 @@ function Get-ReadAndSetEnvironmentVariables {
                     $prefix = Get-Item -Path ("env:" + $EnvVarSet[$envVar.Key]["Prefix"])
                     $defaultValue = (Join-Path -Path $prefix.Value -ChildPath $EnvVarSet[$envVar.Key]["DefVal"])
                     $promptText = $envVar.Key + " (" + $defaultValue + ")"
-                } else {
+                }
+                else {
                     $defaultValue = $EnvVarSet[$envVar.Key]["DefVal"]
                     $promptText = $envVar.Key + " (" + $defaultValue + ")"
                 }
@@ -247,10 +250,10 @@ function New-CustomTempDir {
 
 function Invoke-Script {
     param (
-        [string]$Script
+        $Script
     )
     # Write-Host $Script
-    & $Script
+    $Script
 }
 
 function Show-EnvironmentVariables {

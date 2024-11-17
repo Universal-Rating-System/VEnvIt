@@ -88,11 +88,12 @@ function Publish-Secrets {
     # Move the secrets.ps1 file from VENVIT_DIR to VENV_SECRETS_DIR if it does not already exist in VENV_SECRETS_DIR
     $copiedFiles = @()
     $directories = @( $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR )
+    $sourcePath = Join-Path -Path ("$UpgradeScriptDir\src") -ChildPath (Get-SecretsFileName)
     foreach ($directory in $directories) {
-        $secretsPath = Join-Path -Path $directory -ChildPath (Get-SecretsFileName)
-        if ( -not(Test-Path -Path $secretsPath)) {
-            Copy-Item -Path $UpgradeScriptDir -Destination $secretsPath -Force
-            $copiedFiles += $secretsPath
+        $destinationPath = Join-Path -Path $directory -ChildPath (Get-SecretsFileName)
+        if ( -not(Test-Path -Path $destinationPath)) {
+            Copy-Item -Path $sourcePath -Destination $destinationPath -Force
+            $copiedFiles += $destinationPath
         }
     }
     return $copiedFiles
