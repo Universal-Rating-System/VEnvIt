@@ -259,15 +259,16 @@ function Invoke-Script {
 function Show-EnvironmentVariables {
     Write-Host ""
     Write-Host "System Environment Variables" -ForegroundColor Green
-    Write-Host "VENV_ENVIRONMENT:         $env:VENV_ENVIRONMENT"
     Write-Host "PROJECTS_BASE_DIR:        $env:PROJECTS_BASE_DIR"
     Write-Host "PROJECT_DIR:              $env:PROJECT_DIR"
-    Write-Host "VENVIT_DIR:               $env:VENVIT_DIR"
+    Write-Host "VENV_BASE_DIR:            $env:VENV_BASE_DIR"
+    Write-Host "VENV_CONFIG_DEFAULT_DIR:  $env:VENV_CONFIG_DIR"
+    Write-Host "VENV_CONFIG_USER_DIR:    $env:VENV_CONFIG_DIR"
+    Write-Host "VENV_ENVIRONMENT:         $env:VENV_ENVIRONMENT"
+    Write-Host "VENV_PYTHON_BASE_DIR:     $env:VENV_PYTHON_BASE_DIR"
     Write-Host "VENV_SECRETS_DEFAULT_DIR: $env:VENV_SECRETS_DIR"
     Write-Host "VENV_SECRETS_USER_DIR:    $env:VENV_SECRETS_DIR"
-    Write-Host "VENV_CONFIG_DIR:          $env:VENV_CONFIG_DIR"
-    Write-Host "VENV_BASE_DIR:            $env:VENV_BASE_DIR"
-    Write-Host "VENV_PYTHON_BASE_DIR:     $env:VENV_PYTHON_BASE_DIR"
+    Write-Host "VENVIT_DIR:               $env:VENVIT_DIR"
     Write-Host ""
     Write-Host "Project Environment Variables" -ForegroundColor Green
     Write-Host "PROJECT_NAME:             $env:PROJECT_NAME"
