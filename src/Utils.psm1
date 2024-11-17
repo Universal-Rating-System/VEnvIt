@@ -253,7 +253,7 @@ function Invoke-Script {
         $Script
     )
     # Write-Host $Script
-    $Script
+    & $Script
 }
 
 function Show-EnvironmentVariables {
