@@ -46,7 +46,7 @@ function Unregister-VirtualEnvironment {
     # Deactivate the current virtual environment if it is active
     if ($env:VIRTUAL_ENV) {
         "Deactivate VEnv $env:VIRTUAL_ENV."
-        Invoke-Script -Script "deactivate"
+        Invoke-Script -ScriptPath "deactivate"
     }
 
     New-ProjectArchive -ProjectName $ProjectName
