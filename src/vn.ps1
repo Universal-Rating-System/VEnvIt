@@ -157,7 +157,7 @@ function New-VirtualEnvironment {
     Invoke-Script -ScriptPath ("$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python") -Arguments @("-m", "venv", "--clear", "$env:VENV_BASE_DIR\$env:PROJECT_NAME`_env")
     Set-Location -Path $InstallationValues.ProjectDir
     Invoke-Script -ScriptPath ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1")
-    Invoke-Script -ScriptPath "python.exe" -Arguments ("-m pip install --upgrade pip")
+    Invoke-Script -ScriptPath "python.exe" -Arguments @("-m", "pip", "install", "--upgrade", "pip")
 }
 
 function New-SupportScript {
@@ -345,8 +345,8 @@ function Set-Environment {
     $env:PROJECT_NAME = $InstallationValues.ProjectName
     $env:VENV_ORGANIZATION_NAME = $InstallationValues.Organization
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
-        Invoke-Script -Script ("$env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1")
-        Invoke-Script -Script ("$env:VENV_SECRETS_USER_DIR\secrets.ps1")
+        Invoke-Script -ScriptPath ("$env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1")
+        Invoke-Script -ScriptPath ("$env:VENV_SECRETS_USER_DIR\secrets.ps1")
     }
 
     $organizationDir = (Join-Path -Path $env:PROJECTS_BASE_DIR -ChildPath $env:VENV_ORGANIZATION_NAME)
