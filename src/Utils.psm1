@@ -250,11 +250,11 @@ function Get-Version {
 function Invoke-Script {
     param (
         [string]$ScriptPath,
-        [string[]]$Arguments = ""
+        [string[]]$Arguments = $null
     )
     & $ScriptPath $Arguments
     # This should be improved
-    return $true
+    return -
 }
 
 function New-CustomTempDir {
