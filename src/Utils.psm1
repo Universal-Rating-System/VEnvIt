@@ -238,15 +238,6 @@ function Get-Version {
     return $version
 }
 
-# function Invoke-Executable {
-#     param (
-#         [string]$ExecutablePath,
-#         [string]$Arguments
-#     )
-#     # Call the executable with the arguments
-#     & $ExecutablePath $Arguments
-# }
-
 function Invoke-Script {
     param (
         [string]$ScriptPath,
