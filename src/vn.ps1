@@ -154,7 +154,8 @@ function New-VirtualEnvironment {
         # Invoke-Script -Script "deactivate"
     }
 
-    Invoke-Script -ScriptPath ("$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python") -Arguments ("-m venv --clear $env:VENV_BASE_DIR\$env:PROJECT_NAME" + "_env")
+    Invoke-Script -ScriptPath ("$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python") -Arguments "@("-m", "venv", "--clear", "$env:VENV_BASE_DIR\$env:PROJECT_NAME`_env")
+    $arguments = @("-m", "venv", "--clear", "$env:VENV_BASE_DIR\$env:PROJECT_NAME`_env")
     Set-Location -Path $InstallationValues.ProjectDir
     Invoke-Script -ScriptPath ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1")
     Invoke-Script -ScriptPath "python.exe" -Arguments ("-m pip install --upgrade pip")
