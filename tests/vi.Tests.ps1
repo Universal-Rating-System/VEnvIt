@@ -88,7 +88,7 @@ Describe "Function Tests" {
 
                 Invoke-VirtualEnvironment -ProjectName "MyProject"
 
-                Assert-MockCalled -CommandName "Invoke-Script" -ParameterFilter { $Script -eq "deactivate" }
+                Assert-MockCalled -CommandName "Invoke-Script" -ParameterFilter { $ScriptPath -eq "deactivate" }
                 # (Test-Path $tempDir) | Should -Be $true
             }
         }
