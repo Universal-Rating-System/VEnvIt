@@ -100,7 +100,8 @@ Describe "Function Tests" {
             Mock Invoke-Script { return "Mock: Deactivated current VEnv"
             } -ParameterFilter { $ScriptPath -eq "deactivate" }
             Mock Invoke-Script { return "Mock: Install VEnv"
-            } -ParameterFilter { $ScriptPath -eq "$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python -m venv --clear $env:VENV_BASE_DIR\$env:PROJECT_NAME" + "_env" }
+            # } -ParameterFilter { $ScriptPath -eq "$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python -m venv --clear $env:VENV_BASE_DIR\$env:PROJECT_NAME" + "_env" }
+            } -ParameterFilter { $ScriptPath -eq "$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python" }
             Mock Invoke-Script { return "Mock: Upgrade pip"
             } -ParameterFilter { $ScriptPath -eq "python.exe -m pip install --upgrade pip" }
 
