@@ -145,13 +145,52 @@ function InitGit {
     }
 }
 
+function Invoke-CreateNewVirtualEnvironment {
+    param (
+        [string]$ProjectName,
+        [string]$PythonVer,
+        [string]$Organization,
+        [string]$ResetScripts,
+        [string]$DevMode
+    )
+
+    $installationValues = Get-InstallationValues -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
+    Set-Environment -InstallationValues $installationValues
+    Show-EnvironmentVariables
+    $continue = Read-YesOrNo -PromptText "Continue"
+
+    Write-Host $separator -ForegroundColor Cyan
+
+    if ($continue) {
+        New-VirtualEnvironment -InstallationValues $installationValues
+        New-ProjectInstallScript -InstallationValues $installationValues
+        $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+        $venvInstallScripts = New-VEnvInstallScripts -InstallationValues $installationValues -TimeStamp $timeStamp
+        $venvEnvVarScripts = New-VEnvEnvVarScripts -InstallationValues $installationValues -TimeStamp $timeStamp
+        $venvCustonSetupScripts = New-VEnvCustomSetupScripts -InstallationValues $installationValues -TimeStamp $timeStamp
+
+        # Write-Host $separator -ForegroundColor Cyan
+        Invoke-Script -ScriptPath $venvInstallScripts[0] | Out-Null
+        # Write-Host $separator -ForegroundColor Cyan
+        Invoke-Script -ScriptPath $venvInstallScripts[1] | Out-Null
+        # Write-Host $separator -ForegroundColor Cyan
+        Invoke-Script -ScriptPath $venvEnvVarScripts[0] | Out-Null
+        # Write-Host $separator -ForegroundColor Cyan
+        Invoke-Script -ScriptPath $venvEnvVarScripts[1] | Out-Null
+        # Write-Host $separator -ForegroundColor Cyan
+        Invoke-Script -ScriptPath $venvCustonSetupScripts[0] | Out-Null
+        # Write-Host $separator -ForegroundColor Cyan
+        Invoke-Script -ScriptPath $venvCustonSetupScripts[1] | Out-Null
+        Write-Host $separator -ForegroundColor Cyan
+    }
+}
+
 function New-VirtualEnvironment {
     param (
         [PSCustomObject]$InstallationValues
     )
     if ($env:VIRTUAL_ENV) {
-        "Deactivating Virtual environment $env:VIRTUAL_ENV."
-        # Invoke-Script -Script "deactivate"
+        Invoke-Script -ScriptPath "deactivate" | Out-Null
     }
 
     Write-Host "Installaing new virtual environment"-ForegroundColor Yellow
@@ -186,6 +225,7 @@ function New-VEnvCustomSetupScripts {
         [string]$TimeStamp
     )
 
+    Write-Host "Create custom setup virtual enviroment script" -ForegroundColor Yellow
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "CustomSetup.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
@@ -217,6 +257,7 @@ function New-VEnvEnvVarScripts {
         [string]$TimeStamp
     )
 
+    Write-Host "Create initialize project virtual enviroment variables script" -ForegroundColor Yellow
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "EnvVar.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
@@ -243,6 +284,7 @@ function New-VEnvInstallScripts {
         [string]$TimeStamp
     )
 
+    Write-Host "Create virtual environment install script"-ForegroundColor Yellow
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "Install.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
@@ -266,13 +308,12 @@ function New-ProjectInstallScript {
         [PSCustomObject]$InstallationValues
     )
 
-    Write-Host "Ceate project install script"-ForegroundColor Yellow
+    Write-Host "Create project install script"-ForegroundColor Yellow
     $ProjectInstallScriptPath = Join-Path -Path $InstallationValues.ProjectDir -ChildPath "Install.ps1"
     if (-not (Test-Path -Path $ProjectInstallScriptPath)) {
         $content = @'
 Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Running $env:PROJECT_DIR\Install.ps1..." -ForegroundColor Yellow
-Write-Host "Install Pre-Commit and related tools" -ForegroundColor Yellow
 pip install --upgrade --force --no-cache-dir black
 pip install --upgrade --force --no-cache-dir flake8
 pip install --upgrade --force --no-cache-dir pre-commit
@@ -294,46 +335,6 @@ Write-Host "Install $envPROJECT_NAME" -ForegroundColor Yellow
     Set-Content -Path $ProjectInstallScriptPath -Value $content
     if (-not (Test-Path (Join-Path -Path $InstallationValues.ProjectDir -ChildPath "\.pre-commit-config.yaml"))) {
         CreatePreCommitConfigYaml
-    }
-}
-
-function Invoke-CreateNewVirtualEnvironment {
-    param (
-        [string]$ProjectName,
-        [string]$PythonVer,
-        [string]$Organization,
-        [string]$ResetScripts,
-        [string]$DevMode
-    )
-
-    $installationValues = Get-InstallationValues -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -DevMode $DevMode -ResetScripts $ResetScripts
-    Set-Environment -InstallationValues $installationValues
-    Show-EnvironmentVariables
-    $continue = Read-YesOrNo -PromptText "Continue"
-
-    Write-Host $separator -ForegroundColor Cyan
-
-    if ($continue) {
-        New-VirtualEnvironment -InstallationValues $installationValues
-        New-ProjectInstallScript -InstallationValues $installationValues
-        $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-        $venvInstallScripts = New-VEnvInstallScripts -InstallationValues $installationValues -TimeStamp $timeStamp
-        $venvEnvVarScripts = New-VEnvEnvVarScripts -InstallationValues $installationValues -TimeStamp $timeStamp
-        $venvCustonSetupScripts = New-VEnvCustomSetupScripts -InstallationValues $installationValues -TimeStamp $timeStamp
-
-        Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -ScriptPath $venvInstallScripts[0]
-        Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -ScriptPath $venvInstallScripts[1]
-        Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -ScriptPath $venvEnvVarScripts[0]
-        Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -ScriptPath $venvEnvVarScripts[1]
-        Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -ScriptPath $venvCustonSetupScripts[0]
-        Write-Host $separator -ForegroundColor Cyan
-        Invoke-Script -ScriptPath $venvCustonSetupScripts[1]
-        Write-Host $separator -ForegroundColor Cyan
     }
 }
 
@@ -360,6 +361,8 @@ function Set-Environment {
     if (-not (Test-Path $InstallationValues.ProjectDir)) {
         mkdir $InstallationValues.ProjectDir | Out-Null
     }
+    $env:PROJECT_DIR = $InstallationValues.ProjectDir
+
     return $InstallationValues
 }
 
@@ -374,11 +377,11 @@ function Show-Help {
     vr.ps1 -h
 
     Parameters:
-      ProjectName   The name of the project.
-      PythonVer     Python version for the virtual environment.
-      Organization  Acronym for the organization owning the project.
-      DevMode       [y|n] If "y", installs \[dev\] modules from pyproject.
-      ResetScripts  [y|n] If "y", moves certain scripts to the Archive directory.
+    ProjectName The name of the project.
+    PythonVer Python version for the virtual environment.
+    Organization Acronym for the organization owning the project.
+    DevMode [y | n] If "y", installs \[dev\] modules from pyproject.
+    ResetScripts [y | n] If "y", moves certain scripts to the Archive directory.
 "@ | Write-Host
 
     Write-Host $separator -ForegroundColor Cyan

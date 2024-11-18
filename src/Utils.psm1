@@ -242,12 +242,12 @@ function Get-Version {
 function Invoke-Script {
     param (
         [string]$ScriptPath,
-        [string[]]$Arguments = $null
+        [string[]]$Arguments = $null,
+        [switch]$verbose = $false
     )
-    Write-Host "ScriptPath: $ScriptPath"
-    Write-Host "Arguments   $Arguments"
-    Write-Host "Command:    $ScriptPath $Arguments"
-
+    if ($vebose) {
+        Write-Host "Command: $ScriptPath $Arguments"
+    }
     & $ScriptPath $Arguments
     # This should be improved
     return $true
@@ -267,7 +267,6 @@ function Show-EnvironmentVariables {
     Write-Host ""
     Write-Host "System Environment Variables" -ForegroundColor Green
     Write-Host "PROJECTS_BASE_DIR:        $env:PROJECTS_BASE_DIR"
-    Write-Host "PROJECT_DIR:              $env:PROJECT_DIR"
     Write-Host "VENV_BASE_DIR:            $env:VENV_BASE_DIR"
     Write-Host "VENV_CONFIG_DEFAULT_DIR:  $env:VENV_CONFIG_DEFAULT_DIR"
     Write-Host "VENV_CONFIG_USER_DIR:     $env:VENV_CONFIG_USER_DIR"
@@ -280,6 +279,7 @@ function Show-EnvironmentVariables {
     Write-Host "Project Environment Variables" -ForegroundColor Green
     Write-Host "PROJECT_NAME:             $env:PROJECT_NAME"
     Write-Host "VENV_ORGANIZATION_NAME:   $env:VENV_ORGANIZATION_NAME"
+    Write-Host "PROJECT_DIR:              $env:PROJECT_DIR"
     Write-Host ""
     Write-Host "INSTALLER_PWD:            $env:INSTALLER_PWD"
     Write-Host "INSTALLER_USERID:         $env:INSTALLER_USERID"

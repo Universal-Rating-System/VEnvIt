@@ -32,18 +32,19 @@ $env:VENV_BASE_DIR = "D:\GoogleDrive\venv"
 $env:VENV_CONFIG_DIR = $null
 # $env:VENV_CONFIG_DIR = "G:\Shared drives\VenvIt Secrets\config"
 $env:VENV_CONFIG_DEFAULT_DIR = "G:\Shared drives\VenvIt\Config"
-$env:VENV_CONFIG_USER_DIR = "D:\GoogleDrive\VenvIt\Config"
+$env:VENV_CONFIG_USER_DIR = "G:\Shared drives\Apps\VenvItClient\Config"
 $env:VENV_ENVIRONMENT = "loc_dev"
 $env:VENV_PYTHON_BASE_DIR = "C:\Python"
 $env:VENV_SECRETS_DEFAULT_DIR = "G:\Shared drives\VenvIt\Secrets"
 # $env:VENV_SECRETS_DIR = "G:\Shared drives\VenvIt Secrets"
 $env:VENV_SECRETS_DIR = $null
-$env:VENV_SECRETS_USER_DIR = "D:\GoogleDrive\VenvIt\Secrets"
+$env:VENV_SECRETS_USER_DIR = "G:\Shared drives\Apps\VenvItClient\Secrets"
 $env:VENVIT_DIR = "G:\Shared drives\VenvIt"
 
 $env:PROJECT_DIR = "D:\Dropbox\Projects\BEE\venvit"
 $env:PROJECT_NAME = "VenvIt"
 $env:VIRTUAL_ENV = "D:\GoogleDrive\venv\venvit_env"
+# $env:VIRTUAL_ENV = $null
 
 [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $env:PROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
