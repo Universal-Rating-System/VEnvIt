@@ -250,7 +250,7 @@ function Invoke-Script {
     }
     & $ScriptPath $Arguments
     # This should be improved
-    return $true
+    return "Done!"
 }
 
 function New-CustomTempDir {
