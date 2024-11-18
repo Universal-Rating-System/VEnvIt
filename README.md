@@ -185,7 +185,7 @@ where:
     Invoke-WebRequest "https://github.com/BrightEdgeeServices/venvit/releases/download/$Tag/Installation-Files.zip" -OutFile $UpgradeScriptPath
     Expand-Archive -Path $UpgradeScriptPath -DestinationPath $UpgradeScriptDir
     Import-Module -Name (Join-Path -Path $UpgradeScriptDir.FullName -ChildPath "src/Install-Conclude.psm1")
-    Invoke-ConcludeInstall -Release $Tag -UpgradeScriptDir $UpgradeScriptDir
+    Invoke-ConcludeInstall -Release $Tag -UpgradeScriptDir $UpgradeScriptDir`n
    ```
 
 1. Configure the secrets.ps1 script in the VENV_SECRETS_DEFAULT_DIR and VENV_SECRETS_USER_DIR

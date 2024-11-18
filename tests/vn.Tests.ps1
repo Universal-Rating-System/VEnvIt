@@ -42,13 +42,17 @@ Describe "Top level script execution" {
 Describe "Function Tests" {
     BeforeAll {
         # . $PSScriptRoot\..\src\vn.ps1 -Pester
+        if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+        Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+        if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+        Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+
         $originalSessionValues = Backup-SessionEnvironmentVariables
         $originalSystemValues = Backup-SystemEnvironmentVariables
     }
 
     BeforeEach {
-        if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-        Import-Module $PSScriptRoot\..\src\Utils.psm1
     }
 
     Context "Get-InstallationValues" {
@@ -87,8 +91,8 @@ Describe "Function Tests" {
     Context "Invoke-VirtualEnvironment" {
         BeforeAll {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+            # if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            # Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
@@ -174,8 +178,8 @@ Describe "Function Tests" {
     Context "New-ProjectInstallScript" {
         BeforeEach {
             . $PSScriptRoot\..\src\vn.ps1 -Pester
-            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
+            # if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
+            # Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 
             $mockInstalVal = Set-TestSetup_7_0_0
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
