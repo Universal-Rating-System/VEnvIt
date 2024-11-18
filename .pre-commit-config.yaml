@@ -1,42 +1,11 @@
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
     hooks:
-      - id: check-added-large-files
-      - id: check-json
-      - id: check-merge-conflict
-      - id: check-toml
-      - id: check-yaml
-      # - id: debug-statements
-      - id: no-commit-to-branch
-        args: [ --branch, master ]
-      - id: pretty-format-json
-        args: [ --autofix, --no-sort-keys ]
-      - id: trailing-whitespace
-        args: [ --markdown-linebreak-ext=md ]
-
-  - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.17  # Use the ref you want to point at
+    - id: black
+      language_version: python3
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
     hooks:
-      - id: mdformat
-        args: [ --end-of-line, lf, ReleaseNotes.md, README.md, .github/ISSUE_TEMPLATE/bugfix.md ]
-        additional_dependencies:
-          - mdformat-black
-          - mdformat-gfm
-          - mdformat_frontmatter
-
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
-    hooks:
-      - id: codespell
-        args: [ --write, --toml, pyproject.toml ]
-        additional_dependencies:
-          - tomli
-
-  # - repo: local
-  #   hooks:
-  #     - id: powershell-script-analyzer
-  #       name: PSScriptAnalyzer
-  #       entry: pwsh -Command "Install-Module -Name PSScriptAnalyzer -Repository PSGallery -Force -Scope CurrentUser; Invoke-ScriptAnalyzer -Path .\*.ps1 -Recurse"
-  #       language: system
-  #       files: \.ps1$
+    - id: flake8
+      language_version: python3
