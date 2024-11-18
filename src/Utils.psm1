@@ -250,7 +250,7 @@ function Get-Version {
 function Invoke-Script {
     param (
         [string]$ScriptPath,
-        [string]$Arguments = ""
+        [string[]]$Arguments = ""
     )
     & $ScriptPath $Arguments
     # This should be improved
