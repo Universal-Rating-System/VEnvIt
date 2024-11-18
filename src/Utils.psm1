@@ -216,6 +216,7 @@ function Get-ReadAndSetEnvironmentVariables {
 function Get-SecretsFileName {
     return "Secrets.ps1"
 }
+
 function Get-Version {
     param (
         [Parameter(Mandatory = $true)]
@@ -243,6 +244,10 @@ function Invoke-Script {
         [string]$ScriptPath,
         [string[]]$Arguments = $null
     )
+    Write-Host "ScriptPath: $ScriptPath"
+    Write-Host "Arguments   $Arguments"
+    Write-Host "Command:    $ScriptPath $Arguments"
+
     & $ScriptPath $Arguments
     # This should be improved
     return $true

@@ -154,10 +154,11 @@ function New-VirtualEnvironment {
         # Invoke-Script -Script "deactivate"
     }
 
-    Invoke-Script -ScriptPath ("$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python") -Arguments @("-m", "venv", "--clear", "$env:VENV_BASE_DIR\$env:PROJECT_NAME`_env")
+    Write-Host "Installaing new virtual environment"-ForegroundColor Yellow
+    Invoke-Script -ScriptPath ("$env:VENV_PYTHON_BASE_DIR\Python" + $InstallationValues.PythonVer + "\python") -Arguments @("-m", "venv", "--clear", "$env:VENV_BASE_DIR\$env:PROJECT_NAME`_env") | Out-Null
     Set-Location -Path $InstallationValues.ProjectDir
-    Invoke-Script -ScriptPath ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1")
-    Invoke-Script -ScriptPath "python.exe" -Arguments @("-m", "pip", "install", "--upgrade", "pip")
+    Invoke-Script -ScriptPath ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1") | Out-Null
+    Invoke-Script -ScriptPath "python.exe" -Arguments @("-m", "pip", "install", "--upgrade", "pip") | Out-Null
 }
 
 function New-SupportScript {
@@ -265,6 +266,7 @@ function New-ProjectInstallScript {
         [PSCustomObject]$InstallationValues
     )
 
+    Write-Host "Ceate project install script"-ForegroundColor Yellow
     $ProjectInstallScriptPath = Join-Path -Path $InstallationValues.ProjectDir -ChildPath "Install.ps1"
     if (-not (Test-Path -Path $ProjectInstallScriptPath)) {
         $content = @'
