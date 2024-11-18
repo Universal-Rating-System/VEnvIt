@@ -40,9 +40,9 @@ jobs:
       - name: Create Manifest
         shell: pwsh
         run: |
-          Import-Module .\src\Utils.psm1
+          # Import-Module .\src\Utils.psm1
           Import-Module .\src\Update-Manifest.psm1
-          # Invoke-UpdateManifest -ConfigBaseDir "."
+          Invoke-UpdateManifest -ConfigBaseDir "."
 
       - name: Add Manifest to Repo
         run: |
