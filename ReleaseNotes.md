@@ -9,7 +9,7 @@
 - Cleanup the vscode configuration file.
 - Improved Install.ps1
 - Add -Pester support for all ps1 scripts. It is limited to the more important functions. The rest still has to be done.
-- Renamed variable names to standards.  Not all are done. See https://github.com/PoshCode/PowerShellPracticeAndStyle
+- Renamed variable names to standards. Not all are done. See https://github.com/PoshCode/PowerShellPracticeAndStyle
 - Introduce Utils.psm1 to hold all common utility functions.
 - Split functions into smaller portions simplifying the code and to allow for more effective testing.
 - Introduce the VENV_CONFIG_DEFAULT_DIR and VENV_CONFIG_USER_DIR environment variables at the expense of VENV_CONFIG_DIR
@@ -40,7 +40,7 @@ ______________________________________________________________________
 - Add `New Release` issue template.
 - Combine `Pre-Commit` and `Check-Documentation` workflows into 'Pre-Commit-and-Document-Check'
 - Add a numbered prefix to the workflow file names.
-- Removed `CI` workflow, since no formal testing is done.  When Pester is employed, it will be commissioned again.
+- Removed `CI` workflow, since no formal testing is done. When Pester is employed, it will be commissioned again.
 - Removed unnecessary environment variables from `04-build-and-deploy-to-production.yml`.
 - Removed unnecessary steps from `04-build-and-deploy-to-production.yml` not relates to PowerShell scripts.
 - Add steps to `04-build-and-deploy-to-production.yml` for PowerShell scripts.
