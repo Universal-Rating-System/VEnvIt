@@ -19,10 +19,6 @@ param (
     [ValidateSet("y", "n", "Y", "N")]
     [String]$DevMode = "Y",
 
-    # [Parameter(Mandatory = $false)]
-    # [ValidateSet("y", "n", "Y", "N")]
-    # [String]$MultiUser = "Y",
-
     [Parameter(Mandatory = $false)]
     [Switch]$Help,
 
@@ -169,17 +165,11 @@ function Invoke-CreateNewVirtualEnvironment {
         $venvEnvVarScripts = New-VEnvEnvVarScripts -InstallationValues $installationValues -TimeStamp $timeStamp
         $venvCustonSetupScripts = New-VEnvCustomSetupScripts -InstallationValues $installationValues -TimeStamp $timeStamp
 
-        # Write-Host $separator -ForegroundColor Cyan
         Invoke-Script -ScriptPath $venvInstallScripts[0]
-        # Write-Host $separator -ForegroundColor Cyan
         Invoke-Script -ScriptPath $venvInstallScripts[1]
-        # Write-Host $separator -ForegroundColor Cyan
         Invoke-Script -ScriptPath $venvEnvVarScripts[0]
-        # Write-Host $separator -ForegroundColor Cyan
         Invoke-Script -ScriptPath $venvEnvVarScripts[1]
-        # Write-Host $separator -ForegroundColor Cyan
         Invoke-Script -ScriptPath $venvCustonSetupScripts[0]
-        # Write-Host $separator -ForegroundColor Cyan
         Invoke-Script -ScriptPath $venvCustonSetupScripts[1]
         Write-Host $separator -ForegroundColor Cyan
     }
@@ -229,7 +219,6 @@ function New-VEnvCustomSetupScripts {
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "CustomSetup.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
-        # $content += 'Write-Host "Running $env:VENV_CONFIG_DEFAULT_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
         $content += 'Write-Host "Running $PSCommandPath..." -ForegroundColor Yellow' + "`n"
         $content += '# Set/override environment variables by changing them here.  Uncomment them and set the correct value or add a variable by replacing "??"'
         $content += '#$env:INSTALLER_PWD = "??"' + "`n"
@@ -243,7 +232,6 @@ function New-VEnvCustomSetupScripts {
         New-SupportScript -BaseDir $env:VENV_CONFIG_DEFAULT_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp | Out-Null
 
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
-        # $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
         $content += 'Write-Host "Running $PSCommandPath..." -ForegroundColor Yellow' + "`n"
         $content += "# Insert customized setup commands specific to the user.`n"
         $content += "# Values in this file will override values set by the Organization custom setup script.`n"
@@ -263,7 +251,6 @@ function New-VEnvEnvVarScripts {
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "EnvVar.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
-        # $content += 'Write-Host "Running $env:VENV_CONFIG_DEFAULT_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
         $content += 'Write-Host "Running $PSCommandPath..." -ForegroundColor Yellow' + "`n"
         $content += '$env:VENV_PY_VER = "' + $InstallationValues.PythonVer + '"' + "`n"
         $content += '$env:PYTHONPATH = "' + $InstallationValues.ProjectDir + "\src;" + $InstallationValues.ProjectDir + "\tests" + '"' + "`n"
@@ -272,7 +259,6 @@ function New-VEnvEnvVarScripts {
         New-SupportScript -BaseDir $env:VENV_CONFIG_DEFAULT_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp | Out-Null
 
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
-        # $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
         $content += 'Write-Host "Running $PSCommandPath..." -ForegroundColor Yellow' + "`n"
         $content += "# Insert customized setup commands specific to the user.`n"
         $content += "# Values in this file will override values set by the Organization custom setup script.`n"
@@ -292,14 +278,12 @@ function New-VEnvInstallScripts {
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "Install.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
-        # $content += 'Write-Host "Running $env:VENV_CONFIG_DEFAULT_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
         $content += 'Write-Host "Running $PSCommandPath..." -ForegroundColor Yellow' + "`n"
         $content += "git init`n"
         $content += '& ' + $InstallationValues.ProjectDir + "\Install.ps1`n"
         New-SupportScript -BaseDir $env:VENV_CONFIG_DEFAULT_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp | Out-Null
 
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
-        # $content += 'Write-Host "Running $env:VENV_CONFIG_USER_DIR\' + "$fileName..." + '"' + " -ForegroundColor Yellow`n"
         $content += 'Write-Host "Running $PSCommandPath..." -ForegroundColor Yellow' + "`n"
         $content += "# Insert customized setup commands specific to the user`n"
         $content += "# Values in this file will override values set by the Organization installation script.`n"
@@ -427,7 +411,6 @@ if (-not $Pester) {
     Write-Host ''
     $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     Write-Host "=[ START $dateTime ]=================================================[ vn.ps1 ]=" -ForegroundColor Blue
-    # $project_name = $args[0]
     Write-Host "Create new $ProjectName virtual environment" -ForegroundColor Blue
     if ($ProjectName -eq "" -or $Help) {
         Show-Help

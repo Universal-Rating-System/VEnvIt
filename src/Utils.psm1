@@ -1,19 +1,5 @@
 ﻿# Utils.psm1
 
-# TODO
-# References to this variable should be replaced through the code with the versioned instances below.
-# $defEnvVarSet = @{
-#     PROJECTS_BASE_DIR        = @{DefVal = "~\Projects"; IsDir = $true }
-#     VENV_BASE_DIR            = @{DefVal = "~\venv"; IsDir = $true }
-#     VENV_CONFIG_DEFAULT_DIR  = @{DefVal = "$env:ProgramFiles\VenvIt\Config"; IsDir = $true }
-#     VENV_CONFIG_USER_DIR     = @{DefVal = "~\VenvIt\Config"; IsDir = $true }
-#     VENV_ENVIRONMENT         = @{DefVal = "loc_dev"; IsDir = $false }
-#     VENV_PYTHON_BASE_DIR     = @{DefVal = "c:\Python"; IsDir = $true }
-#     VENV_SECRETS_DEFAULT_DIR = @{DefVal = "$env:ProgramFiles\VenvIt\Secrets"; IsDir = $true }
-#     VENV_SECRETS_USER_DIR    = @{DefVal = "~\VenvIt\Secrets"; IsDir = $true }
-#     VENVIT_DIR               = @{DefVal = "$env:ProgramFiles\VenvIt"; IsDir = $true }
-# }
-
 $defEnvVarSet_0_0_0 = @{
     ENVIRONMENT          = @{DefVal = "loc_dev"; IsDir = $false }
     RTE_ENVIRONMENT      = @{DefVal = "loc_dev"; IsDir = $false }

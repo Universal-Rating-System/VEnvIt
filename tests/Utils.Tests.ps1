@@ -17,16 +17,10 @@ Describe "Function Tests" {
 
         $originalSessionValues = Backup-SessionEnvironmentVariables
         $originalSystemValues = Backup-SystemEnvironmentVariables
-}
+    }
 
     Context "Backup-ArchiveOldVersion" {
         BeforeEach {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
-
-            # $OriginalValues = Backup-SessionEnvironmentVariables
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         }
 
@@ -47,12 +41,9 @@ Describe "Function Tests" {
         }
 
         It "Should archive version 7.0.0" {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
 
             $mockInstalVal = Set-TestSetup_7_0_0
             $installationDir = "$env:VENVIT_DIR"
-            # $FileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
             $archive = Backup-ArchiveOldVersion -InstallationDir $installationDir -TimeStamp $timeStamp
 
             (Test-Path -Path $archive) | Should -Be $true
@@ -62,7 +53,6 @@ Describe "Function Tests" {
             $mockInstalVal = Set-TestSetup_7_0_0
             $installationDir = "$env:VENVIT_DIR"
             $backupDir = (Join-Path -Path $mockInstalVal.TempDir -ChildPath "VEnvIt Backup")
-            # $FileList = $env:VENVIT_DIR, $env:VENV_CONFIG_DEFAULT_DIR, $env:VENV_CONFIG_USER_DIR, $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR
             $archive = Backup-ArchiveOldVersion -InstallationDir $InstallationDir -TimeStamp $timeStamp -DestinationDir $backupDir
 
             (Test-Path -Path $archive) | Should -Be $true
@@ -70,8 +60,6 @@ Describe "Function Tests" {
 
         AfterEach {
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
-        #     Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
-        #     Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
         }
     }
 
@@ -85,10 +73,6 @@ Describe "Function Tests" {
 
     Context "Confirm-SystemEnvironmentVariablesExist" {
         BeforeEach {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
-
-            # $OriginalValues = Backup-SessionEnvironmentVariables
 
             $envVarSet = @{
                 TEST_ONE = @{DefVal = "Test one"; IsDir = $true; SystemMandatory = $true }
@@ -116,15 +100,11 @@ Describe "Function Tests" {
 
         AfterEach {
             Unpublish-EnvironmentVariables $envVarSet
-            # Restore-SessionEnvironmentVariables -OriginalValues $originalValues
         }
     }
 
     Context "Copy-Deep" {
         BeforeEach {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
-
             $originalObject = [PSCustomObject]@{ Name = "Alice"; Details = @{ Age = 30; City = "New York" } }
         }
 
@@ -139,8 +119,6 @@ Describe "Function Tests" {
 
     Context "Get-ConfigFileName" {
         BeforeAll {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
         }
         It "Should return secrets filename" {
             Get-ConfigFileName -ProjectName "MyProject" -Postfix "Postfix" | Should -Be "VEnvMyProjectPostfix.ps1"
@@ -150,8 +128,6 @@ Describe "Function Tests" {
 
     Context "Get-ManifestFileName" {
         BeforeAll {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
         }
         It "Should return manifest filename" {
             Get-ManifestFileName | Should -Be "Manifest.psd1"
@@ -161,8 +137,6 @@ Describe "Function Tests" {
 
     Context "Get-ReadAndSetEnvironmentVariables" {
         BeforeAll {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
             $envVarTestSet = @{
                 TEST_ONE   = @{DefVal = "Test one"; IsDir = $true; SystemMandatory = $true; ReadOrder = 2; Prefix = $false }
                 TEST_TWO   = @{DefVal = "Test two"; IsDir = $true; SystemMandatory = $true; ReadOrder = 1; Prefix = $false }
@@ -204,8 +178,6 @@ Describe "Function Tests" {
 
     Context "Get-SecretsFileName" {
         BeforeAll {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
         }
         It "Should return secrets filename" {
             Get-SecretsFileName | Should -Be "Secrets.ps1"
@@ -215,25 +187,15 @@ Describe "Function Tests" {
 
     Context "Get-Version" {
         BeforeAll {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
-            # if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
-            # Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
-            # if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
-            # Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
         }
 
         BeforeEach {
-            # if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-            # Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
-            # $OriginalValues = Backup-SessionEnvironmentVariables
         }
 
         It "Should get 0.0.0" {
             $mockInstalVal = Set-TestSetup_0_0_0
             $Version = Get-Version -SourceDir $env:SCRIPTS_DIR
             $Version | Should -Be "0.0.0"
-            # Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
 
         It "Should get 6.0.0" {
@@ -243,7 +205,6 @@ Describe "Function Tests" {
             $mockInstalVal = Set-TestSetup_6_0_0
             $Version = Get-Version -SourceDir $env:VENVIT_DIR
             $Version | Should -Be "6.0.0"
-            # Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
 
         It "Should get 7.0.0" {
@@ -253,31 +214,11 @@ Describe "Function Tests" {
             $mockInstalVal = Set-TestSetup_7_0_0
             $Version = Get-Version -SourceDir $env:VENVIT_DIR
             $Version | Should -Be "7.0.0"
-            # Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
         }
         AfterEach {
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
-            # Restore-SessionEnvironmentVariables -OriginalValues $originalValues
         }
     }
-
-    # Context "Invoke-Executable" {
-    #     BeforeEach {
-    #     }
-
-    #     It "Script without arguments" {
-    #         (Invoke-Executable -ExecutablePath "dir") | Should -Be $true
-    #     }
-
-    #     It "With arguments" {
-    #         (Invoke-Executable -ScriptPath $destinationPath -Arguments "Some argument") | Should -Be $true
-    #     }
-
-    #     AfterEach {
-    #         Remove-Item -Path $tempDir -Recurse -Force
-    #     }
-
-    # }
 
     Context "Invoke-Script" {
         BeforeEach {
@@ -387,12 +328,6 @@ Write-Host "This is a test."
 
     Context "Publish-EnvironmentVariables" {
         BeforeAll {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
-
-            # $originalSessionValues = Backup-SessionEnvironmentVariables
-            # $originalSystemValues = Backup-SystemEnvironmentVariables
-
             $testEnvVarSet = @{
                 TEST_VAL = @{DefVal = "Test value"; IsDir = $false }
                 TEST_DIR = @{DefVal = "$env:TEMP\Test_Dir"; IsDir = $True }
@@ -411,16 +346,11 @@ Write-Host "This is a test."
             Unpublish-EnvironmentVariables -EnvVarSet $testEnvVarSet
         }
         AfterAll {
-            # Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
-            # Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
         }
     }
 
     Context "Unpublish-EnvironmentVariables" {
         BeforeAll {
-            # if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            # Import-Module $PSScriptRoot\..\src\Utils.psm1
-
             $originalSessionValues = Backup-SessionEnvironmentVariables
             $originalSystemValues = Backup-SystemEnvironmentVariables
 

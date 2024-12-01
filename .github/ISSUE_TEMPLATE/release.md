@@ -9,7 +9,7 @@ labels:
 
 ______________________________________________________________________
 
-## Tickets / branches included
+## Issues Included
 
 - [](<>)
 

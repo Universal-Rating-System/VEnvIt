@@ -149,16 +149,6 @@ Describe "Function Tests" {
         }
 
         It "Should bypass for new installation" {
-            # Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_6_0_0 {
-            #     return $true
-            # }
-            # # Mock -CommandName Invoke-PrepForUpgrade_6_0_0 { return $true }
-            # Mock -ModuleName Conclude-UpgradePrep -CommandName Invoke-PrepForUpgrade_7_0_0 {
-            #     return $true
-            # }
-            # Mock -CommandName Invoke-PrepForUpgrade_7_0_0
-            # $CurrentManifestPath = Join-Path -Path $env:SCRIPTS_DIR -ChildPath (Get-ManifestFileName)
-            # New-ManifestPsd1 -DestinationPath $CurrentManifestPath -Data $ManifestData000
             $mockInstalVal = Set-TestSetup_New
             $UpgradeManifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
             New-ManifestPsd1 -DestinationPath $UpgradeManifestPath -data $ManifestData700

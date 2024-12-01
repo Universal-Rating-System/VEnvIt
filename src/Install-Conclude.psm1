@@ -122,5 +122,3 @@ function Test-Admin {
 
 Export-ModuleMember -Function Clear-InstallationFiles, Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories
 Export-ModuleMember -Function Publish-LatestVersion, Publish-Secrets, Set-Path, Test-Admin
-# Export-ModuleMember -Variable envVarSet
-# Export-ModuleMember -Variable envVarSet
