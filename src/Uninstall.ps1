@@ -135,7 +135,7 @@ if (-not $Pester) {
     Write-Host ''
     $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     Write-Host "=[ START $dateTime ]==========================================[ Uninstall.ps1 ]=" -ForegroundColor Blue
-    Write-Host "Initialize the $project_name virtual environment" -ForegroundColor Blue
+    Write-Host "Uninstall VEnvIt" -ForegroundColor Blue
     if ($BackupDir -eq "" -or $Help) {
         Show-Help
     }

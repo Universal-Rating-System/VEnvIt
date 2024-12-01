@@ -171,20 +171,6 @@ Describe "Function Tests" {
             $mockInstalVal = Set-TestSetup_7_0_0
 
             $upgradeDetail = Set-TestSetup_InstallationFiles
-            # $TempDir = New-CustomTempDir -Prefix "VenvIt"
-            # $upgradeScriptDir = Join-Path -Path $TempDir -ChildPath "TempUpgradeDir"
-            # New-Item -ItemType Directory -Path "$upgradeScriptDir\src"
-            # Copy-Item -Path "$PSScriptRoot\..\README.md" -Destination $upgradeScriptDir
-            # Copy-Item -Path "$PSScriptRoot\..\LICENSE" -Destination $upgradeScriptDir
-            # Copy-Item -Path "$PSScriptRoot\..\ReleaseNotes.md" -Destination $upgradeScriptDir
-            # Copy-Item -Path "$PSScriptRoot\..\src\vi.ps1" -Destination "$upgradeScriptDir\src"
-            # Copy-Item -Path "$PSScriptRoot\..\src\vn.ps1" -Destination "$upgradeScriptDir\src"
-            # Copy-Item -Path "$PSScriptRoot\..\src\vr.ps1" -Destination "$upgradeScriptDir\src"
-            # Copy-Item -Path "$PSScriptRoot\..\src\utils.psm1" -Destination "$upgradeScriptDir\src"
-            # Copy-Item -Path "$PSScriptRoot\..\src\secrets.ps1" -Destination "$upgradeScriptDir\src"
-            # $manifestPath = Join-Path -Path $UpgradeScriptDir -ChildPath (Get-ManifestFileName)
-            # New-ManifestPsd1 -DestinationPath $manifestPath -data $ManifestData700
-
         }
 
         It "Should copy all secrets files" {

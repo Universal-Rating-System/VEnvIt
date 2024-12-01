@@ -78,7 +78,7 @@
       "script": ".\\src\\Update-Manifest.ps1"
     },
     {
-      "name": "Uninstall",
+      "name": "Uninstall Download",
       "type": "PowerShell",
       "request": "launch",
       "script": ".\\src\\Uninstall.ps1",

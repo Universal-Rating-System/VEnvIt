@@ -1,12 +1,15 @@
----
+______________________________________________________________________
+
 name: New Release
 about: Planned improvement or addition to functionality; non-urgent.
-title: '[Release]: Release v'
+title: '\[Release\]: Release v'
 labels:
-  - release
----
 
-## Tickets / branches included
+- release
+
+______________________________________________________________________
+
+## Issues Included
 
 - [](<>)
 
