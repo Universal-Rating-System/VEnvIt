@@ -32,7 +32,11 @@ param (
 )
 
 if ((Get-Module -Name "Utils") -and $Pester ) {
+    Copy-Item -Path function:prompt -Destination function:bakupPrompt
+    Copy-Item -Path function:_OLD_VIRTUAL_PROMPT -Destination function:backup_OLD_VIRTUAL_PROMPT
     Remove-Module -Name "Utils"
+    Copy-Item -Path function:bakupPrompt -Destination function:prompt
+    Copy-Item -Path function:backup_OLD_VIRTUAL_PROMPT -Destination function:_OLD_VIRTUAL_PROMPT
 }
 Import-Module $PSScriptRoot\..\src\Utils.psm1
 

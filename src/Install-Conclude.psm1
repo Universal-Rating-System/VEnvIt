@@ -3,7 +3,11 @@
 if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
 Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 if ((Get-Module -Name "Utils") -and $Pester ) {
+    Copy-Item -Path function:prompt -Destination function:bakupPrompt
+    Copy-Item -Path function:_OLD_VIRTUAL_PROMPT -Destination function:backup_OLD_VIRTUAL_PROMPT
     Remove-Module -Name "Utils"
+    Copy-Item -Path function:bakupPrompt -Destination function:prompt
+    Copy-Item -Path function:backup_OLD_VIRTUAL_PROMPT -Destination function:_OLD_VIRTUAL_PROMPT
 }
 Import-Module $PSScriptRoot\..\src\Utils.psm1
 $separator = "-" * 80
