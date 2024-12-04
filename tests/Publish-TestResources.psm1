@@ -7,7 +7,7 @@ Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
 if ((Get-Module -Name "Utils") -and $Pester ) {
     Remove-Module -Name "Utils"
 }
-Import-Module $PSScriptRoot\Utils.psm1
+Import-Module $PSScriptRoot\..\src\Utils.psm1
 if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
 Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
 

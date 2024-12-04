@@ -1,7 +1,7 @@
 ﻿if ((Get-Module -Name "Utils") -and $Pester ) {
     Remove-Module -Name "Utils"
 }
-Import-Module $PSScriptRoot\Utils.psm1
+Import-Module $PSScriptRoot\..\src\Utils.psm1
 $VersionChanges = @{
     '0.0.0' = 'Invoke-Upgrade_0_0_0'
     '6.0.0' = 'Invoke-PrepForUpgrade_6_0_0'

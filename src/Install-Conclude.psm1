@@ -5,7 +5,7 @@ Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 if ((Get-Module -Name "Utils") -and $Pester ) {
     Remove-Module -Name "Utils"
 }
-Import-Module $PSScriptRoot\Utils.psm1
+Import-Module $PSScriptRoot\..\src\Utils.psm1
 $separator = "-" * 80
 
 function Clear-InstallationFiles {

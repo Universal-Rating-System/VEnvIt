@@ -34,7 +34,7 @@ param (
 if ((Get-Module -Name "Utils") -and $Pester ) {
     Remove-Module -Name "Utils"
 }
-Import-Module $PSScriptRoot\Utils.psm1
+Import-Module $PSScriptRoot\..\src\Utils.psm1
 
 
 function CreateDirIfNotExist {
