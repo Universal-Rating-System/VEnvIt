@@ -19,6 +19,10 @@ param (
     [ValidateSet("y", "n", "Y", "N")]
     [String]$DevMode = "Y",
 
+    # [Parameter(Mandatory = $false)]
+    # [ValidateSet("y", "n", "Y", "N")]
+    # [Switch]$Verbose = $false,
+
     [Parameter(Mandatory = $false)]
     [Switch]$Help,
 
@@ -27,7 +31,9 @@ param (
     [Switch]$Pester
 )
 
-if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+if ((Get-Module -Name "Utils") -and $Pester ) {
+    Remove-Module -Name "Utils"
+}
 Import-Module $PSScriptRoot\Utils.psm1
 
 
@@ -416,7 +422,7 @@ if (-not $Pester) {
         Show-Help
     }
     else {
-        Invoke-CreateNewVirtualEnvironment -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -ResetScripts $ResetScripts -DevMode $DevMode
+        Invoke-CreateNewVirtualEnvironment -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -ResetScripts $ResetScripts -DevMode $DevMode -Verbose $Verbose
         Show-EnvironmentVariables
     }
     Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan

@@ -16,17 +16,21 @@
 - Introduce the VENV_SECRETS_DEFAULT_DIR and VENV_SECRETS_USER_DIR environment variables at the expense of VENV_SECRETS_DIR
 - Create the Invoke-Script function to abstract PS function calls to enable better testing.
 
-# Release 6.0.1
-
-## General Changes
-
 ## Ticket(s) Included
 
 1. BEE-00037 | VEnvIt | Add Pester Support
 2. BEE-00096 | VEnvIt | Update README with missing information
 3. BEE-00234 | VEnvIt | Improve organizational support
-4. BEE-00236 | VEnvIt | Set ExecutionPolicy
-5. BEE-00269 | VEnvIt | Implement "Uninstall"
+4. BEE-00269 | VEnvIt | Implement "Uninstall"
+
+______________________________________________________________________
+
+# Release 6.0.1
+
+## Ticket(s) Included
+
+1. BEE-00236 | VEnvIt | Set ExecutionPolicy
+2. BEE-00030 | VEnvIt | Add Windows PowerShell Support
 
 ______________________________________________________________________
 
