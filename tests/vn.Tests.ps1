@@ -9,7 +9,7 @@ Describe "Top level script execution" {
     }
     Context "When Help parameter is passed" {
         It "Should call Show-Help function" {
-            . $PSScriptRoot\..\src\vn.ps1 -Help
+            & $PSScriptRoot\..\src\vn.ps1 -Help
             Assert-MockCalled -CommandName "Show-Help" -Exactly 1
         }
     }
