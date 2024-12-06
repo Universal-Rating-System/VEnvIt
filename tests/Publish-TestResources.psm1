@@ -47,6 +47,7 @@ function Backup-SessionEnvironmentVariables {
         VENV_SECRETS_DEFAULT_DIR = $env:VENV_SECRETS_DEFAULT_DIR
         VENV_SECRETS_USER_DIR    = $env:VENV_SECRETS_USER_DIR
         VENVIT_DIR               = $env:VENVIT_DIR
+        VIRTUAL_ENV              = $env:VIRTUAL_ENV
     }
 }
 
@@ -322,6 +323,8 @@ function Restore-SessionEnvironmentVariables {
     $env:VENV_SECRETS_DEFAULT_DIR = $OriginalValues.VENV_SECRETS_DEFAULT_DIR
     $env:VENV_SECRETS_USER_DIR = $OriginalValues.VENV_SECRETS_USER_DIR
     $env:VENVIT_DIR = $OriginalValues.VENVIT_DIR
+    $env:VIRTUAL_ENV = $OriginalValues.VIRTUAL_ENV
+
 }
 
 function Restore-SystemEnvironmentVariables {

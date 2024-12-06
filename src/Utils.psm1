@@ -306,7 +306,9 @@ function Publish-EnvironmentVariables {
     foreach ($envVar in $EnvVarSet.Keys) {
         $newValue = $EnvVarSet[$envVar]["DefVal"]
         Set-Item -Path env:$envVar -Value $newValue
-        [System.Environment]::SetEnvironmentVariable($envVar, $newValue, [System.EnvironmentVariableTarget]::Machine)
+        if ($EnvVarSet[$envVar].SystemMandatory) {
+            [System.Environment]::SetEnvironmentVariable($envVar, $newValue, [System.EnvironmentVariableTarget]::Machine)
+        }
     }
 }
 

@@ -6,6 +6,12 @@ Describe "Top level script execution" {
     }
 
     BeforeEach {
+        if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+        Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+        $originalSessionValues = Backup-SessionEnvironmentVariables
+        $originalSystemValues = Backup-SystemEnvironmentVariables
+
         Mock -CommandName "Show-Help" -MockWith { return "Mock: Show-Help called" }
     }
 
@@ -40,19 +46,19 @@ Describe "Top level script execution" {
             & $PSScriptRoot\..\src\vi.ps1
             Assert-MockCalled -CommandName "Show-Help" -Exactly 1
         }
+    AfterEach {
+        Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+    }
+    }
+    AfterEach {
+        Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+        Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
     }
 }
 
 Describe "Function Tests" {
-    BeforeAll {
-        $originalSessionValues = Backup-SessionEnvironmentVariables
-        $originalSystemValues = Backup-SystemEnvironmentVariables
-    }
-
     Context "Invoke-VirtualEnvironment" {
-        BeforeEach {
-            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-            Import-Module $PSScriptRoot\..\src\Utils.psm1
+        BeforeAll {
         }
 
         Context "With virtual environment activated" {
@@ -62,9 +68,16 @@ Describe "Function Tests" {
                 if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
                 Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 
+            }
+            BeforeEach {
+                if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+                Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+                $originalSessionValues = Backup-SessionEnvironmentVariables
+                $originalSystemValues = Backup-SystemEnvironmentVariables
+
                 $mockInstalVal = Set-TestSetup_7_0_0
                 $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-                # New-VEnvCustomSetupScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
             }
             It "Should invoke the virtual environment" {
                 # . $PSScriptRoot\..\src\vi.ps1 -Pester
@@ -91,19 +104,21 @@ Describe "Function Tests" {
                 Assert-MockCalled -CommandName "Invoke-Script" -ParameterFilter { $ScriptPath -eq "deactivate" }
                 # (Test-Path $tempDir) | Should -Be $true
             }
+            AfterEach {
+                Set-Location -Path $env:TEMP
+                Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+
+                Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+                Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+            }
         }
-        AfterEach {
-            Set-Location -Path $env:TEMP
-            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+        AfterAll {
         }
     }
 
     Context "Show-Help" {
         # TODO
         # Test to be implemented
-    }
-    AfterAll {
-        Restore-SessionEnvironmentVariables -OriginalValues $originalValues
     }
 }
 
