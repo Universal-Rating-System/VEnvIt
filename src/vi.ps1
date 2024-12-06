@@ -17,6 +17,9 @@ function Invoke-VirtualEnvironment {
         [string]$ProjectName
     )
 
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
     Import-Module $PSScriptRoot\Utils.psm1
 
     Invoke-Script -ScriptPath ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar"))

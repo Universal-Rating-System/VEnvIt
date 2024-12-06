@@ -46,6 +46,57 @@ function Invoke-Uninstall {
     param (
         [string]$BackupDir
     )
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
+    if ((Get-Module -Name "Utils") -and $Pester ) {
+        Remove-Module -Name "Utils"
+    }
     Import-Module $PSScriptRoot\Utils.psm1
 
     if (-not $BackupDir) {
@@ -62,7 +113,8 @@ function Invoke-Uninstall {
         Backup-EnvironmentVariables -DestinationPath $archivePath
         Remove-InstallationFiles -InstallationDir $env:VENVIT_DIR
         Unpublish-EnvironmentVariables -EnvVarSet $defEnvVarSet_7_0_0
-    } else {
+    }
+    else {
         $archivePath = $false
     }
 

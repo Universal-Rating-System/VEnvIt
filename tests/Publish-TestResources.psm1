@@ -4,9 +4,14 @@
 if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
 Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
 
-if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+if ((Get-Module -Name "Utils") -and $Pester ) {
+    if (Test-Path function:function:prompt) { Copy-Item -Path function:prompt -Destination function:bakupPrompt }
+    if (Test-Path function:_OLD_VIRTUAL_PROMPT) { Copy-Item function:_OLD_VIRTUAL_PROMPT -Destination function:backup_OLD_VIRTUAL_PROMPT }
+    Remove-Module -Name "Utils"
+    if (Test-Path function:function:bakupPrompt) { Copy-Item -Path function:bakupPrompt -Destination function:prompt }
+    if (Test-Path function:backup_OLD_VIRTUAL_PROMPT) { Copy-Item -Path function:backup_OLD_VIRTUAL_PROMPT -Destination function:_OLD_VIRTUAL_PROMPT }
+}
 Import-Module $PSScriptRoot\..\src\Utils.psm1
-
 if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
 Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
 
@@ -42,6 +47,7 @@ function Backup-SessionEnvironmentVariables {
         VENV_SECRETS_DEFAULT_DIR = $env:VENV_SECRETS_DEFAULT_DIR
         VENV_SECRETS_USER_DIR    = $env:VENV_SECRETS_USER_DIR
         VENVIT_DIR               = $env:VENVIT_DIR
+        VIRTUAL_ENV              = $env:VIRTUAL_ENV
     }
 }
 
@@ -317,6 +323,8 @@ function Restore-SessionEnvironmentVariables {
     $env:VENV_SECRETS_DEFAULT_DIR = $OriginalValues.VENV_SECRETS_DEFAULT_DIR
     $env:VENV_SECRETS_USER_DIR = $OriginalValues.VENV_SECRETS_USER_DIR
     $env:VENVIT_DIR = $OriginalValues.VENVIT_DIR
+    $env:VIRTUAL_ENV = $OriginalValues.VIRTUAL_ENV
+
 }
 
 function Restore-SystemEnvironmentVariables {

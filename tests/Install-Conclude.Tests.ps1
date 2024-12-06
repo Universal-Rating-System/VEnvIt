@@ -22,7 +22,9 @@ Describe "Function Tests" {
         }
 
         BeforeEach {
-            $OriginalValues = Backup-SessionEnvironmentVariables
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
+
             $tempDir = New-CustomTempDir -Prefix "VenvIt"
             $upgradeScriptDir = "$tempDir\UpgradeScript"
             New-Item -ItemType Directory -Path $upgradeScriptDir | Out-Null
@@ -35,13 +37,17 @@ Describe "Function Tests" {
 
         AfterEach {
             Remove-Item -Path $TempDir -Recurse -Force
-            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
         }
     }
 
     Context "Invoke-ConcludeInstall" {
         BeforeEach {
             if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
+
             Import-Module $PSScriptRoot\..\src\Utils.psm1
 
             $upgradeDetail = Set-TestSetup_InstallationFiles
@@ -81,6 +87,8 @@ Describe "Function Tests" {
         AfterEach {
             Remove-Item -Path $TempDir -Recurse -Force
             Remove-Item -Path ($upgradeDetail.Dir + "\..") -Recurse -Force
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
         }
     }
 
@@ -91,10 +99,11 @@ Describe "Function Tests" {
 
     Context "New-Directories" {
         BeforeAll {
-            $originalSessionValues = Backup-SessionEnvironmentVariables
-            $originalSystemValues = Backup-SystemEnvironmentVariables
             if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
             Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
         }
         BeforeEach {
             $tempDir = "$env:TEMP\Test_Dir"
@@ -134,8 +143,9 @@ Describe "Function Tests" {
         }
         BeforeEach {
             $originalSessionValues = Backup-SessionEnvironmentVariables
-            $mockInstalVal = Set-TestSetup_6_0_0
+            $originalSystemValues = Backup-SystemEnvironmentVariables
 
+            $mockInstalVal = Set-TestSetup_6_0_0
             $upgradeDetail = Set-TestSetup_InstallationFiles
         }
 
@@ -150,9 +160,11 @@ Describe "Function Tests" {
         }
 
         AfterEach {
-            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
             Remove-Item -Path ($upgradeDetail.Dir + "\..") -Recurse -Force
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
         }
         AfterAll {
         }
@@ -168,8 +180,9 @@ Describe "Function Tests" {
         }
         BeforeEach {
             $originalSessionValues = Backup-SessionEnvironmentVariables
-            $mockInstalVal = Set-TestSetup_7_0_0
+            $originalSystemValues = Backup-SystemEnvironmentVariables
 
+            $mockInstalVal = Set-TestSetup_7_0_0
             $upgradeDetail = Set-TestSetup_InstallationFiles
         }
 
@@ -193,15 +206,19 @@ Describe "Function Tests" {
         }
 
         AfterEach {
-            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
             Remove-Item -Path $upgradeDetail.Dir -Recurse -Force | Out-Null
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force | Out-Null
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
         }
     }
 
     Context "Set-Path" {
         BeforeEach {
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
             $orgigPATH = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
+            $env:VENVIT_DIR = ".\my\path"
         }
 
         It "VenvIt not in path" {
@@ -220,6 +237,8 @@ Describe "Function Tests" {
 
         AfterEach {
             [System.Environment]::SetEnvironmentVariable("Path", $orgigPATH, [System.EnvironmentVariableTarget]::Machine)
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
         }
     }
 
@@ -227,6 +246,9 @@ Describe "Function Tests" {
         BeforeAll {
             if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
             Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
+
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
         }
         It "Returns true if an administrator" {
             Mock -ModuleName Install-Conclude -CommandName Invoke-IsInRole { return $true }
@@ -239,18 +261,13 @@ Describe "Function Tests" {
 
             Test-Admin | Should -Be $false
         }
+        AfterAll {
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+        }
     }
 
     AfterAll {
-        [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $OrigVENV_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
-        [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $OrigPROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
-        [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $OrigVENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
-        [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $OrigVENV_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
-        [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $OrigVENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
-        [System.Environment]::SetEnvironmentVariable("VENV_BASE_DIR", $OrigVENV_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
-        [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $OrigVENV_PYTHON_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
-        [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $OrigVENV_CONFIG_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
-        [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $OrigVENV_CONFIG_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
     }
 
 }

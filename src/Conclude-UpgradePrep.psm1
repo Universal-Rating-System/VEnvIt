@@ -1,6 +1,11 @@
-﻿if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+﻿if ((Get-Module -Name "Utils") -and $Pester ) {
+    if (Test-Path function:function:prompt) { Copy-Item -Path function:prompt -Destination function:bakupPrompt }
+    if (Test-Path function:_OLD_VIRTUAL_PROMPT) { Copy-Item function:_OLD_VIRTUAL_PROMPT -Destination function:backup_OLD_VIRTUAL_PROMPT }
+    Remove-Module -Name "Utils"
+    if (Test-Path function:function:bakupPrompt) { Copy-Item -Path function:bakupPrompt -Destination function:prompt }
+    if (Test-Path function:backup_OLD_VIRTUAL_PROMPT) { Copy-Item -Path function:backup_OLD_VIRTUAL_PROMPT -Destination function:_OLD_VIRTUAL_PROMPT }
+}
 Import-Module $PSScriptRoot\..\src\Utils.psm1
-
 $VersionChanges = @{
     '0.0.0' = 'Invoke-Upgrade_0_0_0'
     '6.0.0' = 'Invoke-PrepForUpgrade_6_0_0'

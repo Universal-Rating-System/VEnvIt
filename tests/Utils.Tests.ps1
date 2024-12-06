@@ -329,8 +329,8 @@ Write-Host "This is a test."
     Context "Publish-EnvironmentVariables" {
         BeforeAll {
             $testEnvVarSet = @{
-                TEST_VAL = @{DefVal = "Test value"; IsDir = $false }
-                TEST_DIR = @{DefVal = "$env:TEMP\Test_Dir"; IsDir = $True }
+                TEST_VAL = @{DefVal = "Test value"; IsDir = $false; SystemMandatory = $true }
+                TEST_DIR = @{DefVal = "$env:TEMP\Test_Dir"; IsDir = $True; SystemMandatory = $true }
             }
         }
         It "Should set the system and environment variables" {

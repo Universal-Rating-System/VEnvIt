@@ -16,35 +16,35 @@
       ]
     },
     {
-      "name": "vn t1 312 HdT -RS -DM",
+      "name": "vn Test01 312 Test -RS -DM -Verbose",
       "type": "PowerShell",
       "request": "launch",
       "script": ".\\src\\vn.ps1",
       "args": [
         "Test01",
         "312",
-        "HdT",
+        "Test",
         "-ResetScripts",
         "Y",
         "-DevMode",
-        "Y"
+        "Y",
+        "-Verbose"
       ]
     },
     {
-      "name": "vn t1 312 HdT -RS -MU",
+      "name": "vn Test02 312 Test -RS -DM -Verbose",
       "type": "PowerShell",
       "request": "launch",
       "script": ".\\src\\vn.ps1",
       "args": [
-        "Test01",
+        "Test02",
         "312",
-        "HdT",
+        "Test",
         "-ResetScripts",
         "Y",
         "-DevMode",
         "Y",
-        "-MultiUser",
-        "y"
+        "-Verbose"
       ]
     },
     {

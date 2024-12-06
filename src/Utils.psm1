@@ -228,12 +228,10 @@ function Get-Version {
 function Invoke-Script {
     param (
         [string]$ScriptPath,
-        [string[]]$Arguments = $null,
-        [switch]$verbose = $false
+        [string[]]$Arguments = $null
+        # [switch]$Verbose = $false
     )
-    if ($vebose) {
-        Write-Host "Command: $ScriptPath $Arguments"
-    }
+    Write-Verbose "Command: $ScriptPath $Arguments"
     & $ScriptPath $Arguments
     # This should be improved
     return "Done!"
@@ -308,7 +306,9 @@ function Publish-EnvironmentVariables {
     foreach ($envVar in $EnvVarSet.Keys) {
         $newValue = $EnvVarSet[$envVar]["DefVal"]
         Set-Item -Path env:$envVar -Value $newValue
-        [System.Environment]::SetEnvironmentVariable($envVar, $newValue, [System.EnvironmentVariableTarget]::Machine)
+        if ($EnvVarSet[$envVar].SystemMandatory) {
+            [System.Environment]::SetEnvironmentVariable($envVar, $newValue, [System.EnvironmentVariableTarget]::Machine)
+        }
     }
 }
 

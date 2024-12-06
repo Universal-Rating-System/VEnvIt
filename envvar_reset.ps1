@@ -16,6 +16,7 @@ Write-Host "VENVIT_DIR =               $env:VENVIT_DIR"
 Write-Host "`nCurrent session variable values" -ForegroundColor Green
 Write-Host "PROJECT_DIR =              $env:PROJECT_DIR"
 Write-Host "PROJECT_NAME =             $env:PROJECT_NAME"
+Write-Host "VENV_ORGANIZATION_NAME=    $env:VENV_ORGANIZATION_NAME"
 Write-Host "VIRTUAL_ENV =              $env:VIRTUAL_ENV"
 Write-Host "`nPrvious version values" -ForegroundColor Green
 Write-Host "RTE_ENVIRONMENT =          $env:RTE_ENVIRONMENT"
@@ -34,6 +35,7 @@ $env:VENV_CONFIG_DIR = $null
 $env:VENV_CONFIG_DEFAULT_DIR = "G:\Shared drives\VenvIt\Config"
 $env:VENV_CONFIG_USER_DIR = "G:\Shared drives\Apps\VenvItClient\Config"
 $env:VENV_ENVIRONMENT = "loc_dev"
+$env:VENV_ORGANIZATION_NAME = "BEE"
 $env:VENV_PYTHON_BASE_DIR = "C:\Python"
 $env:VENV_SECRETS_DEFAULT_DIR = "G:\Shared drives\VenvIt\Secrets"
 # $env:VENV_SECRETS_DIR = "G:\Shared drives\VenvIt Secrets"
@@ -55,11 +57,13 @@ $env:VIRTUAL_ENV = "D:\GoogleDrive\venv\venvit_env"
 [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_DEFAULT_DIR", $env:VENV_CONFIG_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable("VENV_CONFIG_USER_DIR", $env:VENV_CONFIG_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable("VENV_ENVIRONMENT", $env:VENV_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable("VENV_ORGANIZATION_NAME", $null, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable("VENV_PYTHON_BASE_DIR", $env:VENV_PYTHON_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DEFAULT_DIR", $env:VENV_SECRETS_DEFAULT_DIR, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_DIR", $env:VENV_SECRETS_DIR, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable("VENV_SECRETS_USER_DIR", $env:VENV_SECRETS_USER_DIR, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable("VENVIT_DIR", $env:VENVIT_DIR, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable("VIRTUAL_ENV", $null, [System.EnvironmentVariableTarget]::Machine)
 
 
 
@@ -77,6 +81,7 @@ Write-Host "VENVIT_DIR =               $env:VENVIT_DIR"
 Write-Host "`nCurrent session variable values" -ForegroundColor Green
 Write-Host "PROJECT_DIR =              $env:PROJECT_DIR"
 Write-Host "PROJECT_NAME =             $env:PROJECT_NAME"
+Write-Host "VENV_ORGANIZATION_NAME=    $env:VENV_ORGANIZATION_NAME"
 Write-Host "VIRTUAL_ENV =              $env:VIRTUAL_ENV"
 Write-Host "`nPrvious version values" -ForegroundColor Green
 Write-Host "RTE_ENVIRONMENT =          $env:RTE_ENVIRONMENT"

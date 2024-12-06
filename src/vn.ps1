@@ -19,6 +19,10 @@ param (
     [ValidateSet("y", "n", "Y", "N")]
     [String]$DevMode = "Y",
 
+    # [Parameter(Mandatory = $false)]
+    # [ValidateSet("y", "n", "Y", "N")]
+    # [Switch]$Verbose = $false,
+
     [Parameter(Mandatory = $false)]
     [Switch]$Help,
 
@@ -27,8 +31,14 @@ param (
     [Switch]$Pester
 )
 
-if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-Import-Module $PSScriptRoot\Utils.psm1
+if ((Get-Module -Name "Utils") -and $Pester ) {
+    if (Test-Path function:function:prompt) { Copy-Item -Path function:prompt -Destination function:bakupPrompt }
+    if (Test-Path function:_OLD_VIRTUAL_PROMPT) {Copy-Item function:_OLD_VIRTUAL_PROMPT -Destination function:backup_OLD_VIRTUAL_PROMPT}
+    Remove-Module -Name "Utils"
+    if (Test-Path function:function:bakupPrompt) { Copy-Item -Path function:bakupPrompt -Destination function:prompt}
+    if (Test-Path function:backup_OLD_VIRTUAL_PROMPT) {Copy-Item -Path function:backup_OLD_VIRTUAL_PROMPT -Destination function:_OLD_VIRTUAL_PROMPT}
+}
+Import-Module $PSScriptRoot\..\src\Utils.psm1
 
 
 function CreateDirIfNotExist {
@@ -416,7 +426,7 @@ if (-not $Pester) {
         Show-Help
     }
     else {
-        Invoke-CreateNewVirtualEnvironment -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -ResetScripts $ResetScripts -DevMode $DevMode
+        Invoke-CreateNewVirtualEnvironment -ProjectName $ProjectName -PythonVer $PythonVer -Organization $Organization -ResetScripts $ResetScripts -DevMode $DevMode -Verbose $Verbose
         Show-EnvironmentVariables
     }
     Write-Host '-[ END ]------------------------------------------------------------------------' -ForegroundColor Cyan
