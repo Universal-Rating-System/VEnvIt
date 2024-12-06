@@ -218,6 +218,7 @@ Describe "Function Tests" {
             $originalSessionValues = Backup-SessionEnvironmentVariables
             $originalSystemValues = Backup-SystemEnvironmentVariables
             $orgigPATH = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
+            $env:VENVIT_DIR = ".\my\path"
         }
 
         It "VenvIt not in path" {
