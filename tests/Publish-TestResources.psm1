@@ -11,7 +11,7 @@ if ((Get-Module -Name "Utils") -and $Pester ) {
     if (Test-Path function:function:bakupPrompt) { Copy-Item -Path function:bakupPrompt -Destination function:prompt }
     if (Test-Path function:backup_OLD_VIRTUAL_PROMPT) { Copy-Item -Path function:backup_OLD_VIRTUAL_PROMPT -Destination function:_OLD_VIRTUAL_PROMPT }
 }
-Import-Module $PSScriptRoot\..\src\Utils.psm1
+Import-Module $PSScriptRoot\Utils.psm1
 if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
 Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
 
@@ -201,7 +201,7 @@ function Set-TestSetup_6_0_0 {
 }
 
 function Set-TestSetup_7_0_0 {
-    Import-Module $PSScriptRoot\..\src\Utils.psm1 -Variable defEnvVarSet_7_0_0
+    Import-Module $PSScriptRoot\Utils.psm1 -Variable defEnvVarSet_7_0_0
 
     $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
     $tempDir = New-CustomTempDir -Prefix "VenvIt"
@@ -248,7 +248,7 @@ function Set-TestSetup_7_0_0 {
 }
 
 function Set-TestSetup_InstallationFiles {
-    Import-Module $PSScriptRoot\..\src\Utils.psm1
+    Import-Module $PSScriptRoot\Utils.psm1
 
     $installationFileList = @()
     $TempDir = New-CustomTempDir -Prefix "VenvIt"

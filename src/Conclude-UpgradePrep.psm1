@@ -5,7 +5,7 @@
     if (Test-Path function:function:bakupPrompt) { Copy-Item -Path function:bakupPrompt -Destination function:prompt }
     if (Test-Path function:backup_OLD_VIRTUAL_PROMPT) { Copy-Item -Path function:backup_OLD_VIRTUAL_PROMPT -Destination function:_OLD_VIRTUAL_PROMPT }
 }
-Import-Module $PSScriptRoot\..\src\Utils.psm1
+Import-Module $PSScriptRoot\Utils.psm1
 $VersionChanges = @{
     '0.0.0' = 'Invoke-Upgrade_0_0_0'
     '6.0.0' = 'Invoke-PrepForUpgrade_6_0_0'

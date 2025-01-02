@@ -9,7 +9,7 @@ if ((Get-Module -Name "Utils") -and $Pester ) {
     if (Test-Path function:function:bakupPrompt) { Copy-Item -Path function:bakupPrompt -Destination function:prompt }
     if (Test-Path function:backup_OLD_VIRTUAL_PROMPT) { Copy-Item -Path function:backup_OLD_VIRTUAL_PROMPT -Destination function:_OLD_VIRTUAL_PROMPT }
 }
-Import-Module $PSScriptRoot\..\src\Utils.psm1
+Import-Module $PSScriptRoot\Utils.psm1
 $separator = "-" * 80
 
 function Clear-InstallationFiles {
@@ -25,7 +25,7 @@ function Invoke-ConcludeInstall {
         [string]$UpgradeScriptDir
     )
     if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-    Import-Module $PSScriptRoot\..\src\Utils.psm1
+    Import-Module $PSScriptRoot\Utils.psm1
 
     # Check for administrative privileges
     if (-not (Test-Admin)) {
@@ -78,7 +78,7 @@ function Publish-LatestVersion {
         $UpgradeSourceDir
     )
     if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-    Import-Module $PSScriptRoot\..\src\Utils.psm1
+    Import-Module $PSScriptRoot\Utils.psm1
 
     foreach ($filename in $sourceFileCompleteList) {
         $barefilename = Split-Path -Path $filename -Leaf
