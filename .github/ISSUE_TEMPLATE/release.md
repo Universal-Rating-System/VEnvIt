@@ -1,15 +1,11 @@
-______________________________________________________________________
-
+---
 name: New Release
 about: Planned improvement or addition to functionality; non-urgent.
-title: '\[Release\]: Release v'
-labels:
+title: '[Release]: Release v'
+labels: enhancement
+---
 
-- release
-
-______________________________________________________________________
-
-## Issues Included
+## Tickets / branches included
 
 - [](<>)
 
@@ -17,7 +13,6 @@ ______________________________________________________________________
 
 ## New Release Checks
 
-- [ ] Implemented upgrde procedure.
 - [ ] Remove warnings, errors and spelling reported by IDE.
 - [ ] Update / remove ToDo's
 - [ ] Commented code is not useful anymore are removed.
