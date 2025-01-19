@@ -223,7 +223,7 @@ Describe "Function Tests" {
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         }
 
-        It "Should chreate zip archives" {
+        It "Should create zip archives" {
             $timeStamp = Get-Date -Format "yyyyMMddHHmm"
             New-VEnvEnvVarScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
 
@@ -235,6 +235,16 @@ Describe "Function Tests" {
             (Test-Path $zipPath) | Should -Be $true
             $zipPath = (Join-Path -Path "$env:VENV_CONFIG_USER_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
             (Test-Path $zipPath) | Should -Be $true
+        }
+
+        It "Should create EnvVar scripts" {
+            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
+            New-VEnvEnvVarScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
+
+            $scriptPath = Join-Path -Path "$env:VENV_CONFIG_DEFAULT_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "EnvVar.ps1")
+            $generatedScriptContent = Get-Content -Path $scriptPath -Raw
+
+            $generatedScriptContent | Should -Be $VEnvMyOrgEnvVarDotPs1
         }
 
         AfterEach {

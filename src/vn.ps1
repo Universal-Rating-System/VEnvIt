@@ -225,7 +225,7 @@ function New-VEnvCustomSetupScripts {
         [string]$TimeStamp
     )
 
-    Write-Host "Create custom setup virtual enviroment script" -ForegroundColor Yellow
+    Write-Host "Create custom setup virtual environment script" -ForegroundColor Yellow
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "CustomSetup.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
@@ -257,15 +257,18 @@ function New-VEnvEnvVarScripts {
         [string]$TimeStamp
     )
 
-    Write-Host "Create initialize project virtual enviroment variables script" -ForegroundColor Yellow
+    Write-Host "Create initialize project virtual environment variables script" -ForegroundColor Yellow
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "EnvVar.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
         $content += 'Write-Host "Running $PSCommandPath..." -ForegroundColor Yellow' + "`n"
         $content += '$env:VENV_PY_VER = "' + $InstallationValues.PythonVer + '"' + "`n"
-        $content += '$env:PYTHONPATH = "' + $InstallationValues.ProjectDir + "\src;" + $InstallationValues.ProjectDir + "\tests" + '"' + "`n"
-        $content += '$env:PROJECT_DIR = "' + $InstallationValues.ProjectDir + '"' + "`n"
-        $content += '$env:PROJECT_NAME = "' + $InstallationValues.ProjectName + '"' + "`n`n"
+        $content += '$env:PROJECT_NAME = "' + $InstallationValues.ProjectName + '"' + "`n"
+        $content += '$env:VENV_ORGANIZATION_NAME = "' + $InstallationValues.Organization + '"' + "`n"
+        $content += '$env:PROJECT_DIR = "$env:PROJECTS_BASE_DIR\$env:VENV_ORGANIZATION_NAME\$env:PROJECT_NAME"' + "`n"
+        $content += '$env:PYTHONPATH = "$env:PROJECT_DIR\.;$env:PROJECT_DIR\src;$env:PROJECT_DIR\tests"' + "`n"
+        $content += '$env:VENV_ENVIRONMENT = "' + $env:VENV_ENVIRONMENT + '"'
+        $content = $content -replace '\r?\n', "`r`n"
         New-SupportScript -BaseDir $env:VENV_CONFIG_DEFAULT_DIR -FileName $fileName -Content $content -TimeStamp $TimeStamp | Out-Null
 
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"

@@ -1,16 +1,18 @@
+.idea
 .coverage
+.coveragerc
 .env
 .git/
 .idea/
 .pytest_cache/
 .run/
-# .vscode/ Propagate the local VS Code settings
+.venv
+.vscode/
 _build/
 *.code-workspace
 *.db
 *.egg-info/
 *.sqlite
-*.code-workspace
 *-workspace
 **/*.egg-info/
 **/__pycache__/
@@ -19,11 +21,15 @@ _build/
 **/*.py.isorted
 **/VersionArchive/
 build/
+CodeCoverage.xml
+coverage.*
 dist/
 docs/build/
 docs/_build/
 docs/source/generated/
 htmlcov/
+logs/
 Manifest.psd1
+testResults.xml
 tmp/
-
+venv/

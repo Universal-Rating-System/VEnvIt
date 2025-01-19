@@ -1,7 +1,7 @@
 # VEnvIt
 
 | **Category** | **Status' and Links** |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
 | General | \[![][maintenance_y_img]\][maintenance_y_lnk] \[![][semver_pic]\][semver_link] |
 | CI | \[![][pre_commit_ci_img]\][pre_commit_ci_lnk] \[![][codecov_img]\][codecov_lnk] \[![][gha_docu_img]\][gha_docu_lnk] |
 | Github | \[![][gh_issues_img]\][gh_issues_lnk] \[![][gh_language_img]\][gh_language_lnk] \[![][gh_last_commit_img]\][gh_last_commit_lnk] |
@@ -155,7 +155,7 @@ When you create a new virtual environment using `vn.ps1`, it generates additiona
 VEnvIt utilizes several environment variables to manage virtual environments effectively. These variables should be set during installation.
 
 | Environment Variable | Description |
-| -------------------- | ----------- |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **PROJECTS_BASE_DIR** | The parent/base directory for all projects (e.g., `C:\Projects`). Organize repositories by organization, such as personal projects and organizational projects (e.g., `C:\Projects\MyOrg\MyProject`, `C:\Projects\Company\CompanyProject`). |
 | **VENV_BASE_DIR** | The directory where the Python virtual environments are stored (e.g., `~\venv`). Unlike the conventional practice of keeping virtual environment files within the project directory, all virtual environments are stored together in this dedicated directory. |
 | **VENV_CONFIG_DEFAULT_DIR** | Directory for default (organization-wide) configuration scripts. Typically a subdirectory of `VENVIT_DIR` (e.g., `$VENVIT_DIR\Configs`). Shared among all developers. |

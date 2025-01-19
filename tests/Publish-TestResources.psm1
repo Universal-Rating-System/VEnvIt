@@ -11,7 +11,7 @@ if ((Get-Module -Name "Utils") -and $Pester ) {
     if (Test-Path function:function:bakupPrompt) { Copy-Item -Path function:bakupPrompt -Destination function:prompt }
     if (Test-Path function:backup_OLD_VIRTUAL_PROMPT) { Copy-Item -Path function:backup_OLD_VIRTUAL_PROMPT -Destination function:_OLD_VIRTUAL_PROMPT }
 }
-Import-Module $PSScriptRoot\Utils.psm1
+Import-Module $PSScriptRoot\..\src\Utils.psm1
 if (Get-Module -Name "Install-Conclude") { Remove-Module -Name "Install-Conclude" }
 Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
 
@@ -30,6 +30,18 @@ $ManifestData700 = @{
     Authors     = "Ann Other <ann@other.com>"
     Description = "Description of 7.0.0"
 }
+
+$VEnvMyOrgEnvVarDotPs1 = @'
+Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
+Write-Host "Running $PSCommandPath..." -ForegroundColor Yellow
+$env:VENV_PY_VER = "312"
+$env:PROJECT_NAME = "MyProject"
+$env:VENV_ORGANIZATION_NAME = "MyOrg"
+$env:PROJECT_DIR = "$env:PROJECTS_BASE_DIR\$env:VENV_ORGANIZATION_NAME\$env:PROJECT_NAME"
+$env:PYTHONPATH = "$env:PROJECT_DIR\.;$env:PROJECT_DIR\src;$env:PROJECT_DIR\tests"
+$env:VENV_ENVIRONMENT = "loc_dev"
+
+'@ -replace '\r?\n', "`r`n"
 
 function Backup-SessionEnvironmentVariables {
     return [PSCustomObject]@{
@@ -201,7 +213,7 @@ function Set-TestSetup_6_0_0 {
 }
 
 function Set-TestSetup_7_0_0 {
-    Import-Module $PSScriptRoot\Utils.psm1 -Variable defEnvVarSet_7_0_0
+    Import-Module $PSScriptRoot\..\src\Utils.psm1 -Variable defEnvVarSet_7_0_0
 
     $mockInstalVal = [PSCustomObject]@{ ProjectName = "MyProject"; PythonVer = "312"; Organization = "MyOrg"; DevMode = "Y"; ResetScripts = "Y" }
     $tempDir = New-CustomTempDir -Prefix "VenvIt"
@@ -248,7 +260,7 @@ function Set-TestSetup_7_0_0 {
 }
 
 function Set-TestSetup_InstallationFiles {
-    Import-Module $PSScriptRoot\Utils.psm1
+    Import-Module $PSScriptRoot\..\src\Utils.psm1
 
     $installationFileList = @()
     $TempDir = New-CustomTempDir -Prefix "VenvIt"
@@ -350,4 +362,4 @@ function Restore-SystemEnvironmentVariables {
 Export-ModuleMember -Function Backup-SessionEnvironmentVariables, Backup-SystemEnvironmentVariables, ConvertFrom-ProdToTestEnvVar
 Export-ModuleMember -Function Set-TestSetup_0_0_0, Set-TestSetup_6_0_0, Set-TestSetup_7_0_0, Set-TestSetup_InstallationFiles, Set-TestSetup_New
 Export-ModuleMember -Function New-CreateAppScripts, New-TestEnvironment, Restore-SessionEnvironmentVariables, Restore-SystemEnvironmentVariables
-Export-ModuleMember -Variable ManifestData000, ManifestData600, ManifestData700, sourceFileCopyList
+Export-ModuleMember -Variable ManifestData000, ManifestData600, ManifestData700, sourceFileCopyList, VEnvMyOrgEnvVarDotPs1
