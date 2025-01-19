@@ -1,7 +1,8 @@
 {
   "configurations": [
     {
-      "name": "Install"
+      "name": "Install",
+      "script": ".\\src\\Install.ps1"
     }
   ]
 }
