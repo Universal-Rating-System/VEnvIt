@@ -1,11 +1,89 @@
 {
   "configurations": [
     {
+      "name": "Install",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Install.ps1"
+    },
+    {
       "name": "Install -Help",
+      "type": "PowerShell",
       "request": "launch",
       "script": ".\\src\\Install.ps1",
       "args": [
         "-Help"
+      ]
+    },
+    {
+      "name": "vn Test01 312 Test -RS -DM -Verbose",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\vn.ps1",
+      "args": [
+        "Test01",
+        "312",
+        "Test",
+        "-ResetScripts",
+        "Y",
+        "-DevMode",
+        "Y",
+        "-Verbose"
+      ]
+    },
+    {
+      "name": "vn Test02 312 Test -RS -DM -Verbose",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\vn.ps1",
+      "args": [
+        "Test02",
+        "312",
+        "Test",
+        "-ResetScripts",
+        "Y",
+        "-DevMode",
+        "Y",
+        "-Verbose"
+      ]
+    },
+    {
+      "name": "vn no-args",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\vn.ps1"
+    },
+    {
+      "name": "Update-Manifest .",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Update-Manifest.ps1",
+      "args": [
+        "."
+      ]
+    },
+    {
+      "name": "Update-Manifest -h",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Update-Manifest.ps1",
+      "args": [
+        "-h"
+      ]
+    },
+    {
+      "name": "Update-Manifest noParam",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Update-Manifest.ps1"
+    },
+    {
+      "name": "Uninstall Download",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": ".\\src\\Uninstall.ps1",
+      "args": [
+        "D:\\GoogleDrive\\Download"
       ]
     }
   ]
