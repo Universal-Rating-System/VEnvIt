@@ -1,8 +1,12 @@
 {
   "configurations": [
     {
-      "name": "Install",
-      "script": ".\\src\\Install.ps1"
+      "name": "Install -Help",
+      "request": "launch",
+      "script": ".\\src\\Install.ps1",
+      "args": [
+        "-Help"
+      ]
     }
   ]
 }

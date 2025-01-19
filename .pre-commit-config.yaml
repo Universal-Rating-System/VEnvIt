@@ -13,7 +13,7 @@ repos:
 #        args: [ --fix=crlf ]
       - id: no-commit-to-branch
         args: [ --branch, master ]
-      - id: pretty-format-json
+      # - id: pretty-format-json
       - id: requirements-txt-fixer
 #      - id: trailing-whitespace
 #        args: [ --markdown-linebreak-ext=md ]
