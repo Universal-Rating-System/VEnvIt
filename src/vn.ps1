@@ -376,12 +376,14 @@ function Show-Help {
     vn.ps1 ProjectName PythonVer Organization DevMode ResetScripts
     vr.ps1 -h
 
-    Parameters:
-    ProjectName The name of the project.
-    PythonVer Python version for the virtual environment.
-    Organization Acronym for the organization owning the project.
-    DevMode [y | n] If "y", installs \[dev\] modules from pyproject.
-    ResetScripts [y | n] If "y", moves certain scripts to the Archive directory.
+    Arguments:
+    (0) ProjectName The name of the project.
+    (1) PythonVer Python version for the virtual environment.
+    (2) Organization Acronym for the organization owning the project.
+    -DevMode [y | n] If "y", installs \[dev\] modules from pyproject. Optional (default is no)
+    -ResetScripts [y | n] If "y", moves certain scripts to the Archive directory. Optional (default is no)
+
+    E.g. vn myproject 312 ORG -DevMode Y -ResetScripts Y
 "@ | Write-Host
 
     Write-Host $separator -ForegroundColor Cyan
