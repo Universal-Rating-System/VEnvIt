@@ -33,7 +33,7 @@ $ManifestData700 = @{
 
 $VEnvMyOrgEnvVarDotPs1 = @'
 Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
-Write-Host "Running $PSCommandPath..." -ForegroundColor Yellow
+Write-Host "Executing $PSCommandPath..." -ForegroundColor Yellow
 $env:VENV_PY_VER = "312"
 $env:PROJECT_NAME = "MyProject"
 $env:VENV_ORGANIZATION_NAME = "MyOrg"

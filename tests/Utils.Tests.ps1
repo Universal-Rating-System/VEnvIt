@@ -71,6 +71,29 @@ Describe "Function Tests" {
         AfterAll {}
     }
 
+    Context "Clear-NonSystemMandatoryEnvironmentVariables" {
+        BeforeEach {
+
+            $envVarSet = @{
+                TEST_ONE = @{DefVal = "Test one"; IsDir = $true; SystemMandatory = $true }
+                TEST_TWO = @{DefVal = "Test two"; IsDir = $true; SystemMandatory = $false }
+            }
+            Publish-EnvironmentVariables -EnvVarSet $envVarSet
+        }
+
+        It "Should clear non mandatory variables" {
+            (Get-Item -Path ("env:TEST_ONE")).Value | Should -Be "Test one"
+            (Get-Item -Path ("env:TEST_TWO")).Value | Should -Be "Test two"
+            Clear-NonSystemMandatoryEnvironmentVariables $envVarSet
+            (Get-Item -Path ("env:TEST_ONE")).Value | Should -Be "Test one"
+            Test-Path env:TEST_TWO | Should -Be $false
+        }
+
+        AfterEach {
+            Unpublish-EnvironmentVariables $envVarSet
+        }
+    }
+
     Context "Confirm-SystemEnvironmentVariablesExist" {
         BeforeEach {
 
@@ -174,7 +197,6 @@ Describe "Function Tests" {
             $env:TEST_THREE = $null
         }
     }
-
 
     Context "Get-SecretsFileName" {
         BeforeAll {

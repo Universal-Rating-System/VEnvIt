@@ -59,7 +59,6 @@ $sourceFileCopyList = @(
     "src\vr.ps1"
 )
 
-
 function Backup-ArchiveOldVersion {
     param (
         [Parameter(Mandatory = $true, Position = 0)]
@@ -128,6 +127,19 @@ function Backup-ScriptToArchiveIfExists {
         # Write-Host "Zipped $ScriptPath."
     }
     return $archivePath
+}
+
+function Clear-NonSystemMandatoryEnvironmentVariables {
+    param(
+        $EnvVarSet
+    )
+
+    $sortedKeys = $EnvVarSet.GetEnumerator() | Sort-Object { $_.Value.ReadOrder }
+    foreach ($envVar in $sortedKeys) {
+        if (-not $EnvVarSet[$envVar.Key]["SystemMandatory"]) {
+            Set-Item -Path ("env:" + $envVar.Key) -Value $null
+        }
+    }
 }
 
 function Confirm-SystemEnvironmentVariablesExist {
@@ -234,7 +246,7 @@ function Invoke-Script {
     Write-Verbose "Command: $ScriptPath $Arguments"
     & $ScriptPath $Arguments
     # This should be improved
-    return "Done!"
+    return $True
 }
 
 function New-CustomTempDir {
@@ -273,7 +285,9 @@ function Show-EnvironmentVariables {
     Write-Host "MYSQL_TCP_PORT:           $env:MYSQL_TCP_PORT"
     Write-Host ""
     Write-Host "Git Information" -ForegroundColor Green
-    git branch --all
+    if (Test-Path ".git") {
+        git branch --all
+    }
 }
 
 function Read-YesOrNo {
@@ -323,8 +337,8 @@ function Unpublish-EnvironmentVariables {
 }
 
 Export-ModuleMember -Variable defEnvVarSet_7_0_0, separator, sourceFileCompleteList, sourceFileCopyList
-Export-ModuleMember -Function Backup-ArchiveOldVersion, Backup-ScriptToArchiveIfExists, Confirm-SystemEnvironmentVariablesExist
-Export-ModuleMember -Function Copy-Deep, Get-ReadAndSetEnvironmentVariables, Get-ConfigFileName, Get-ManifestFileName, Get-SecretsFileName
-Export-ModuleMember -Function Get-Version, Invoke-Executable, Invoke-Script, New-CustomTempDir, Publish-EnvironmentVariables
-Export-ModuleMember -Function Read-YesOrNo
+Export-ModuleMember -Function Backup-ArchiveOldVersion, Backup-ScriptToArchiveIfExists, Clear-NonSystemMandatoryEnvironmentVariables
+Export-ModuleMember -Function Confirm-SystemEnvironmentVariablesExist, Copy-Deep, Get-ReadAndSetEnvironmentVariables, Get-ConfigFileName
+Export-ModuleMember -Function Get-ManifestFileName, Get-SecretsFileName, Get-Version, Invoke-Executable, Invoke-Script, New-CustomTempDir
+Export-ModuleMember -Function Publish-EnvironmentVariables, Read-YesOrNo
 Export-ModuleMember -Function Show-EnvironmentVariables, Unpublish-EnvironmentVariables

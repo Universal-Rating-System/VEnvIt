@@ -10,7 +10,7 @@ ______________________________________________________________________
 
 <!-- See http://matthewrocklin.com/blog/work/2018/02/28/minimal-bug-reports or https://stackoverflow.com/help/mcve for an example -->
 
-```python
+```powershell
 # Put your MCVE code here
 ```
 

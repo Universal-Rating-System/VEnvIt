@@ -7,7 +7,7 @@ jobs:
   CI:
     runs-on: ${{matrix.os}}
     env:
-      GH_REPO_ACCESS_BY_OWN_APPS: ${{ secrets.GH_REPO_ACCESS_BY_OWN_APPS }}
+      GH_REPO_ACCESS_CITIQ_ALL: ${{ secrets.GH_REPO_ACCESS_CITIQ_ALL }}
       VENV_ENVIRONMENT: ${{vars.VENV_ENVIRONMENT}}
 
     strategy:

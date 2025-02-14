@@ -202,6 +202,14 @@ Describe "Function Tests" {
             (Test-Path $scriptPath) | Should -Be $true
             $scriptPath = Join-Path -Path "$env:VENV_CONFIG_USER_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "CustomSetup.ps1")
             (Test-Path $scriptPath) | Should -Be $true
+            $scriptPath = Join-Path -Path "$env:VENV_CONFIG_DEFAULT_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "EnvVar.ps1")
+            (Test-Path $scriptPath) | Should -Be $true
+            $scriptPath = Join-Path -Path "$env:VENV_CONFIG_USER_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "EnvVar.ps1")
+            (Test-Path $scriptPath) | Should -Be $true
+            $configPath = Join-Path -Path "$env:VENV_CONFIG_DEFAULT_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "Install.ps1")
+            (Test-Path $configPath) | Should -Be $true
+            $configPath = Join-Path -Path "$env:VENV_CONFIG_USER_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "Install.ps1")
+            (Test-Path $configPath) | Should -Be $true
             $zipPath = (Join-Path -Path "$env:VENV_CONFIG_DEFAULT_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
             (Test-Path $zipPath) | Should -Be $true
             $zipPath = (Join-Path -Path "$env:VENV_CONFIG_USER_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
@@ -210,31 +218,6 @@ Describe "Function Tests" {
 
         AfterEach {
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
-        }
-    }
-
-    Context "New-VEnvEnvVarScripts" {
-        BeforeEach {
-            . $PSScriptRoot\..\src\vn.ps1 -Pester
-            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
-
-            $mockInstalVal = Set-TestSetup_7_0_0
-            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-        }
-
-        It "Should create zip archives" {
-            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvEnvVarScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
-
-            $scriptPath = Join-Path -Path "$env:VENV_CONFIG_DEFAULT_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "EnvVar.ps1")
-            (Test-Path $scriptPath) | Should -Be $true
-            $scriptPath = Join-Path -Path "$env:VENV_CONFIG_USER_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "EnvVar.ps1")
-            (Test-Path $scriptPath) | Should -Be $true
-            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_DEFAULT_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
-            (Test-Path $zipPath) | Should -Be $true
-            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_USER_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
-            (Test-Path $zipPath) | Should -Be $true
         }
 
         It "Should create EnvVar scripts" {
@@ -249,30 +232,6 @@ Describe "Function Tests" {
 
         AfterEach {
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
-        }
-    }
-
-    Context "New-VEnvInstallScripts" {
-        BeforeEach {
-            . $PSScriptRoot\..\src\vn.ps1 -Pester
-            if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
-            Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
-
-            $mockInstalVal = Set-TestSetup_7_0_0
-            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-        }
-        It "Should chreate zip archives" {
-            $timeStamp = Get-Date -Format "yyyyMMddHHmm"
-            New-VEnvInstallScripts -InstallationValues $mockInstalVal -TimeStamp $timeStamp
-
-            $configPath = Join-Path -Path "$env:VENV_CONFIG_DEFAULT_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "Install.ps1")
-            (Test-Path $configPath) | Should -Be $true
-            $configPath = Join-Path -Path "$env:VENV_CONFIG_USER_DIR" -ChildPath ("VEnv" + $mockInstalVal.ProjectName + "Install.ps1")
-            (Test-Path $configPath) | Should -Be $true
-            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_DEFAULT_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
-            (Test-Path $zipPath) | Should -Be $true
-            $zipPath = (Join-Path -Path "$env:VENV_CONFIG_USER_DIR\Archive" -ChildPath ($env:PROJECT_NAME + "_" + $timeStamp + ".zip"))
-            (Test-Path $zipPath) | Should -Be $true
         }
 
         AfterEach {
