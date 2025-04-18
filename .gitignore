@@ -21,6 +21,7 @@
 _build/
 bin/
 build/
+CodeCoverage.*
 coverage*
 dist/
 docs/source/generated/
