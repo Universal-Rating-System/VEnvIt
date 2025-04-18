@@ -1,10 +1,10 @@
 # VEnvIt
 
-| **Category** | **Status' and Links** |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| General | \[![][maintenance_y_img]\][maintenance_y_lnk] \[![][semver_pic]\][semver_link] |
-| CI | \[![][pre_commit_ci_img]\][pre_commit_ci_lnk] \[![][codecov_img]\][codecov_lnk] \[![][gha_docu_img]\][gha_docu_lnk] |
-| Github | \[![][gh_issues_img]\][gh_issues_lnk] \[![][gh_language_img]\][gh_language_lnk] \[![][gh_last_commit_img]\][gh_last_commit_lnk] |
+| **Category** | **Status' and Links**                                                                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| General      | \[![][maintenance_y_img]\][maintenance_y_lnk] \[![][semver_pic]\][semver_link]                                                  |
+| CI           | \[![][pre_commit_ci_img]\][pre_commit_ci_lnk] \[![][codecov_img]\][codecov_lnk] \[![][gha_docu_img]\][gha_docu_lnk]             |
+| Github       | \[![][gh_issues_img]\][gh_issues_lnk] \[![][gh_language_img]\][gh_language_lnk] \[![][gh_last_commit_img]\][gh_last_commit_lnk] |
 
 VEnvIt is a utility that employs Python and PowerShell scripts to create, initialize, and remove virtual environments tailored for both development and production systems. It provides significant flexibility, allowing users to configure their environments according to specific requirements.
 

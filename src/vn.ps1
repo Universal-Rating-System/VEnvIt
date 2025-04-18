@@ -225,7 +225,7 @@ function New-VEnvCustomSetupScripts {
         [string]$TimeStamp
     )
 
-    Write-Host "Create custom setup virtual enviroment script" -ForegroundColor Yellow
+    Write-Host "Create custom setup virtual environment script" -ForegroundColor Yellow
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "CustomSetup.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
@@ -257,7 +257,7 @@ function New-VEnvEnvVarScripts {
         [string]$TimeStamp
     )
 
-    Write-Host "Create initialize project virtual enviroment variables script" -ForegroundColor Yellow
+    Write-Host "Create initialize project virtual environment variables script" -ForegroundColor Yellow
     if ($InstallationValues.ResetScripts -eq "Y") {
         $fileName = ("VEnv" + $InstallationValues.ProjectName + "EnvVar.ps1")
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
