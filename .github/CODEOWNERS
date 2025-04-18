@@ -12,7 +12,7 @@
 
 # Copy-paste-adapted from SciPy
 
-# Administrator and CIs
+# Administrata and CIs
 *.toml  @hendrikdutoit
 *.yml  @hendrikdutoit
 *.rst  @hendrikdutoit
