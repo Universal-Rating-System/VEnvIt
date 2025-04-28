@@ -19,10 +19,10 @@
 ## Ticket(s) Included
 
 1. BEE-00037 | VEnvIt | Add Pester Support
-2. BEE-00096 | VEnvIt | Update README with missing information
-3. BEE-00234 | VEnvIt | Improve organizational support
-4. BEE-00269 | VEnvIt | Implement "Uninstall"
-5. BEE-00276 | VEnvIt | Fix broken environment variable values after Pester tests
+1. BEE-00096 | VEnvIt | Update README with missing information
+1. BEE-00234 | VEnvIt | Improve organizational support
+1. BEE-00269 | VEnvIt | Implement "Uninstall"
+1. BEE-00276 | VEnvIt | Fix broken environment variable values after Pester tests
 
 ______________________________________________________________________
 
@@ -31,7 +31,7 @@ ______________________________________________________________________
 ## Ticket(s) Included
 
 1. BEE-00236 | VEnvIt | Set ExecutionPolicy
-2. BEE-00030 | VEnvIt | Add Windows PowerShell Support
+1. BEE-00030 | VEnvIt | Add Windows PowerShell Support
 
 ______________________________________________________________________
 

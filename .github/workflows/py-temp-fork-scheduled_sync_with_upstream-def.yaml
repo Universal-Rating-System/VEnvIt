@@ -1,0 +1,29 @@
+# py-temp-fork-scheduled_sync_with_upstream-def.yaml
+name: Python Template Scheduled Merge Fork with Upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:      # Allows manual trigger
+
+jobs:
+  Scheduled-fork-update-pull-template:
+    permissions:
+      id-token: write
+      contents: write
+    #    if: github.event.pull_request.merged == true
+    uses: BrightEdgeeServices/devops-automation/.github/workflows/py-wf-fork-scheduled_sync_with_upstream-def.yaml@master
+    #    with:
+    #  run_deploy: ${{ startsWith(github.ref, 'refs/tags/') == true }}
+    #      original_owner:     ${{ vars.ORIGINAL_OWNER }}
+    #      original_repo_name: ${{ vars.ORIGINAL_REPO_NAME }}
+    # secrets: inherit
+    secrets:
+      GH_REPO_ACCESS_BEE_MASTER: ${{secrets.GH_REPO_ACCESS_BEE_MASTER }}
+      GH_REPO_ACCESS_RTE_MASTER: ${{secrets.GH_REPO_ACCESS_RTE_MASTER }}
+      # MYSQL_PASSWORD:            ${{secrets.MYSQL_PASSWORD}}
+      # MYSQL_ROOT_PASSWORD:       ${{secrets.MYSQL_ROOT_PASSWORD}}
+      # MYSQL_USER:                ${{secrets.MYSQL_USER}}
+      # PYPI_API_TOKEN_PROD:       ${{secrets.PYPI_API_TOKEN_PROD}}
+      # RELEASE_EMAIL_USER:        ${{secrets.RELEASE_EMAIL_USER }}
+      # RELEASE_EMAIL_PASSWORD:    ${{secrets.RELEASE_EMAIL_PASSWORD }}
