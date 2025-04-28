@@ -5,7 +5,7 @@ param (
     [string]$ProjectName,
 
     [Parameter(Mandatory = $false, Position = 1)]
-    [ValidateSet("305", "306", "307", "308", "309", "310", "311", "312", "313")]
+    [ValidateSet("35", "36", "37", "38", "39", "310", "311", "312", "313")]
     [string]$PythonVer,
 
     [Parameter(Mandatory = $false, Position = 2)]
@@ -173,14 +173,14 @@ function Invoke-CreateNewVirtualEnvironment {
         $timeStamp = Get-Date -Format "yyyyMMddHHmm"
         $venvInstallScripts = New-VEnvInstallScripts -InstallationValues $installationValues -TimeStamp $timeStamp
         $venvEnvVarScripts = New-VEnvEnvVarScripts -InstallationValues $installationValues -TimeStamp $timeStamp
-        $venvCustonSetupScripts = New-VEnvCustomSetupScripts -InstallationValues $installationValues -TimeStamp $timeStamp
+        $venvCustomSetupScripts = New-VEnvCustomSetupScripts -InstallationValues $installationValues -TimeStamp $timeStamp
 
         Invoke-Script -ScriptPath $venvInstallScripts[0] | Out-Null
         Invoke-Script -ScriptPath $venvInstallScripts[1] | Out-Null
         Invoke-Script -ScriptPath $venvEnvVarScripts[0] | Out-Null
         Invoke-Script -ScriptPath $venvEnvVarScripts[1] | Out-Null
-        Invoke-Script -ScriptPath $venvCustonSetupScripts[0] | Out-Null
-        Invoke-Script -ScriptPath $venvCustonSetupScripts[1] | Out-Null
+        Invoke-Script -ScriptPath $venvCustomSetupScripts[0] | Out-Null
+        Invoke-Script -ScriptPath $venvCustomSetupScripts[1] | Out-Null
         Write-Host $separator -ForegroundColor Cyan
     }
 }
@@ -231,10 +231,12 @@ function New-VEnvCustomSetupScripts {
         $content = 'Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan' + "`n"
         $content += 'Write-Host "Executing $PSCommandPath..." -ForegroundColor Yellow' + "`n"
         $content += '# Set/override environment variables by changing them here.  Uncomment them and set the correct value or add a variable by replacing "??"'
-        $content += '#$env:INSTALLER_PWD = "??"' + "`n"
-        $content += '#$env:INSTALLER_USERID = "??"' + "`n"
+        $content += '#$env:INSTALLER_USER_PWD = "??"' + "`n"
+        $content += '#$env:INSTALLER_USER_ID = "??"' + "`n"
         $content += '#$env:LINUX_ROOT_PWD = "??"' + "`n"
         $content += '#$env:MYSQL_DATABASE = "??"' + "`n"
+        $content += '#$env:MYSQL_USER = "??"' + "`n"
+        $content += '#$env:MYSQL_PASSWORD = "??"' + "`n"
         $content += '#$env:MYSQL_HOST = "??"' + "`n"
         $content += '#$env:MYSQL_PWD = "??"' + "`n"
         $content += '#$env:MYSQL_ROOT_PASSWORD = "??"' + "`n"
