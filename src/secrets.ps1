@@ -24,13 +24,13 @@ elseif (
 
 # Set the default userid's and passwords
 $env:INSTALLER_USER_PWD = "N0Pa55wrd"
-$env:INSTALLER_USER_ID = "installerid"
+$env:INSTALLER_USER_ID = "installer"
 $env:LINUX_ROOT_PWD = "N0Pa55wrd"
 $env:MYSQL_HOST = "localhost"
 $env:MYSQL_PWD = "N0Pa55wrd"
 $env:MYSQL_ROOT_PASSWORD = 'N0Pa55wrd'
 $env:MYSQL_DATABASE = 'mydb'
-$env:MYSQL_USER = 'installerid'
+$env:MYSQL_USER = "installer"
 $env:MYSQL_PASSWORD = 'N0Pa55wrd'
 #----------------------------------------------
 # IMPORTANT NOTICE

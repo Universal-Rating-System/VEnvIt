@@ -3,7 +3,7 @@
 if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
 Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 if ((Get-Module -Name "Utils") -and $Pester ) {
-    if (Test-Path function:function:prompt) { Copy-Item -Path function:prompt -Destination function:bakupPrompt }
+    if (Test-Path ) { Copy-Item -Path function:prompt -Destination function:bakupPrompt }
     if (Test-Path function:_OLD_VIRTUAL_PROMPT) { Copy-Item function:_OLD_VIRTUAL_PROMPT -Destination function:backup_OLD_VIRTUAL_PROMPT }
     Remove-Module -Name "Utils"
     if (Test-Path function:function:bakupPrompt) { Copy-Item -Path function:bakupPrompt -Destination function:prompt }
@@ -18,6 +18,57 @@ function Clear-InstallationFiles {
     )
     Remove-Item -Path $upgradeScriptDir -Force -Recurse
     Write-Host "Installation files has been deleted." -ForegroundColor Green
+}
+
+function Install-PythonVirtualEnv {
+    [CmdletBinding()]
+    param ()
+
+    $pythonBaseDir = $env:VENV_PYTHON_BASE_DIR
+    $venvTargetDir = $env:VENVIT_DIR
+
+    if (-not (Test-Path $pythonBaseDir)) {
+        Write-Error "Environment variable 'VENV_PYTHON_BASE_DIR' does not point to a valid directory."
+        return
+    }
+    if (-not (Test-Path $venvTargetDir)) {
+        Write-Error "Environment variable 'VENVIT_DIR' does not point to a valid directory."
+        return
+    }
+
+    # Find all subdirectories matching Python version naming (e.g., Python35, Python39, Python313)
+    $pythonDirs = Get-ChildItem -Path $pythonBaseDir -Directory | Where-Object {
+        $_.Name -match "^Python(\d+)$"
+    }
+    if ($pythonDirs.Count -eq 0) {
+        Write-Error "No Python directories found in '$pythonBaseDir'."
+        return
+    }
+
+    # Sort by version number and get the latest
+    $latestPythonDir = $pythonDirs |
+        Sort-Object { [int]($_.Name -replace "^Python", "") } -Descending |
+        Select-Object -First 1
+
+    $pythonPath = Join-Path -Path $latestPythonDir.FullName -ChildPath "python.exe"
+    if (-not (Test-Path $pythonPath)) {
+        Write-Error "Python executable not found at: $pythonPath"
+        return
+    }
+
+    # Virtual environment path
+    $venvPath = Join-Path -Path $venvTargetDir -ChildPath "venv"
+
+    # Create the virtual environment
+    Write-Host "Creating virtual environment using Python at '$pythonPath'..."
+    & $pythonPath -m venv $venvPath
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Virtual environment successfully created at: $venvPath"
+    }
+    else {
+        Write-Error "Failed to create virtual environment."
+    }
 }
 
 function Invoke-ConcludeInstall {
@@ -39,6 +90,7 @@ function Invoke-ConcludeInstall {
     Get-ReadAndSetEnvironmentVariables -EnvVarSet $defEnvVarSet_7_0_0
     Set-Path
     Write-Host "Environment variables have been set successfully." -ForegroundColor Green
+    Install-PythonVirtualEnv
     New-Directories -EnvVarSet $defEnvVarSet_7_0_0
     Publish-LatestVersion -UpgradeSourceDir $UpgradeScriptDir
     Publish-Secrets -UpgradeScriptDir $UpgradeScriptDir

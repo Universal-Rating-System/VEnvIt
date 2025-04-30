@@ -282,6 +282,8 @@ function Show-EnvironmentVariables {
     Write-Host "MYSQL_DATABASE:           $env:MYSQL_DATABASE"
     Write-Host "MYSQL_USER:               $env:MYSQL_USER"
     Write-Host "MYSQL_PASSWORD:           $env:MYSQL_PASSWORD"
+    Write-Host "MYSQL_USER:               $env:MYSQL_USER"
+    Write-Host "MYSQL_PASSWORD:           $env:MYSQL_PASSWORD"
     Write-Host "MYSQL_HOST:               $env:MYSQL_HOST"
     Write-Host "MYSQL_ROOT_PASSWORD:      $env:MYSQL_ROOT_PASSWORD"
     Write-Host "MYSQL_TCP_PORT:           $env:MYSQL_TCP_PORT"
