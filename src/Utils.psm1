@@ -215,26 +215,56 @@ function Get-SecretsFileName {
     return "Secrets.ps1"
 }
 
-function Get-Version {
+function Install-PythonRepository {
     param (
-        [Parameter(Mandatory = $true)]
-        [String]$SourceDir
+        [string]$Major = "3",
+        [string]$Minor = "13",
+        [string]$Patch = "3"
     )
-    $version = $null
-    if (Test-Path $SourceDir) {
-        $manifestPath = Join-Path -Path $SourceDir -ChildPath (Get-ManifestFileName)
-        if (Test-Path $manifestPath) {
-            $Manifest = Import-PowerShellDataFile -Path $manifestPath
-            $version = [version]$Manifest.ModuleVersion
+    $pythonVersion = "$Major.$Minor.$Patch"
+    $pythonInstaller = "python-$PythonVersion-amd64.exe"
+    $installerUrl = "https://www.python.org/ftp/python/$PythonVersion/$pythonInstaller"
+    $installerPath = "$env:TEMP\python-$PythonVersion.exe"
+
+    $pythonMiorVersionDir = Join-Path -Path $env:VENV_PYTHON_BASE_DIR -ChildPath ("Python$Major$Minor")
+    if (-not (Test-Path -Path $pythonMiorVersionDir)) {
+        if (-not (Test-Path -Path $installerPath)) {
+            Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
         }
-        elseif (Test-Path "env:VENVIT_DIR") {
-            $version = "6.0.0"
-        }
-        elseif (Test-Path "env:SCRIPTS_DIR") {
-            $version = "0.0.0"
-        }
+        Start-Process -FilePath $installerPath `
+            -ArgumentList "/quiet /passive TargetDir=$pythonMiorVersionDir /Include_debug=1 Include_launcher=0 Include_symbols=1 /log $env:TEMP/mypyinstall.log" `
+            -Wait -NoNewWindow
     }
-    return $version
+    return $pythonMiorVersionDir
+}
+
+function Install-PythonVirtualEnv {
+    [CmdletBinding()]
+    param (
+        [string]$Major = "3",
+        [string]$Minor = "13",
+        [string]$Patch = "3"
+    )
+
+    $venvItTargetDir = (Join-Path -Path $env:APPDATA -ChildPath "VEnvIt_venv")
+    $pythonMiorVersionDir = Join-Path -Path $env:VENV_PYTHON_BASE_DIR -ChildPath ("Python$Major$Minor")
+    $pythonRepoPath = Join-Path -Path $pythonMiorVersionDir -ChildPath "python.exe"
+
+    if (-not (Test-Path $pythonRepoPath)) {
+        Write-Error "Environment variable $pythonMiorVersionDir does not point to a valid directory."
+        return
+    }
+
+    Write-Host "Creating virtual environment using Python at '$venvItTargetDir'..."
+    & $pythonRepoPath -m venv $venvItTargetDir
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Virtual environment successfully created at: $venvItTargetDir"
+    }
+    else {
+        Write-Error "Failed to create virtual environment."
+    }
+    return (Join-Path -Path $venvItTargetDir -ChildPath "Scripts\python.exe")
 }
 
 function Invoke-Script {
@@ -343,6 +373,6 @@ function Unpublish-EnvironmentVariables {
 Export-ModuleMember -Variable defEnvVarSet_7_0_0, separator, sourceFileCompleteList, sourceFileCopyList
 Export-ModuleMember -Function Backup-ArchiveOldVersion, Backup-ScriptToArchiveIfExists, Clear-NonSystemMandatoryEnvironmentVariables
 Export-ModuleMember -Function Confirm-SystemEnvironmentVariablesExist, Copy-Deep, Get-ReadAndSetEnvironmentVariables, Get-ConfigFileName
-Export-ModuleMember -Function Get-ManifestFileName, Get-SecretsFileName, Get-Version, Invoke-Executable, Invoke-Script, New-CustomTempDir
-Export-ModuleMember -Function Publish-EnvironmentVariables, Read-YesOrNo
+Export-ModuleMember -Function Get-ManifestFileName, Get-SecretsFileName, Get-Version, Install-PythonRepository, Install-PythonVirtualEnv
+Export-ModuleMember -Function Invoke-Executable, Invoke-Script, New-CustomTempDir, Publish-EnvironmentVariables, Read-YesOrNo
 Export-ModuleMember -Function Show-EnvironmentVariables, Unpublish-EnvironmentVariables

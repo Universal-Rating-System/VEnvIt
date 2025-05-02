@@ -4,6 +4,7 @@ $separator = "-" * 80
 
 Write-Host $separator -ForegroundColor Cyan
 Write-Host "Current system variable values" -ForegroundColor Green
+Write-Host "APPDATA =                  $env:APPDATA"
 Write-Host "PROJECTS_BASE_DIR =        $env:PROJECTS_BASE_DIR"
 Write-Host "VENV_BASE_DIR =            $env:VENV_BASE_DIR"
 Write-Host "VENV_CONFIG_DEFAULT_DIR =  $env:VENV_CONFIG_DEFAULT_DIR"
@@ -25,6 +26,7 @@ Write-Host "SECRETS_DIR =              $env:SECRETS_DIR"
 Write-Host "VENV_CONFIG_DIR =          $env:VENV_CONFIG_DIR"
 Write-Host "VENV_SECRETS_DIR =         $env:VENV_SECRETS_USER_DIR"
 
+$env:APPDATA = "C:\Users\bee\AppData\Roaming"
 $env:PROJECTS_BASE_DIR = "D:\Dropbox\Projects"
 $env:RTE_ENVIRONMENT = $null
 $env:SCRIPTS_DIR = $null
@@ -48,6 +50,7 @@ $env:PROJECT_NAME = "VenvIt"
 $env:VIRTUAL_ENV = "D:\GoogleDrive\venv\venvit_env"
 # $env:VIRTUAL_ENV = $null
 
+[System.Environment]::SetEnvironmentVariable("APPDATA", $env:APPDATA, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $env:PROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $env:RTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable("SCRIPTS_DIR", $env:SCRIPTS_DIR, [System.EnvironmentVariableTarget]::Machine)
@@ -69,6 +72,7 @@ $env:VIRTUAL_ENV = "D:\GoogleDrive\venv\venvit_env"
 
 Write-Host $separator -ForegroundColor Cyan
 Write-Host "Current system variable values" -ForegroundColor Green
+Write-Host "APPDATA =                  $env:APPDATA"
 Write-Host "PROJECTS_BASE_DIR =        $env:PROJECTS_BASE_DIR"
 Write-Host "VENV_BASE_DIR =            $env:VENV_BASE_DIR"
 Write-Host "VENV_CONFIG_DEFAULT_DIR =  $env:VENV_CONFIG_DEFAULT_DIR"

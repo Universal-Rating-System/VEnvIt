@@ -10,6 +10,7 @@ $VersionChanges = @{
     '0.0.0' = 'Invoke-Upgrade_0_0_0'
     '6.0.0' = 'Invoke-PrepForUpgrade_6_0_0'
     '7.0.0' = 'Invoke-PrepForUpgrade_7_0_0'
+    '7.2.0' = 'Invoke-PrepForUpgrade_7_2_0'
 }
 $PreVersion600EnvVars = @( "RTE_ENVIRONMENT", "SCRIPTS_DIR", "SECRETS_DIR" )
 $PreVersion700EnvVars = @( "VENV_CONFIG_DIR", "VENV_SECRETS_DIR" )
@@ -61,6 +62,12 @@ function Invoke-PrepForUpgrade_7_0_0 {
     foreach ($var in $PreVersion700EnvVars) {
         Remove-EnvVarIfExists -EnvVarName $var
     }
+}
+
+function Invoke-PrepForUpgrade_7_2_0 {
+    # Apply necessary changes and cleanup to prepare and implement v7.2.0
+    # The current installed version is v7.0.0
+    Write-Host "v7.2.0 preparation steps are done." -ForegroundColor Green
 }
 
 function Remove-EnvVarIfExists {

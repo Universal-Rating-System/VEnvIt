@@ -242,6 +242,66 @@ Describe "Function Tests" {
         }
     }
 
+    Context 'Install-PythonRepository' {
+
+        BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
+
+            $mockInstalVal = Set-TestSetup_7_0_0
+            $major = "3"
+            $minor = "13"
+            $patch = "3"
+        }
+
+        AfterAll {
+            # Clean up
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force | Out-Null
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+        }
+
+        It 'Should call Invoke-WebRequest with the correct URL and output path' {
+            $pythonRepoDir = Install-PythonRepository -Major $major -Minor $minor -Patch $patch
+
+            $pythonPath = Join-Path -Path $pythonRepoDir -ChildPath "python.exe"
+            Test-Path $pythonPath | Should -Be $true
+        }
+    }
+
+    Context 'Install-PythonVirtualEnv' {
+
+        BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
+
+            $mockInstalVal = Set-TestSetup_7_0_0
+            $major = "3"
+            $minor = "13"
+            $patch = "3"
+        }
+
+        AfterAll {
+            # Clean up
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force | Out-Null
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+        }
+
+        It 'Creates a virtual environment' {
+            $pythonVenvPAth = Install-PythonVirtualEnv -Major $major -Minor $minor -Patch $patch
+
+            # $pythonVenvPath = Join-Path -Path $pythonVenvDir -ChildPath "scripts/python.exe"
+            Test-Path $pythonVenvPath | Should -Be $true
+        }
+    }
+
     Context "Invoke-Script" {
         BeforeEach {
             $tempDir = New-CustomTempDir -Prefix "VenvIt"
