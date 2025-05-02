@@ -31,8 +31,21 @@ $ManifestData700 = @{
     Description = "Description of 7.0.0"
 }
 
+$VEnvMyOrgEnvVarDotPs1 = @'
+Write-Host "--------------------------------------------------------------------------------" -ForegroundColor Cyan
+Write-Host "Executing $PSCommandPath..." -ForegroundColor Yellow
+$env:VENV_PY_VER = "312"
+$env:PROJECT_NAME = "MyProject"
+$env:VENV_ORGANIZATION_NAME = "MyOrg"
+$env:PROJECT_DIR = "$env:PROJECTS_BASE_DIR\$env:VENV_ORGANIZATION_NAME\$env:PROJECT_NAME"
+$env:PYTHONPATH = "$env:PROJECT_DIR\.;$env:PROJECT_DIR\src;$env:PROJECT_DIR\tests"
+$env:VENV_ENVIRONMENT = "loc_dev"
+
+'@ -replace '\r?\n', "`r`n"
+
 function Backup-SessionEnvironmentVariables {
     return [PSCustomObject]@{
+        APPDATA                  = $env:APPDATA
         PROJECT_NAME             = $env:PROJECT_NAME
         PROJECTS_BASE_DIR        = $env:PROJECTS_BASE_DIR
         RTE_ENVIRONMENT          = $env:RTE_ENVIRONMENT
@@ -53,6 +66,7 @@ function Backup-SessionEnvironmentVariables {
 
 function Backup-SystemEnvironmentVariables {
     return [PSCustomObject]@{
+        APPDATA                  = [System.Environment]::GetEnvironmentVariable("APPDATA", [System.EnvironmentVariableTarget]::Machine)
         PROJECT_NAME             = [System.Environment]::GetEnvironmentVariable("PROJECT_NAME", [System.EnvironmentVariableTarget]::Machine)
         PROJECTS_BASE_DIR        = [System.Environment]::GetEnvironmentVariable("PROJECTS_BASE_DIR", [System.EnvironmentVariableTarget]::Machine)
         RTE_ENVIRONMENT          = [System.Environment]::GetEnvironmentVariable("RTE_ENVIRONMENT", [System.EnvironmentVariableTarget]::Machine)
@@ -89,6 +103,11 @@ function ConvertFrom-ProdToTestEnvVar {
             }
             elseif (-not $newEnvVarSet[$envVar]["DefVal"]) {
                 $newEnvVarSet[$envVar]["DefVal"] = $tempDir
+            }
+            elseif ($envVar -eq "VENV_PYTHON_BASE_DIR") {
+                if (-not (Test-Path -Path $newEnvVarSet[$envVar]["DefVal"])){
+                    $newEnvVarSet[$envVar]["DefVal"] = $tempDir
+                }
             }
             else {
                 $lastChild = Split-Path -Path $newEnvVarSet[$envVar]["DefVal"] -Leaf
@@ -232,6 +251,14 @@ function Set-TestSetup_7_0_0 {
         New-Item -Path $scriptPath -ItemType File -Force | Out-Null
         Set-Content -Path $scriptPath -Value ('Write-Host "Executing ' + $fileName + '"')
     }
+    # Create Python repository mock directories
+    $env:APPDATA = (Join-Path -Path $mockInstalVal.TempDir -ChildPath $env:USERNAME)
+    New-Item -ItemType Directory -Path $env:APPDATA | Out-Null
+    # $python313Dir = (Join-Path -Path $env:VENV_PYTHON_BASE_DIR -ChildPath "Python313")
+    # New-Item -ItemType Directory -Path $python313Dir | Out-Null
+    # $python313Exe = (Join-Path -Path $python313Dir -ChildPath "python.exe")
+    # New-Item -ItemType File -Force -Path $python313Exe | Out-Null
+    # Set-Content -Path $python313Exe -Value 'My mock exe file'
 
     # Create the secrtet's files
     $directories = @( $env:VENV_SECRETS_DEFAULT_DIR, $env:VENV_SECRETS_USER_DIR )
@@ -309,6 +336,7 @@ function Restore-SessionEnvironmentVariables {
     param(
         [PSCustomObject]$OriginalValues
     )
+    $env:APPDATA = $OriginalValues.APPDATA
     $env:PROJECT_NAME = $OriginalValues.PROJECT_NAME
     $env:PROJECTS_BASE_DIR = $OriginalValues.PROJECTS_BASE_DIR
     $env:RTE_ENVIRONMENT = $OriginalValues.RTE_ENVIRONMENT
@@ -331,6 +359,7 @@ function Restore-SystemEnvironmentVariables {
     param(
         [PSCustomObject]$OriginalValues
     )
+    [System.Environment]::SetEnvironmentVariable("APPDATA", $OriginalValues.APPDATA, [System.EnvironmentVariableTarget]::Machine)
     [System.Environment]::SetEnvironmentVariable("PROJECT_NAME", $OriginalValues.PROJECT_NAME, [System.EnvironmentVariableTarget]::Machine)
     [System.Environment]::SetEnvironmentVariable("PROJECTS_BASE_DIR", $OriginalValues.PROJECTS_BASE_DIR, [System.EnvironmentVariableTarget]::Machine)
     [System.Environment]::SetEnvironmentVariable("RTE_ENVIRONMENT", $OriginalValues.RTE_ENVIRONMENT, [System.EnvironmentVariableTarget]::Machine)
@@ -350,4 +379,4 @@ function Restore-SystemEnvironmentVariables {
 Export-ModuleMember -Function Backup-SessionEnvironmentVariables, Backup-SystemEnvironmentVariables, ConvertFrom-ProdToTestEnvVar
 Export-ModuleMember -Function Set-TestSetup_0_0_0, Set-TestSetup_6_0_0, Set-TestSetup_7_0_0, Set-TestSetup_InstallationFiles, Set-TestSetup_New
 Export-ModuleMember -Function New-CreateAppScripts, New-TestEnvironment, Restore-SessionEnvironmentVariables, Restore-SystemEnvironmentVariables
-Export-ModuleMember -Variable ManifestData000, ManifestData600, ManifestData700, sourceFileCopyList
+Export-ModuleMember -Variable ManifestData000, ManifestData600, ManifestData700, sourceFileCopyList, VEnvMyOrgEnvVarDotPs1

@@ -2,7 +2,7 @@
 
 BeforeAll {
     if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-    Import-Module $PSScriptRoot\..\src\Utils.psm1
+    Import-Module $PSScriptRoot\Utils.psm1
 }
 
 function Convert-PyprojectToml {

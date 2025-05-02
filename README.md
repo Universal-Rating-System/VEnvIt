@@ -1,7 +1,7 @@
 # VEnvIt
 
 | **Category** | **Status' and Links** |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
 | General | \[![][maintenance_y_img]\][maintenance_y_lnk] \[![][semver_pic]\][semver_link] |
 | CI | \[![][pre_commit_ci_img]\][pre_commit_ci_lnk] \[![][codecov_img]\][codecov_lnk] \[![][gha_docu_img]\][gha_docu_lnk] |
 | Github | \[![][gh_issues_img]\][gh_issues_lnk] \[![][gh_language_img]\][gh_language_lnk] \[![][gh_last_commit_img]\][gh_last_commit_lnk] |
@@ -155,7 +155,7 @@ When you create a new virtual environment using `vn.ps1`, it generates additiona
 VEnvIt utilizes several environment variables to manage virtual environments effectively. These variables should be set during installation.
 
 | Environment Variable | Description |
-| -------------------- | ----------- |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **PROJECTS_BASE_DIR** | The parent/base directory for all projects (e.g., `C:\Projects`). Organize repositories by organization, such as personal projects and organizational projects (e.g., `C:\Projects\MyOrg\MyProject`, `C:\Projects\Company\CompanyProject`). |
 | **VENV_BASE_DIR** | The directory where the Python virtual environments are stored (e.g., `~\venv`). Unlike the conventional practice of keeping virtual environment files within the project directory, all virtual environments are stored together in this dedicated directory. |
 | **VENV_CONFIG_DEFAULT_DIR** | Directory for default (organization-wide) configuration scripts. Typically a subdirectory of `VENVIT_DIR` (e.g., `$VENVIT_DIR\Configs`). Shared among all developers. |
@@ -288,3 +288,20 @@ For support or any questions, please open an issue on the [Issue Tracker](https:
 # Example Usage of `vn.ps1`, `vi.ps1`, and `vr.ps1`
 
 _To be completed in future updates._
+
+[codecov_img]: https://img.shields.io/codecov/c/gh/BrightEdgeeServices/venvit "CodeCov"
+[codecov_lnk]: (https://app.codecov.io/gh/BrightEdgeeServices/venvit) "CodeCov"
+[gha_docu_img]: https://img.shields.io/readthedocs/venvit "Read the Docs"
+[gha_docu_lnk]: https://github.com/BrightEdgeeServices/venvit/blob/master/.github/workflows/02-check-documentation.yml "Read the Docs"
+[gh_issues_img]: https://img.shields.io/github/issues-raw/BrightEdgeeServices/venvit "GitHub - Issue Counter"
+[gh_issues_lnk]: https://github.com/BrightEdgeeServices/venvit/issues "GitHub - Issue Counter"
+[gh_language_img]: https://img.shields.io/github/languages/top/BrightEdgeeServices/venvit "GitHub - Top Language"
+[gh_language_lnk]: https://github.com/BrightEdgeeServices/venvit "GitHub - Top Language"
+[gh_last_commit_img]: https://img.shields.io/github/last-commit/BrightEdgeeServices/venvit/master "GitHub - Last Commit"
+[gh_last_commit_lnk]: https://github.com/BrightEdgeeServices/venvit/commit/master "GitHub - Last Commit"
+[maintenance_y_img]: https://img.shields.io/badge/Maintenance%20Intended-%E2%9C%94-green.svg?style=flat-square "Maintenance - intended"
+[maintenance_y_lnk]: http://unmaintained.tech/ "Maintenance - intended"
+[pre_commit_ci_img]: https://img.shields.io/github/actions/workflow/status/BrightEdgeeServices/venvit/01-pre-commit-and-document-check.yml?label=pre-commit "Pre-Commit"
+[pre_commit_ci_lnk]: https://github.com/BrightEdgeeServices/venvit/blob/master/.github/workflows/01-pre-commit-and-document-check.yml "Pre-Commit"
+[semver_link]: https://semver.org/ "Sentic Versioning - 2.0.0"
+[semver_pic]: https://img.shields.io/badge/Semantic%20Versioning-2.0.0-brightgreen.svg?style=flat-square "Sentic Versioning - 2.0.0"

@@ -10,7 +10,7 @@ BeforeAll {
     Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
 }
 
-Describe "Function Tests" {
+Describe "Utils.Test.ps1: Function Tests" {
     BeforeAll {
         # if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
         # Import-Module $PSScriptRoot\Publish-TestResources.psm1
@@ -69,6 +69,29 @@ Describe "Function Tests" {
         BeforeAll {}
         It "TODO Backup-ScriptToArchiveIfExists" {}
         AfterAll {}
+    }
+
+    Context "Clear-NonSystemMandatoryEnvironmentVariables" {
+        BeforeEach {
+
+            $envVarSet = @{
+                TEST_ONE = @{DefVal = "Test one"; IsDir = $true; SystemMandatory = $true }
+                TEST_TWO = @{DefVal = "Test two"; IsDir = $true; SystemMandatory = $false }
+            }
+            Publish-EnvironmentVariables -EnvVarSet $envVarSet
+        }
+
+        It "Should clear non mandatory variables" {
+            (Get-Item -Path ("env:TEST_ONE")).Value | Should -Be "Test one"
+            (Get-Item -Path ("env:TEST_TWO")).Value | Should -Be "Test two"
+            Clear-NonSystemMandatoryEnvironmentVariables $envVarSet
+            (Get-Item -Path ("env:TEST_ONE")).Value | Should -Be "Test one"
+            Test-Path env:TEST_TWO | Should -Be $false
+        }
+
+        AfterEach {
+            Unpublish-EnvironmentVariables $envVarSet
+        }
     }
 
     Context "Confirm-SystemEnvironmentVariablesExist" {
@@ -175,7 +198,6 @@ Describe "Function Tests" {
         }
     }
 
-
     Context "Get-SecretsFileName" {
         BeforeAll {
         }
@@ -217,6 +239,66 @@ Describe "Function Tests" {
         }
         AfterEach {
             Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force
+        }
+    }
+
+    Context 'Install-PythonRepository' {
+
+        BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
+
+            $mockInstalVal = Set-TestSetup_7_0_0
+            $major = "3"
+            $minor = "13"
+            $patch = "3"
+        }
+
+        AfterAll {
+            # Clean up
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force | Out-Null
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+        }
+
+        It 'Should call Invoke-WebRequest with the correct URL and output path' {
+            $pythonRepoDir = Install-PythonRepository -Major $major -Minor $minor -Patch $patch
+
+            $pythonPath = Join-Path -Path $pythonRepoDir -ChildPath "python.exe"
+            Test-Path $pythonPath | Should -Be $true
+        }
+    }
+
+    Context 'Install-PythonVirtualEnv' {
+
+        BeforeAll {
+            if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+            Import-Module $PSScriptRoot\..\src\Utils.psm1
+
+            $originalSessionValues = Backup-SessionEnvironmentVariables
+            $originalSystemValues = Backup-SystemEnvironmentVariables
+
+            $mockInstalVal = Set-TestSetup_7_0_0
+            $major = "3"
+            $minor = "13"
+            $patch = "3"
+        }
+
+        AfterAll {
+            # Clean up
+            Remove-Item -Path $mockInstalVal.TempDir -Recurse -Force | Out-Null
+            Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
+            Restore-SystemEnvironmentVariables -OriginalValues $originalSystemValues
+        }
+
+        It 'Creates a virtual environment' {
+            $pythonVenvPAth = Install-PythonVirtualEnv -Major $major -Minor $minor -Patch $patch
+
+            # $pythonVenvPath = Join-Path -Path $pythonVenvDir -ChildPath "scripts/python.exe"
+            Test-Path $pythonVenvPath | Should -Be $true
         }
     }
 

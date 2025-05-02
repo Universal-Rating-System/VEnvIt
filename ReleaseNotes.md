@@ -1,3 +1,15 @@
+# Release 7.2.0
+
+Establish Python as the primary execution environment for VEnvIt to ensure cross-platform compatibility and minimize reliance on PowerShell.
+
+______________________________________________________________________
+
+# Release 7.1.0
+
+Forked version to Universal-Rating-System
+
+______________________________________________________________________
+
 # Release 7.0.0
 
 - Removed reduandant (commented) code in several files.

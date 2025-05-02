@@ -9,7 +9,7 @@ BeforeAll {
 
 }
 
-Describe "Function Tests" {
+Describe "Upgrade.Tests.ps1: Function Tests" {
     BeforeAll {
         if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
         Import-Module $PSScriptRoot\..\src\Utils.psm1

@@ -1,6 +1,6 @@
 ﻿# Install.Tests.ps1
 
-Describe "Function Tests" {
+Describe "Install.Tests.ps1: Function Tests" {
     Context "Invoke-Install" {
         BeforeAll {
             . $PSScriptRoot\..\src\Install.ps1 -Pester
@@ -71,7 +71,7 @@ Describe "Function Tests" {
     }
 }
 
-Describe "Install.ps1 testing" {
+Describe "Install.Tests.ps1: Testing" {
     # Test to be implemented
 }
 

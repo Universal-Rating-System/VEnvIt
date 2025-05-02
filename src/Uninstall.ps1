@@ -49,54 +49,6 @@ function Invoke-Uninstall {
     if ((Get-Module -Name "Utils") -and $Pester ) {
         Remove-Module -Name "Utils"
     }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
-    if ((Get-Module -Name "Utils") -and $Pester ) {
-        Remove-Module -Name "Utils"
-    }
     Import-Module $PSScriptRoot\Utils.psm1
 
     if (-not $BackupDir) {

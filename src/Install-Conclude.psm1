@@ -3,13 +3,13 @@
 if (Get-Module -Name "Conclude-UpgradePrep") { Remove-Module -Name "Conclude-UpgradePrep" }
 Import-Module $PSScriptRoot\..\src\Conclude-UpgradePrep.psm1
 if ((Get-Module -Name "Utils") -and $Pester ) {
-    if (Test-Path function:function:prompt) { Copy-Item -Path function:prompt -Destination function:bakupPrompt }
+    if (Test-Path ) { Copy-Item -Path function:prompt -Destination function:bakupPrompt }
     if (Test-Path function:_OLD_VIRTUAL_PROMPT) { Copy-Item function:_OLD_VIRTUAL_PROMPT -Destination function:backup_OLD_VIRTUAL_PROMPT }
     Remove-Module -Name "Utils"
     if (Test-Path function:function:bakupPrompt) { Copy-Item -Path function:bakupPrompt -Destination function:prompt }
     if (Test-Path function:backup_OLD_VIRTUAL_PROMPT) { Copy-Item -Path function:backup_OLD_VIRTUAL_PROMPT -Destination function:_OLD_VIRTUAL_PROMPT }
 }
-Import-Module $PSScriptRoot\..\src\Utils.psm1
+Import-Module $PSScriptRoot\Utils.psm1
 $separator = "-" * 80
 
 function Clear-InstallationFiles {
@@ -25,7 +25,7 @@ function Invoke-ConcludeInstall {
         [string]$UpgradeScriptDir
     )
     if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-    Import-Module $PSScriptRoot\..\src\Utils.psm1
+    Import-Module $PSScriptRoot\Utils.psm1
 
     # Check for administrative privileges
     if (-not (Test-Admin)) {
@@ -39,6 +39,8 @@ function Invoke-ConcludeInstall {
     Get-ReadAndSetEnvironmentVariables -EnvVarSet $defEnvVarSet_7_0_0
     Set-Path
     Write-Host "Environment variables have been set successfully." -ForegroundColor Green
+    Install-PythonRepository -Major "3" -Minor "13" -Patch "3"
+    $venvPythonPath = Install-PythonVirtualEnv -Major "3" -Minor "13" -Patch "3"
     New-Directories -EnvVarSet $defEnvVarSet_7_0_0
     Publish-LatestVersion -UpgradeSourceDir $UpgradeScriptDir
     Publish-Secrets -UpgradeScriptDir $UpgradeScriptDir
@@ -78,7 +80,7 @@ function Publish-LatestVersion {
         $UpgradeSourceDir
     )
     if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
-    Import-Module $PSScriptRoot\..\src\Utils.psm1
+    Import-Module $PSScriptRoot\Utils.psm1
 
     foreach ($filename in $sourceFileCompleteList) {
         $barefilename = Split-Path -Path $filename -Leaf
@@ -125,5 +127,5 @@ function Test-Admin {
     return Invoke-IsInRole -Principal $Principal -Role $adminRole
 }
 
-Export-ModuleMember -Function Clear-InstallationFiles, Invoke-ConcludeInstall, Invoke-IsInRole, New-Directories
-Export-ModuleMember -Function Publish-LatestVersion, Publish-Secrets, Set-Path, Test-Admin
+Export-ModuleMember -Function Clear-InstallationFiles, Install-PythonVirtualEnv , Invoke-ConcludeInstall, Invoke-IsInRole
+Export-ModuleMember -Function New-Directories, Publish-LatestVersion, Publish-Secrets, Set-Path, Test-Admin

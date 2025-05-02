@@ -12,7 +12,13 @@ param (
     [Switch]$Pester
 )
 
-if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
+if ((Get-Module -Name "Utils") -and $Pester ) {
+    if (Test-Path function:function:prompt) { Copy-Item -Path function:prompt -Destination function:bakupPrompt }
+    if (Test-Path function:_OLD_VIRTUAL_PROMPT) { Copy-Item function:_OLD_VIRTUAL_PROMPT -Destination function:backup_OLD_VIRTUAL_PROMPT }
+    Remove-Module -Name "Utils"
+    if (Test-Path function:function:bakupPrompt) { Copy-Item -Path function:bakupPrompt -Destination function:prompt }
+    if (Test-Path function:backup_OLD_VIRTUAL_PROMPT) { Copy-Item -Path function:backup_OLD_VIRTUAL_PROMPT -Destination function:_OLD_VIRTUAL_PROMPT }
+}
 Import-Module $PSScriptRoot\Utils.psm1
 
 function New-ProjectArchive {
@@ -46,7 +52,7 @@ function Unregister-VirtualEnvironment {
     # Deactivate the current virtual environment if it is active
     if ($env:VIRTUAL_ENV) {
         "Deactivate VEnv $env:VIRTUAL_ENV."
-        Invoke-Script -ScriptPath "deactivate"
+        Invoke-Script -ScriptPath "deactivate" | Out-Null
     }
 
     New-ProjectArchive -ProjectName $ProjectName
@@ -60,6 +66,7 @@ function Unregister-VirtualEnvironment {
     else {
         Write-Host "Not removed: $venv_dir (does not exist)."
     }
+    Clear-NonSystemMandatoryEnvironmentVariables $defEnvVarSet_7_0_0
 }
 
 
