@@ -10,7 +10,7 @@ BeforeAll {
     Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
 }
 
-Describe "Function Tests" {
+Describe "Utils.Test.ps1: Function Tests" {
     BeforeAll {
         # if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
         # Import-Module $PSScriptRoot\Publish-TestResources.psm1

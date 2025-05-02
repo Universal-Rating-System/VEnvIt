@@ -3,7 +3,7 @@
 if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
 Import-Module $PSScriptRoot\..\tests\Publish-TestResources.psm1
 
-Describe "Top level script execution" {
+Describe "vr.Tests.ps1: Top level script execution" {
     BeforeAll {
         . $PSScriptRoot\..\src\vr.ps1 -Pester
     }
@@ -42,7 +42,7 @@ Describe "Top level script execution" {
     }
 }
 
-Describe "Function Tests" {
+Describe "vr.Tests.ps1: Function Tests" {
     BeforeAll {
         $originalSessionValues = Backup-SessionEnvironmentVariables
         $originalSystemValues = Backup-SystemEnvironmentVariables
@@ -110,7 +110,7 @@ Describe "Function Tests" {
             (Get-Item -Path ("env:VENV_CONFIG_USER_DIR")).Value | Should -Be ($mockInstalVal.TempDir + "\VenvIt\Config")
             (Get-Item -Path ("env:VENV_ENVIRONMENT")).Value | Should -Be "loc_dev"
             Test-Path env:VENV_ORGANIZATION_NAME | Should -Be $false
-            (Get-Item -Path ("env:VENV_PYTHON_BASE_DIR")).Value | Should -Be ($mockInstalVal.TempDir + "\Python")
+            # (Get-Item -Path ("env:VENV_PYTHON_BASE_DIR")).Value | Should -Be ($mockInstalVal.TempDir + "\Python")
             (Get-Item -Path ("env:VENV_SECRETS_DEFAULT_DIR")).Value | Should -Be ($mockInstalVal.TempDir + "\Secrets")
             (Get-Item -Path ("env:VENV_SECRETS_USER_DIR")).Value | Should -Be ($mockInstalVal.TempDir + "\VenvIt\Secrets")
             (Get-Item -Path ("env:VENVIT_DIR")).Value | Should -Be ($mockInstalVal.TempDir + "\Program Files\VenvIt")

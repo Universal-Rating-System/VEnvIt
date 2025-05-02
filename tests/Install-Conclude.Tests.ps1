@@ -7,7 +7,7 @@ BeforeAll {
     Import-Module $PSScriptRoot\..\src\Install-Conclude.psm1
 }
 
-Describe "Function Tests" {
+Describe "Install-Conclude.Tests.ps1: Function Tests" {
     BeforeAll {
         # This test must be run with administrator rights.
         if (-not (Test-Admin)) {

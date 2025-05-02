@@ -11,7 +11,7 @@ BeforeAll {
     Import-Module $PSScriptRoot\..\src\Utils.psm1
 }
 
-Describe "Function Tests" {
+Describe "Uninstall.Tests.ps1: Function Tests" {
     BeforeAll {
         # if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
         # Import-Module $PSScriptRoot\Publish-TestResources.psm1

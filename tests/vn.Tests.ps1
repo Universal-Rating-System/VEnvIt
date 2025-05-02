@@ -1,6 +1,6 @@
 # vn.Tests.ps1
 
-Describe "Top level script execution" {
+Describe "vn.Tests.ps1: Top level script execution" {
     BeforeAll {
         . $PSScriptRoot\..\src\vn.ps1 -Pester
     }
@@ -39,7 +39,7 @@ Describe "Top level script execution" {
     }
 }
 
-Describe "Function Tests" {
+Describe "vn.Tests.ps1: Function Tests" {
     BeforeAll {
         if (Get-Module -Name "Utils") { Remove-Module -Name "Utils" }
         Import-Module $PSScriptRoot\..\src\Utils.psm1
