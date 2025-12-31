@@ -7,7 +7,7 @@ on:
   workflow_dispatch:      # Allows manual trigger
 
 jobs:
-  all-temp-fork-scheduled_sync_with_upstream-weekly:
+  all-temp-fork-pub_scheduled_sync_with_upstream-weekly:
     permissions:
       id-token: write
       contents: write
