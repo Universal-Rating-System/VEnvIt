@@ -7,7 +7,7 @@ BeforeAll {
     Import-Module $PSScriptRoot\..\src\Utils.psm1
 }
 
-Describe "Top level script execution" {
+Describe "Uninstall.Tests.ps1: Top level script execution" {
     BeforeAll {
         . $PSScriptRoot\..\src\Uninstall.ps1 -Pester
     }
@@ -54,7 +54,7 @@ Describe "Top level script execution" {
     }
 }
 
-Describe "Function Tests" {
+Describe "Uninstall.Tests.ps1: Function Tests" {
     BeforeAll {
         . $PSScriptRoot\..\src\Uninstall.ps1 -Pester
         if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }

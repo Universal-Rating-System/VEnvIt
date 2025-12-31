@@ -22,19 +22,19 @@ function Invoke-VirtualEnvironment {
     }
     Import-Module $PSScriptRoot\Utils.psm1
 
-    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar"))
-    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar"))
+    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar")) | Out-Null
+    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "EnvVar")) | Out-Null
 
     if ($env:VIRTUAL_ENV) {
         "Deactivate VEnv $env:VIRTUAL_ENV."
-        Invoke-Script -ScriptPath "deactivate"
+        Invoke-Script -ScriptPath "deactivate" | Out-Null
     }
-    Invoke-Script -ScriptPath ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1")
+    Invoke-Script -ScriptPath ($env:VENV_BASE_DIR + "\" + $env:PROJECT_NAME + "_env\Scripts\activate.ps1") | Out-Null
 
     # $env:PROJECT_NAME = $_project_name
     if ($env:VENV_ENVIRONMENT -eq "loc_dev") {
-        Invoke-Script -ScriptPath ("$env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1")
-        Invoke-Script -ScriptPath ("$env:VENV_SECRETS_USER_DIR\secrets.ps1")
+        Invoke-Script -ScriptPath ("$env:VENV_SECRETS_DEFAULT_DIR\secrets.ps1") | Out-Null
+        Invoke-Script -ScriptPath ("$env:VENV_SECRETS_USER_DIR\secrets.ps1") | Out-Null
     }
 
     # Remove temporary directories from previous sessions
@@ -53,8 +53,8 @@ function Invoke-VirtualEnvironment {
         Set-Location -Path $env:PROJECTS_BASE_DIR
     }
 
-    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup"))
-    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup"))
+    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_DEFAULT_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup")) | Out-Null
+    Invoke-Script -ScriptPath ("$env:VENV_CONFIG_USER_DIR\" + (Get-ConfigFileName -ProjectName $ProjectName -Postfix "CustomSetup")) | Out-Null
 }
 
 # function ShowEnvVarHelp {

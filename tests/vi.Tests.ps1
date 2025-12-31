@@ -1,6 +1,6 @@
 # vi.Tests.ps1
 
-Describe "Top level script execution" {
+Describe "vi.Tests.ps1: Top level script execution" {
     BeforeAll {
         . $PSScriptRoot\..\src\vi.ps1 -Pester
     }
@@ -46,9 +46,9 @@ Describe "Top level script execution" {
             & $PSScriptRoot\..\src\vi.ps1
             Assert-MockCalled -CommandName "Show-Help" -Exactly 1
         }
-    AfterEach {
-        Restore-SessionEnvironmentVariables -OriginalValues $originalValues
-    }
+        AfterEach {
+            Restore-SessionEnvironmentVariables -OriginalValues $originalValues
+        }
     }
     AfterEach {
         Restore-SessionEnvironmentVariables -OriginalValues $originalSessionValues
@@ -56,7 +56,7 @@ Describe "Top level script execution" {
     }
 }
 
-Describe "Function Tests" {
+Describe "vi.Tests.ps1: Function Tests" {
     Context "Invoke-VirtualEnvironment" {
         BeforeAll {
         }

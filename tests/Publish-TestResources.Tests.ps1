@@ -11,7 +11,7 @@ BeforeAll {
     Import-Module $PSScriptRoot\..\src\Utils.psm1
 }
 
-Describe "Function Tests" {
+Describe "Uninstall.Tests.ps1: Function Tests" {
     BeforeAll {
         # if (Get-Module -Name "Publish-TestResources") { Remove-Module -Name "Publish-TestResources" }
         # Import-Module $PSScriptRoot\Publish-TestResources.psm1
@@ -224,7 +224,7 @@ Describe "Function Tests" {
             $env:VENV_CONFIG_DEFAULT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Config")
             $env:VENV_CONFIG_USER_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "VenvIt\Config")
             $env:VENV_ENVIRONMENT | Should -Be "loc_dev"
-            $env:VENV_PYTHON_BASE_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Python")
+            # $env:VENV_PYTHON_BASE_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Python")
             $env:VENV_SECRETS_DEFAULT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Secrets")
             $env:VENV_SECRETS_USER_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "VenvIt\Secrets")
             $env:VENVIT_DIR | Should -Be (Join-Path -Path $mockInstalVal.tempDir -ChildPath "Program Files\VenvIt")

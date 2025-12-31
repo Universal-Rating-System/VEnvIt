@@ -1,6 +1,6 @@
 ﻿# Update-Manifest.Tests.ps1
 
-Describe "Function Tests" {
+Describe "Update-Manifest.Tests.ps1: Function Tests" {
     BeforeAll {
         if (Get-Module -Name "Update-Manifest") { Remove-Module -Name "Update-Manifest" }
         Import-Module $PSScriptRoot\..\src\Update-Manifest.psm1
